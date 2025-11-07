@@ -1,0 +1,25 @@
+{
+  "id": "flame-tsundere",
+  "type": "waifu",
+  "name": "Flame Tsundere",
+  "archetype": "Tsundere",
+  "set": "CORE-01",
+  "rarity": "common",
+  "affection": 8,
+  "bonds": { "start": 0, "max": 12 },
+  "mood": { "thresholds": { "dere": 5, "extreme": 10 } },
+  "tags": ["poke","tempo"],
+  "text": "On Summon: Deal 1 damage to a target waifu. Extreme: +2 damage on first attack each turn.",
+  "effects": [
+    {
+      "when": "onSummon",
+      "do": [ { "type": "damage", "target": "targetWaifu", "amount": 1 } ]
+    },
+    {
+      "when": "onAttack",
+      "do": [ { "type": "damage", "target": "defender", "amount": 2, "note": "Only if mood=Extreme and it's first attack this turn" } ]
+    }
+  ],
+  "flavor": "It's NOT like she wanted to melt your defenses... idiot!",
+  "version": 1
+}

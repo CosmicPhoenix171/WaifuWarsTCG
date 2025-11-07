@@ -1,0 +1,18 @@
+{
+  "id": "example-waifu-id",
+  "type": "waifu",
+  "name": "Example Waifu",
+  "archetype": "Tsundere",
+  "set": "CORE-01",
+  "rarity": "common",
+  "affection": 8,
+  "bonds": { "start": 0, "max": 12 },
+  "mood": { "thresholds": { "dere": 5, "extreme": 10 } },
+  "tags": [],
+  "text": "On Summon: Do something. Activated: Spend 1 {BOND} to do something else.",
+  "effects": [
+    { "when": "onSummon", "do": [ { "type": "damage", "target": "targetWaifu", "amount": 1 } ] }
+  ],
+  "flavor": "Optional flavor.",
+  "version": 1
+}

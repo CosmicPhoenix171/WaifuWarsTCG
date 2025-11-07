@@ -1,0 +1,21 @@
+{
+  "id": "reversal-strike",
+  "type": "trap",
+  "name": "Reversal Strike",
+  "set": "CORE-01",
+  "rarity": "rare",
+  "cost": 2,
+  "tags": ["defense","burst"],
+  "text": "Trap Trigger: When an opponent declares an attack, prevent 2 damage and deal 1 damage to the attacker. If your defending waifu is Extreme, deal 2 instead.",
+  "effects": [
+    {
+      "when": "trapTrigger",
+      "do": [
+        { "type": "prevent", "target": "defender", "amount": 2 },
+        { "type": "damage", "target": "attacker", "amount": 1, "note": "If defending mood=Extreme, amount becomes 2" }
+      ]
+    }
+  ],
+  "flavor": "Tension flips momentum faster than you can say 'baka'.",
+  "version": 1
+}

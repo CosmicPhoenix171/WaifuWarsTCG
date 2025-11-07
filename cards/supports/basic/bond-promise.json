@@ -1,0 +1,21 @@
+{
+  "id": "bond-promise",
+  "type": "support",
+  "name": "Bond Promise",
+  "set": "CORE-01",
+  "rarity": "uncommon",
+  "cost": 1,
+  "tags": ["bond","ramp"],
+  "text": "Choose a waifu. Gain +2 Bonds on that waifu. If that waifu is in Dere or higher, draw a card.",
+  "effects": [
+    {
+      "when": "activated",
+      "do": [
+        { "type": "gainBonds", "target": "targetWaifu", "amount": 2 },
+        { "type": "draw", "target": "you", "amount": 1, "note": "Only if target mood >= Dere" }
+      ]
+    }
+  ],
+  "flavor": "Pinky swear now, panic later.",
+  "version": 1
+}

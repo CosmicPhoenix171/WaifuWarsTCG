@@ -1,0 +1,14 @@
+{
+  "id": "example-trap-id",
+  "type": "trap",
+  "name": "Example Trap",
+  "set": "CORE-01",
+  "rarity": "rare",
+  "cost": 2,
+  "tags": [],
+  "text": "Trap Trigger: When a condition is met, do a thing.",
+  "effects": [
+    { "when": "trapTrigger", "do": [ { "type": "prevent", "target": "defender", "amount": 2 } ] }
+  ],
+  "version": 1
+}

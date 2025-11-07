@@ -1,0 +1,14 @@
+{
+  "id": "example-support-id",
+  "type": "support",
+  "name": "Example Support",
+  "set": "CORE-01",
+  "rarity": "uncommon",
+  "cost": 1,
+  "tags": [],
+  "text": "Choose a waifu: do a helpful thing.",
+  "effects": [
+    { "when": "activated", "do": [ { "type": "draw", "target": "you", "amount": 1 } ] }
+  ],
+  "version": 1
+}

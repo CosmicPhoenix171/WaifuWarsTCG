@@ -1,0 +1,113 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://waifuwarstcg.local/schema/card.schema.json",
+  "title": "Waifu Wars Card",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "type", "rarity", "text", "version"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+      "description": "Kebab-case unique id (e.g., tsundere-firebrand)"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["waifu", "support", "trap"]
+    },
+    "name": { "type": "string" },
+    "archetype": {
+      "type": "string",
+      "enum": [
+        "Tsundere",
+        "Yandere",
+        "Kuudere",
+        "Deredere",
+        "Himedere",
+        "Yangire",
+        "Kamidere",
+        "Dandere"
+      ]
+    },
+    "set": { "type": "string", "default": "CORE-01" },
+    "rarity": { "type": "string", "enum": ["common","uncommon","rare","mythic"] },
+    "tags": { "type": "array", "items": { "type": "string" } },
+    "flavor": { "type": "string" },
+    "version": { "type": "integer", "minimum": 1 },
+
+    "text": { "type": "string" },
+
+    "affection": { "type": "integer", "minimum": 1 },
+    "bonds": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "start": { "type": "integer", "minimum": 0, "default": 0 },
+        "max": { "type": "integer", "minimum": 1, "default": 12 }
+      }
+    },
+    "mood": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "thresholds": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "dere": { "type": "integer", "minimum": 0 },
+            "extreme": { "type": "integer", "minimum": 0 }
+          },
+          "required": ["dere", "extreme"]
+        }
+      }
+    },
+
+    "cost": { "type": "integer", "minimum": 0 },
+
+    "effects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "when": { "type": "string", "enum": [
+            "onSummon","onAttack","onDamage","activated","trapTrigger","finalStand","confession"
+          ]},
+          "cost": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": { "bonds": { "type": "integer", "minimum": 0 } }
+          },
+          "do": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": { "type": "string", "enum": [
+                  "damage","heal","gainBonds","loseBonds","draw","summon","buff","debuff","redirect","prevent"
+                ]},
+                "target": { "type": "string" },
+                "amount": { "type": "number" },
+                "note": { "type": "string" }
+              },
+              "required": ["type"]
+            }
+          }
+        },
+        "required": ["when", "do"]
+      }
+    }
+  },
+
+  "allOf": [
+    {
+      "if": { "properties": { "type": { "const": "waifu" } } },
+      "then": { "required": ["archetype","affection","bonds","mood"] }
+    },
+    {
+      "if": { "properties": { "type": { "enum": ["support","trap"] } } },
+      "then": { "required": ["cost"] }
+    }
+  ]
+}

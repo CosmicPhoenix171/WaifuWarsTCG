@@ -1,0 +1,49 @@
+{
+  "waifu": [
+    {
+      "id": "flame-tsundere",
+      "type": "waifu",
+      "name": "Flame Tsundere",
+      "archetype": "Tsundere",
+      "rarity": "common",
+      "tags": [
+        "poke",
+        "tempo"
+      ],
+      "set": "CORE-01",
+      "affection": 8,
+      "mood": {
+        "dere": 5,
+        "extreme": 10
+      }
+    }
+  ],
+  "support": [
+    {
+      "id": "bond-promise",
+      "type": "support",
+      "name": "Bond Promise",
+      "rarity": "uncommon",
+      "tags": [
+        "bond",
+        "ramp"
+      ],
+      "set": "CORE-01",
+      "cost": 1
+    }
+  ],
+  "trap": [
+    {
+      "id": "reversal-strike",
+      "type": "trap",
+      "name": "Reversal Strike",
+      "rarity": "rare",
+      "tags": [
+        "defense",
+        "burst"
+      ],
+      "set": "CORE-01",
+      "cost": 2
+    }
+  ]
+}
