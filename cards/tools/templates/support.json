@@ -10,5 +10,6 @@
   "effects": [
     { "when": "activated", "do": [ { "type": "draw", "target": "you", "amount": 1 } ] }
   ],
+  "art": { "default": "cards/supports/basic/example-support-id-default.png" },
   "version": 1
 }

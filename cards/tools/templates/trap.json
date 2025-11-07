@@ -10,5 +10,6 @@
   "effects": [
     { "when": "trapTrigger", "do": [ { "type": "prevent", "target": "defender", "amount": 2 } ] }
   ],
+  "art": { "default": "cards/traps/basic/example-trap-id-default.png" },
   "version": 1
 }

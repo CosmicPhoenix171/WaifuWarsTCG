@@ -17,5 +17,8 @@
     }
   ],
   "flavor": "Tension flips momentum faster than you can say 'baka'.",
+  "art": {
+    "default": "cards/traps/basic/reversal-strike-default.png"
+  },
   "version": 1
 }

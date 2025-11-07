@@ -21,5 +21,9 @@
     }
   ],
   "flavor": "It's NOT like she wanted to melt your defenses... idiot!",
+  "art": {
+    "default": "cards/waifus/tsundere/flame-tsundere-default.png",
+    "extreme": "cards/waifus/tsundere/flame-tsundere-extreme.png"
+  },
   "version": 1
 }

@@ -17,5 +17,8 @@
     }
   ],
   "flavor": "Pinky swear now, panic later.",
+  "art": {
+    "default": "cards/supports/basic/bond-promise-default.png"
+  },
   "version": 1
 }

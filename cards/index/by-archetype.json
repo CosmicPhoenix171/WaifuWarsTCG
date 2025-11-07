@@ -1,4 +1,99 @@
 {
+  "Dandere": [
+    {
+      "id": "whisper-dandere",
+      "type": "waifu",
+      "name": "Whisper Dandere",
+      "archetype": "Dandere",
+      "rarity": "common",
+      "tags": [
+        "defense",
+        "stealth"
+      ],
+      "set": "CORE-01",
+      "affection": 10,
+      "mood": {
+        "dere": 6,
+        "extreme": 10
+      }
+    }
+  ],
+  "Deredere": [
+    {
+      "id": "sunbeam-deredere",
+      "type": "waifu",
+      "name": "Sunbeam Deredere",
+      "archetype": "Deredere",
+      "rarity": "uncommon",
+      "tags": [
+        "support",
+        "heal"
+      ],
+      "set": "CORE-01",
+      "affection": 9,
+      "mood": {
+        "dere": 5,
+        "extreme": 11
+      }
+    }
+  ],
+  "Himedere": [
+    {
+      "id": "crown-himedere",
+      "type": "waifu",
+      "name": "Crown Himedere",
+      "archetype": "Himedere",
+      "rarity": "rare",
+      "tags": [
+        "leader",
+        "aura"
+      ],
+      "set": "CORE-01",
+      "affection": 9,
+      "mood": {
+        "dere": 5,
+        "extreme": 10
+      }
+    }
+  ],
+  "Kamidere": [
+    {
+      "id": "domination-kamidere",
+      "type": "waifu",
+      "name": "Domination Kamidere",
+      "archetype": "Kamidere",
+      "rarity": "mythic",
+      "tags": [
+        "control",
+        "command"
+      ],
+      "set": "CORE-01",
+      "affection": 8,
+      "mood": {
+        "dere": 5,
+        "extreme": 11
+      }
+    }
+  ],
+  "Kuudere": [
+    {
+      "id": "icebound-kuudere",
+      "type": "waifu",
+      "name": "Icebound Kuudere",
+      "archetype": "Kuudere",
+      "rarity": "rare",
+      "tags": [
+        "control",
+        "counter"
+      ],
+      "set": "CORE-01",
+      "affection": 8,
+      "mood": {
+        "dere": 4,
+        "extreme": 9
+      }
+    }
+  ],
   "Tsundere": [
     {
       "id": "flame-tsundere",
@@ -15,6 +110,44 @@
       "mood": {
         "dere": 5,
         "extreme": 10
+      }
+    }
+  ],
+  "Yandere": [
+    {
+      "id": "crimson-yandere",
+      "type": "waifu",
+      "name": "Crimson Yandere",
+      "archetype": "Yandere",
+      "rarity": "rare",
+      "tags": [
+        "burst",
+        "marking"
+      ],
+      "set": "CORE-01",
+      "affection": 7,
+      "mood": {
+        "dere": 4,
+        "extreme": 9
+      }
+    }
+  ],
+  "Yangire": [
+    {
+      "id": "fracture-yangire",
+      "type": "waifu",
+      "name": "Fracture Yangire",
+      "archetype": "Yangire",
+      "rarity": "mythic",
+      "tags": [
+        "gamble",
+        "burst"
+      ],
+      "set": "CORE-01",
+      "affection": 6,
+      "mood": {
+        "dere": 3,
+        "extreme": 8
       }
     }
   ]

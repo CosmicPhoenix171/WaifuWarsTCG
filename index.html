@@ -119,6 +119,15 @@
       </div>
     </section>
 
+    <section id="cards" class="cards-gallery">
+      <div class="container">
+        <h2 class="section-title">Card Spotlight</h2>
+        <p class="cards-intro">Preview a sampling of Waifu archetypes—each colorful personality brings unique stats, moods, and tags to weave into your bond-driven strategy.</p>
+        <div id="cards-status" class="cards-status" role="status" aria-live="polite">Loading card previews…</div>
+        <div id="cards-grid" class="cards-grid" aria-live="polite"></div>
+      </div>
+    </section>
+
     <section class="callouts">
       <div class="container">
         <div class="callout">
@@ -132,7 +141,7 @@
           <div class="callout-copy">
             <h3>Build Your First Deck</h3>
             <p>Start with a Tsundere reactive shell or a Deredere support core—simple rules, deep strategy.</p>
-            <a class="btn btn-secondary" href="#features">See Cards</a>
+            <a class="btn btn-secondary" href="#cards">See Cards</a>
           </div>
         </div>
       </div>
@@ -160,8 +169,79 @@
     </div>
   </footer>
 
-  <script>
-    document.getElementById('year').textContent = new Date().getFullYear();
+  <script type="module">
+    const yearEl = document.getElementById('year');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    const cardsGrid = document.getElementById('cards-grid');
+    const cardsStatus = document.getElementById('cards-status');
+
+    async function loadCards() {
+      if (!cardsGrid || !cardsStatus) return;
+      try {
+        cardsStatus.hidden = false;
+        cardsStatus.textContent = 'Loading card previews…';
+        const res = await fetch('cards/index/by-type.json', { cache: 'no-store' });
+        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
+        const data = await res.json();
+        const waifus = Array.isArray(data?.waifu) ? data.waifu : [];
+
+        if (!waifus.length) {
+          cardsStatus.textContent = 'Card previews are coming soon.';
+          return;
+        }
+
+        cardsStatus.textContent = '';
+        cardsStatus.hidden = true;
+        const frag = document.createDocumentFragment();
+
+        for (const card of waifus) {
+          const tile = document.createElement('article');
+          tile.className = 'card-tile';
+          tile.dataset.rarity = (card.rarity || 'common').toLowerCase();
+
+          const typeLabel = card.type ? card.type.charAt(0).toUpperCase() + card.type.slice(1) : 'Waifu';
+          const moodDere = card.mood?.dere ?? '—';
+          const moodExtreme = card.mood?.extreme ?? '—';
+
+          tile.innerHTML = `
+            <header class="card-head">
+              <span class="card-type">${typeLabel}</span>
+              <span class="card-rarity">${(card.rarity || '').toUpperCase()}</span>
+            </header>
+            <h3 class="card-name">${card.name}</h3>
+            <p class="card-archetype">${card.archetype ? `${card.archetype} Archetype` : 'Standalone Card'} • Set ${card.set || 'TBA'}</p>
+            <dl class="card-stats">
+              <div>
+                <dt>Affection</dt>
+                <dd>${card.affection ?? '—'}</dd>
+              </div>
+              <div>
+                <dt>Dere</dt>
+                <dd>${moodDere}</dd>
+              </div>
+              <div>
+                <dt>Extreme</dt>
+                <dd>${moodExtreme}</dd>
+              </div>
+            </dl>
+            <div class="card-tags" aria-label="Card tags">
+              ${(card.tags || []).map(tag => `<span>${tag}</span>`).join('') || '<span class="card-tag-empty">No tags</span>'}
+            </div>
+          `;
+
+          frag.appendChild(tile);
+        }
+
+        cardsGrid.appendChild(frag);
+      } catch (err) {
+        cardsStatus.textContent = 'Could not load cards right now. Try refreshing in a moment.';
+        cardsStatus.hidden = false;
+        console.error(err);
+      }
+    }
+
+    loadCards();
   </script>
 </body>
 </html>

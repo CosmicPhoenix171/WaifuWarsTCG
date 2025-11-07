@@ -1,0 +1,34 @@
+{
+  "id": "crimson-yandere",
+  "type": "waifu",
+  "name": "Crimson Yandere",
+  "archetype": "Yandere",
+  "set": "CORE-01",
+  "rarity": "rare",
+  "affection": 7,
+  "bonds": { "start": 1, "max": 12 },
+  "mood": { "thresholds": { "dere": 4, "extreme": 9 } },
+  "tags": ["burst","marking"],
+  "text": "On Summon: Mark a rival waifu. Activated: Spend 2 {BOND} to deal 3 damage to the marked target. Extreme: When the mark is cleared, gain +3 bonds.",
+  "effects": [
+    {
+      "when": "onSummon",
+      "do": [ { "type": "debuff", "target": "choiceOpponentWaifu", "note": "Apply Crimson Mark" } ]
+    },
+    {
+      "when": "activated",
+      "cost": { "bonds": 2 },
+      "do": [ { "type": "damage", "target": "markedWaifu", "amount": 3 } ]
+    },
+    {
+      "when": "onDamage",
+      "do": [ { "type": "gainBonds", "target": "self", "amount": 3, "note": "Trigger only if mood=Extreme and mark was cleared" } ]
+    }
+  ],
+  "flavor": "Love can be a double-edged blade. Mostly edge.",
+  "art": {
+    "default": "cards/waifus/yandere/crimson-yandere-default.png",
+    "extreme": "cards/waifus/yandere/crimson-yandere-extreme.png"
+  },
+  "version": 1
+}

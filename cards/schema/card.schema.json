@@ -33,6 +33,16 @@
     "rarity": { "type": "string", "enum": ["common","uncommon","rare","mythic"] },
     "tags": { "type": "array", "items": { "type": "string" } },
     "flavor": { "type": "string" },
+    "art": {
+      "type": "object",
+      "additionalProperties": { "type": "string" },
+      "properties": {
+        "default": { "type": "string" },
+        "dere": { "type": "string" },
+        "extreme": { "type": "string" }
+      },
+      "description": "Optional image asset references keyed by mood or variant"
+    },
     "version": { "type": "integer", "minimum": 1 },
 
     "text": { "type": "string" },

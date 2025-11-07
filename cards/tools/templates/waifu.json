@@ -14,5 +14,6 @@
     { "when": "onSummon", "do": [ { "type": "damage", "target": "targetWaifu", "amount": 1 } ] }
   ],
   "flavor": "Optional flavor.",
+  "art": { "default": "cards/waifus/tsundere/example-waifu-id-default.png" },
   "version": 1
 }
