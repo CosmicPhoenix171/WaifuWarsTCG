@@ -15,6 +15,16 @@
       "mood": {
         "dere": 6,
         "extreme": 10
+      },
+      "bonds": {
+        "start": 0,
+        "max": 12
+      },
+      "text": "Passive: Cannot be targeted by opponent Support cards while Neutral. Dere: Gain +2 shield counters. Extreme: When you speak (play a Support), draw a card.",
+      "flavor": "When she finally speaks up, the whole battlefield listens.",
+      "art": {
+        "default": "cards/waifus/dandere/whisper-dandere-default.png",
+        "extreme": "cards/waifus/dandere/whisper-dandere-extreme.png"
       }
     },
     {
@@ -32,6 +42,16 @@
       "mood": {
         "dere": 5,
         "extreme": 11
+      },
+      "bonds": {
+        "start": 2,
+        "max": 14
+      },
+      "text": "Start of Turn: Give bonded allies +1 {BOND}. Activated: Spend 1 {BOND} to heal 2 Affection to another waifu. Extreme: Your bonded allies gain +1 Affection when they attack.",
+      "flavor": "A beam of sunshine with emergency snacks for everyone.",
+      "art": {
+        "default": "cards/waifus/deredere/sunbeam-deredere-default.png",
+        "extreme": "cards/waifus/deredere/sunbeam-deredere-extreme.png"
       }
     },
     {
@@ -49,6 +69,16 @@
       "mood": {
         "dere": 5,
         "extreme": 10
+      },
+      "bonds": {
+        "start": 1,
+        "max": 13
+      },
+      "text": "Leader Aura: Other allied waifus gain +1 ATK while you have the highest Affection. Dere: Your Support cards cost 1 less. Extreme: When you defeat a waifu, gain +2 {BOND} and heal 2 Affection.",
+      "flavor": "Bow properly and victory is yours to command.",
+      "art": {
+        "default": "cards/waifus/himedere/crown-himedere-default.png",
+        "extreme": "cards/waifus/himedere/crown-himedere-extreme.png"
       }
     },
     {
@@ -66,6 +96,16 @@
       "mood": {
         "dere": 5,
         "extreme": 11
+      },
+      "bonds": {
+        "start": 2,
+        "max": 14
+      },
+      "text": "Command Phase: Spend 2 {BOND} to choose an enemy waifu; it must attack a target you pick this turn. Dere: Opponents can't ready more than one waifu during End Phase. Extreme: When you issue a command, ready one of your waifus.",
+      "flavor": "Kneel now and the world might spare you.",
+      "art": {
+        "default": "cards/waifus/kamidere/domination-kamidere-default.png",
+        "extreme": "cards/waifus/kamidere/domination-kamidere-extreme.png"
       }
     },
     {
@@ -83,6 +123,16 @@
       "mood": {
         "dere": 4,
         "extreme": 9
+      },
+      "bonds": {
+        "start": 1,
+        "max": 12
+      },
+      "text": "Reaction: When an opponent plays a Support, spend 1 {BOND} to cancel it. Dere: Opponents cannot gain bonus bonds outside their turn. Extreme: First trap each turn resets to face-down after resolving.",
+      "flavor": "Logic slices hotter than passion.",
+      "art": {
+        "default": "cards/waifus/kuudere/icebound-kuudere-default.png",
+        "extreme": "cards/waifus/kuudere/icebound-kuudere-extreme.png"
       }
     },
     {
@@ -100,6 +150,16 @@
       "mood": {
         "dere": 5,
         "extreme": 10
+      },
+      "bonds": {
+        "start": 0,
+        "max": 12
+      },
+      "text": "On Summon: Deal 1 damage to a target waifu. Extreme: +2 damage on first attack each turn.",
+      "flavor": "It's NOT like she wanted to melt your defenses... idiot!",
+      "art": {
+        "default": "cards/waifus/tsundere/flame-tsundere-default.png",
+        "extreme": "cards/waifus/tsundere/flame-tsundere-extreme.png"
       }
     },
     {
@@ -117,6 +177,16 @@
       "mood": {
         "dere": 4,
         "extreme": 9
+      },
+      "bonds": {
+        "start": 1,
+        "max": 12
+      },
+      "text": "On Summon: Mark a rival waifu. Activated: Spend 2 {BOND} to deal 3 damage to the marked target. Extreme: When the mark is cleared, gain +3 bonds.",
+      "flavor": "Love can be a double-edged blade. Mostly edge.",
+      "art": {
+        "default": "cards/waifus/yandere/crimson-yandere-default.png",
+        "extreme": "cards/waifus/yandere/crimson-yandere-extreme.png"
       }
     },
     {
@@ -134,6 +204,16 @@
       "mood": {
         "dere": 3,
         "extreme": 8
+      },
+      "bonds": {
+        "start": 0,
+        "max": 12
+      },
+      "text": "When you attack: Flip a coin. Heads — deal +4 damage. Tails — take 2 self-damage. Dere: Gain +1 {BOND} on heads. Extreme: You may flip twice and choose the result, but suffer both tails outcomes.",
+      "flavor": "Sanity is a courtesy, not a promise.",
+      "art": {
+        "default": "cards/waifus/yangire/fracture-yangire-default.png",
+        "extreme": "cards/waifus/yangire/fracture-yangire-extreme.png"
       }
     }
   ],
@@ -148,6 +228,11 @@
         "ramp"
       ],
       "set": "CORE-01",
+      "text": "Choose a waifu. Gain +2 Bonds on that waifu. If that waifu is in Dere or higher, draw a card.",
+      "flavor": "Pinky swear now, panic later.",
+      "art": {
+        "default": "cards/supports/basic/bond-promise-default.png"
+      },
       "cost": 1
     }
   ],
@@ -162,6 +247,11 @@
         "burst"
       ],
       "set": "CORE-01",
+      "text": "Trap Trigger: When an opponent declares an attack, prevent 2 damage and deal 1 damage to the attacker. If your defending waifu is Extreme, deal 2 instead.",
+      "flavor": "Tension flips momentum faster than you can say 'baka'.",
+      "art": {
+        "default": "cards/traps/basic/reversal-strike-default.png"
+      },
       "cost": 2
     }
   ]

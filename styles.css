@@ -65,7 +65,7 @@ a:hover { text-decoration:underline; }
 
 .cards-gallery {
   padding: 4rem 0;
-  background: linear-gradient(145deg,#161127,#0f0c1b 55%,#090712);
+  background: linear-gradient(145deg,#161127 0%,#0f0c1b 55%,#090712 100%);
 }
 .cards-intro {
   margin: 0 0 1.5rem;
@@ -81,113 +81,284 @@ a:hover { text-decoration:underline; }
 }
 .cards-grid {
   display: grid;
-  gap: 1.5rem;
-  margin-top: 1.6rem;
-  grid-template-columns: repeat(auto-fit,minmax(240px,1fr));
+  gap: 2.4rem;
+  margin-top: 1.8rem;
+  grid-template-columns: repeat(auto-fit,minmax(320px,1fr));
+  justify-items: center;
 }
-.card-tile {
-  position: relative;
-  padding: 1.35rem 1.4rem 1.5rem;
-  border-radius: 18px;
-  border: 1px solid #2c253d;
-  background: radial-gradient(circle at 0% 0%, rgba(238,46,139,0.12), transparent 55%), #171223;
+.card-display {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+.card-frame {
+  width: min(100%, 340px);
+  padding: 1.3rem 1.35rem 1.5rem;
+  border-radius: 22px;
+  background: linear-gradient(180deg,#f9fafb 0%,#f1f5f9 100%);
+  border: 1px solid rgba(148,163,184,0.35);
+  box-shadow: 0 20px 40px -24px rgba(15,23,42,0.6);
   display: flex;
   flex-direction: column;
-  gap: .75rem;
-  box-shadow: 0 18px 36px -18px rgba(0,0,0,0.65);
-  overflow: hidden;
+  gap: 1rem;
+  position: relative;
+  color: #111827;
 }
-.card-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  font-size: .8rem;
+.card-frame:before {
+  content: "";
+  position: absolute;
+  inset: -0.35rem;
+  border-radius: 24px;
+  background: linear-gradient(140deg,rgba(238,46,139,0.45),rgba(34,209,243,0.35));
+  z-index: -2;
+  opacity: .7;
+}
+.card-frame:after {
+  content: "";
+  position: absolute;
+  inset: -0.15rem;
+  border-radius: 23px;
+  background: #0f0c1b;
+  z-index: -1;
+}
+.card-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: .8rem;
+  padding: .5rem .75rem;
+  border-radius: 16px;
+  background: linear-gradient(120deg,#e6eefc,#f0f5ff);
+  border: 1px solid rgba(148,181,241,0.55);
+}
+.card-rarity-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  padding: .3rem .7rem;
+  border-radius: 999px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  letter-spacing: .9px;
-  color: #a9a6b5;
+  color: #1e3a8a;
+  background: #bfdbfe;
+  border: 1px solid #60a5fa;
 }
-.card-type {
-  font-weight: 600;
-  color: #f7f7fb;
-}
-.card-rarity {
-  font-weight: 700;
-  font-size: .75rem;
-}
-.card-name {
+.card-title {
   margin: 0;
-  font-size: 1.3rem;
+  font-size: 1.25rem;
   font-weight: 700;
+  letter-spacing: .3px;
+  color: #0f172a;
+}
+.card-aff-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .35rem .6rem;
+  border-radius: 999px;
+  background: #fce7f3;
+  border: 1px solid #f9a8d4;
+  color: #9d174d;
+  font-size: .8rem;
+  font-weight: 700;
+}
+.card-art {
+  position: relative;
+  height: 240px;
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(148,163,184,0.45);
+  background: radial-gradient(circle at 70% 25%,rgba(238,46,139,0.28),transparent 55%),
+              radial-gradient(circle at 30% 70%,rgba(34,209,243,0.25),transparent 65%),
+              #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card-art::after {
+  content: "";
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(244,63,94,0.6);
+  right: 18%;
+  top: 18%;
+  filter: blur(0.5px);
+}
+.card-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.card-art-placeholder {
+  width: 68%;
+  height: 68%;
+  border-radius: 24px;
+  background: repeating-linear-gradient(135deg,rgba(255,255,255,0.65) 0,rgba(255,255,255,0.65) 6px,rgba(209,213,219,0.35) 6px,rgba(209,213,219,0.35) 12px);
+  border: 1px solid rgba(148,163,184,0.45);
+}
+.card-type-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .5rem .75rem;
+  border-radius: 12px;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  font-size: .82rem;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: #1f2937;
+}
+.card-type-label {
+  font-weight: 600;
+  text-transform: none;
   letter-spacing: .4px;
 }
-.card-archetype {
-  margin: -.2rem 0 0;
-  font-size: .82rem;
-  color: #b3afc4;
-  text-transform: uppercase;
+.card-archetype-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .25rem .65rem;
+  border-radius: 10px;
+  background: #991b1b;
+  border: 1px solid #7f1d1d;
+  color: #fff;
+  font-size: .75rem;
+  font-weight: 700;
   letter-spacing: 1px;
 }
-.card-stats {
+.card-text-box {
+  padding: .95rem 1rem;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid rgba(203,213,225,0.7);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.65);
+}
+.card-abilities {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+  font-size: .9rem;
+  line-height: 1.45;
+  color: #111827;
+}
+.card-abilities li {
+  position: relative;
+  padding-left: 1.1rem;
+}
+.card-abilities li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #7c3aed;
+  font-weight: 700;
+}
+.card-ability-empty {
+  opacity: .65;
+  font-style: italic;
+}
+.card-flavor {
+  margin: .85rem 0 0;
+  font-size: .85rem;
+  color: #6b7280;
+  font-style: italic;
+  text-align: left;
+}
+.card-statline {
+  margin: .5rem 0 0;
   display: grid;
   grid-template-columns: repeat(3,minmax(0,1fr));
-  gap: .9rem;
-  margin: .8rem 0 .4rem;
+  gap: .75rem;
 }
-.card-stats div {
-  background: #1f1a2f;
-  border: 1px solid rgba(255,255,255,0.05);
+.card-statline div {
+  background: #f3f4f6;
+  border: 1px solid rgba(203,213,225,0.8);
   border-radius: 12px;
-  padding: .65rem .75rem;
+  padding: .6rem .7rem;
 }
-.card-stats dt {
-  margin: 0 0 .2rem;
+.card-statline dt {
+  margin: 0 0 .25rem;
   font-size: .65rem;
   letter-spacing: .75px;
   text-transform: uppercase;
-  color: #a9a6b5;
+  color: #6b7280;
 }
-.card-stats dd {
+.card-statline dd {
   margin: 0;
-  font-size: 1rem;
+  font-size: .95rem;
   font-weight: 600;
-  color: #f7f7fb;
+  color: #111827;
 }
 .card-tags {
   display: flex;
   flex-wrap: wrap;
   gap: .45rem;
-  margin-top: .2rem;
+  margin-top: .4rem;
 }
-.card-tags span {
-  font-size: .7rem;
-  text-transform: uppercase;
-  letter-spacing: .9px;
-  padding: .4rem .65rem;
+.card-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .35rem .7rem;
   border-radius: 999px;
-  background: rgba(121,41,255,0.18);
-  border: 1px solid rgba(121,41,255,0.35);
-  color: #dcd9e8;
+  border: 1px solid rgba(121,41,255,0.4);
+  background: rgba(121,41,255,0.16);
+  text-transform: uppercase;
+  letter-spacing: .85px;
+  font-size: .7rem;
+  color: #f5f3ff;
 }
 .card-tag-empty {
-  opacity: .65;
-  background: rgba(255,255,255,0.08) !important;
-  border-color: rgba(255,255,255,0.12) !important;
+  background: rgba(107,114,128,0.15);
+  border-color: rgba(107,114,128,0.25);
+  color: #d1d5db;
 }
-.card-tile[data-rarity="common"] {
-  border-color: rgba(255,255,255,0.05);
+.card-footer {
+  margin-top: .2rem;
+  font-size: .72rem;
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: #6b7280;
 }
-.card-tile[data-rarity="uncommon"] {
-  border-color: rgba(34,209,243,0.35);
+.card-display[data-rarity="common"] .card-rarity-badge {
+  background: #e2e8f0;
+  border-color: #cbd5f5;
+  color: #1f2937;
 }
-.card-tile[data-rarity="rare"] {
-  border-color: rgba(238,46,139,0.35);
+.card-display[data-rarity="uncommon"] .card-rarity-badge {
+  background: rgba(34,209,243,0.18);
+  border-color: rgba(34,209,243,0.55);
+  color: #0f766e;
 }
-.card-tile[data-rarity="mythic"] {
-  border-color: rgba(245,200,66,0.5);
-  box-shadow: 0 22px 48px -20px rgba(245,200,66,0.45);
+.card-display[data-rarity="rare"] .card-rarity-badge {
+  background: rgba(238,46,139,0.18);
+  border-color: rgba(238,46,139,0.55);
+  color: #9d174d;
 }
-.card-tile[data-rarity="mythic"] .card-rarity {
-  color: var(--gold);
+.card-display[data-rarity="mythic"] .card-rarity-badge {
+  background: rgba(245,200,66,0.22);
+  border-color: rgba(245,200,66,0.6);
+  color: #92400e;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .battle-loop {

@@ -176,6 +176,34 @@
     const cardsGrid = document.getElementById('cards-grid');
     const cardsStatus = document.getElementById('cards-status');
 
+    function capitalize(word = '') {
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    }
+
+    function formatSentences(text) {
+      if (!text) return [];
+      return text
+        .split(/(?<=[.!?])\s+/)
+        .map(line => line.trim())
+        .filter(Boolean);
+    }
+
+    function formatBonds(bonds) {
+      if (!bonds) return '—';
+      const start = typeof bonds.start === 'number' ? bonds.start : null;
+      const max = typeof bonds.max === 'number' ? bonds.max : null;
+      if (start !== null && max !== null) return `${start} / ${max}`;
+      if (max !== null) return `${max}`;
+      return '—';
+    }
+
+    function formatMood(mood) {
+      if (!mood) return '— / —';
+      const dere = mood.dere ?? '—';
+      const extreme = mood.extreme ?? '—';
+      return `${dere} / ${extreme}`;
+    }
+
     async function loadCards() {
       if (!cardsGrid || !cardsStatus) return;
       try {
@@ -196,41 +224,72 @@
         const frag = document.createDocumentFragment();
 
         for (const card of waifus) {
-          const tile = document.createElement('article');
-          tile.className = 'card-tile';
-          tile.dataset.rarity = (card.rarity || 'common').toLowerCase();
+          const rarity = (card.rarity || 'common').toLowerCase();
+          const typeLabel = card.type ? capitalize(card.type) : 'Waifu';
+          const abilityLines = formatSentences(card.text);
+          const flavor = card.flavor ? card.flavor.replace(/^“|”$/g, '') : '';
+          const moodDisplay = formatMood(card.mood);
+          const bondsDisplay = formatBonds(card.bonds);
+          const artDefault = card.art?.default;
 
-          const typeLabel = card.type ? card.type.charAt(0).toUpperCase() + card.type.slice(1) : 'Waifu';
-          const moodDere = card.mood?.dere ?? '—';
-          const moodExtreme = card.mood?.extreme ?? '—';
+          const article = document.createElement('article');
+          article.className = 'card-display';
+          article.dataset.rarity = rarity;
 
-          tile.innerHTML = `
-            <header class="card-head">
-              <span class="card-type">${typeLabel}</span>
-              <span class="card-rarity">${(card.rarity || '').toUpperCase()}</span>
-            </header>
-            <h3 class="card-name">${card.name}</h3>
-            <p class="card-archetype">${card.archetype ? `${card.archetype} Archetype` : 'Standalone Card'} • Set ${card.set || 'TBA'}</p>
-            <dl class="card-stats">
-              <div>
-                <dt>Affection</dt>
-                <dd>${card.affection ?? '—'}</dd>
+          const tagsHtml = (card.tags || [])
+            .map(tag => `<span class="card-tag">${tag}</span>`)
+            .join('');
+
+          const abilitiesHtml = abilityLines.length
+            ? abilityLines.map(line => `<li>${line}</li>`).join('')
+            : '<li class="card-ability-empty">Ability text coming soon.</li>';
+
+          const flavorHtml = flavor
+            ? `<p class="card-flavor">“${flavor}”</p>`
+            : '';
+
+          article.innerHTML = `
+            <div class="card-frame">
+              <header class="card-header">
+                <span class="card-rarity-badge">${(card.rarity || 'common').toUpperCase()}</span>
+                <h3 class="card-title">${card.name}</h3>
+                <span class="card-aff-chip"><span aria-hidden="true">❤</span><span class="sr-only">Affection</span>${card.affection ?? '—'}</span>
+              </header>
+              <div class="card-art" role="img" aria-label="${card.name} artwork">
+                ${artDefault ? `<img src="${artDefault}" alt="">` : '<div class="card-art-placeholder"></div>'}
               </div>
-              <div>
-                <dt>Dere</dt>
-                <dd>${moodDere}</dd>
+              <div class="card-type-row">
+                <span class="card-type-label">${card.archetype ? `${typeLabel} — ${card.archetype}` : typeLabel}</span>
+                <span class="card-archetype-chip">${(card.archetype || typeLabel).toUpperCase()}</span>
               </div>
-              <div>
-                <dt>Extreme</dt>
-                <dd>${moodExtreme}</dd>
+              <div class="card-text-box">
+                <ul class="card-abilities">
+                  ${abilitiesHtml}
+                </ul>
+                ${flavorHtml}
               </div>
-            </dl>
-            <div class="card-tags" aria-label="Card tags">
-              ${(card.tags || []).map(tag => `<span>${tag}</span>`).join('') || '<span class="card-tag-empty">No tags</span>'}
+              <dl class="card-statline">
+                <div>
+                  <dt>Affection</dt>
+                  <dd>${card.affection ?? '—'}</dd>
+                </div>
+                <div>
+                  <dt>Bonds</dt>
+                  <dd>${bondsDisplay}</dd>
+                </div>
+                <div>
+                  <dt>Mood</dt>
+                  <dd>${moodDisplay}</dd>
+                </div>
+              </dl>
+              <div class="card-tags" aria-label="Card tags">
+                ${tagsHtml || '<span class="card-tag card-tag-empty">No tags yet</span>'}
+              </div>
+              <footer class="card-footer">Set ${card.set || 'TBA'} • ${card.id?.toUpperCase() || ''}</footer>
             </div>
           `;
 
-          frag.appendChild(tile);
+          frag.appendChild(article);
         }
 
         cardsGrid.appendChild(frag);

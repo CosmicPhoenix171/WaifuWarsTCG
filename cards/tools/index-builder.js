@@ -37,6 +37,10 @@ function slim(card) {
     set: card.set,
     affection: card.affection,
     mood: card.mood?.thresholds,
+    bonds: card.bonds,
+    text: card.text,
+    flavor: card.flavor,
+    art: card.art,
     cost: card.cost
   };
 }
