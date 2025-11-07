@@ -79,7 +79,7 @@ The full Core Concept for personality-based archetypes has been moved to a dedic
 Refer to `docs/Archetypes.md` for:
 
 - Core dere archetype definitions and sample effects
-- Relationship Meter / Affection Points (AP)
+- Relationship Meter / Bonds
 - Relationship mechanics (Bond Cards, Mood Swings, Confessions)
 - Deck-building guidance by archetype and emotional states
 
@@ -335,7 +335,7 @@ Animations should be dramatic and satisfying - every card play, attack, and effe
 7. Magical Girl Sakura (Epic): 20 ATK / 8 AFF - Once per turn, negate one attack
 8. Shrine Maiden Rei (Rare): 17 ATK / 6 AFF - Heal 500 LP when summoned
 9. Catgirl Neko (Common): 13 ATK / 3 AFF - Can attack twice per turn if alone
-10. Imouto-chan (Rare): 15 ATK / 5 AFF - "Onii-chan!" - Prevent being discarded once per turn (cost: 2 AP)
+10. Imouto-chan (Rare): 15 ATK / 5 AFF - "Onii-chan!" - Prevent being discarded once per turn (cost: 2 bond points)
 11. Senpai Satori (Epic): 21 ATK / 7 AFF - Your support cards cost 0 this turn
 12. Rival Transfer Student (Epic): 23 ATK / 6 AFF - When summoned, destroy one enemy waifu (deal Affection damage)
 13. Ojou-sama Ayane (Legendary): 28 ATK / 9 AFF - Immune to traps, gains +5 ATK for each trap on field
@@ -414,7 +414,7 @@ interface CardInstance {
   affection?: number
   // Emotional / bond state
   emotional?: {
-    ap: number
+    bondPoints: number
     bonds: string[]
     mood: 'neutral' | 'dere' | 'extreme'
   }
