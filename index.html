@@ -235,6 +235,9 @@
           const article = document.createElement('article');
           article.className = 'card-display';
           article.dataset.rarity = rarity;
+          article.setAttribute('tabindex', '0');
+          article.setAttribute('role', 'button');
+          article.setAttribute('aria-label', `View ${card.name} details`);
 
           const tagsHtml = (card.tags || [])
             .map(tag => `<span class="card-tag">${tag}</span>`)
@@ -289,6 +292,15 @@
             </div>
           `;
 
+          // Add click handler for modal
+          article.addEventListener('click', () => openCardModal(card, rarity));
+          article.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              openCardModal(card, rarity);
+            }
+          });
+
           frag.appendChild(article);
         }
 
@@ -319,6 +331,130 @@
         cardsStatus.hidden = false;
         console.error(err);
       }
+    }
+
+    // Card modal functionality
+    function openCardModal(card, rarity) {
+      const modal = document.getElementById('card-modal');
+      if (!modal) {
+        createCardModal();
+        openCardModal(card, rarity);
+        return;
+      }
+
+      const modalContent = modal.querySelector('.modal-card-wrapper');
+      const typeLabel = card.type ? capitalize(card.type) : 'Waifu';
+      const abilityLines = formatSentences(card.text);
+      const flavor = card.flavor ? card.flavor.replace(/^"|"$/g, '') : '';
+      const moodDisplay = formatMood(card.mood);
+      const bondsDisplay = formatBonds(card.bonds);
+      const artDefault = card.art?.default;
+
+      const tagsHtml = (card.tags || [])
+        .map(tag => `<span class="card-tag">${tag}</span>`)
+        .join('');
+
+      const abilitiesHtml = abilityLines.length
+        ? abilityLines.map(line => `<li>${line}</li>`).join('')
+        : '<li class="card-ability-empty">Ability text coming soon.</li>';
+
+      const flavorHtml = flavor
+        ? `<p class="card-flavor">"${flavor}"</p>`
+        : '';
+
+      modalContent.innerHTML = `
+        <article class="card-display" data-rarity="${rarity}">
+          <div class="card-frame">
+            <header class="card-header">
+              <span class="card-rarity-badge">${(card.rarity || 'common').toUpperCase()}</span>
+              <h3 class="card-title">${card.name}</h3>
+              <span class="card-aff-chip"><span aria-hidden="true">❤</span><span class="sr-only">Affection</span>${card.affection ?? '—'}</span>
+            </header>
+            <div class="card-art" role="img" aria-label="${card.name} artwork">
+              ${artDefault ? `<img src="${artDefault}" alt="">` : '<div class="card-art-placeholder"></div>'}
+            </div>
+            <div class="card-type-row">
+              <span class="card-type-label">${card.archetype ? `${typeLabel} — ${card.archetype}` : typeLabel}</span>
+              <span class="card-archetype-chip">${(card.archetype || typeLabel).toUpperCase()}</span>
+            </div>
+            <div class="card-text-box">
+              <ul class="card-abilities">
+                ${abilitiesHtml}
+              </ul>
+              ${flavorHtml}
+            </div>
+            <dl class="card-statline">
+              <div>
+                <dt>Affection</dt>
+                <dd>${card.affection ?? '—'}</dd>
+              </div>
+              <div>
+                <dt>Bonds</dt>
+                <dd>${bondsDisplay}</dd>
+              </div>
+              <div>
+                <dt>Mood</dt>
+                <dd>${moodDisplay}</dd>
+              </div>
+            </dl>
+            <div class="card-tags" aria-label="Card tags">
+              ${tagsHtml || '<span class="card-tag card-tag-empty">No tags yet</span>'}
+            </div>
+            <footer class="card-footer">Set ${card.set || 'TBA'} • ${card.id?.toUpperCase() || ''}</footer>
+          </div>
+        </article>
+      `;
+
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      
+      // Focus the close button for accessibility
+      setTimeout(() => {
+        const closeBtn = modal.querySelector('.modal-close');
+        if (closeBtn) closeBtn.focus();
+      }, 100);
+    }
+
+    function closeCardModal() {
+      const modal = document.getElementById('card-modal');
+      if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+
+    function createCardModal() {
+      const modal = document.createElement('div');
+      modal.id = 'card-modal';
+      modal.className = 'card-modal';
+      modal.setAttribute('role', 'dialog');
+      modal.setAttribute('aria-modal', 'true');
+      modal.setAttribute('aria-labelledby', 'modal-card-title');
+
+      modal.innerHTML = `
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+          <button class="modal-close" aria-label="Close card preview">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+          <div class="modal-card-wrapper"></div>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+
+      // Close handlers
+      modal.querySelector('.modal-overlay').addEventListener('click', closeCardModal);
+      modal.querySelector('.modal-close').addEventListener('click', closeCardModal);
+      
+      modal.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeCardModal();
+        }
+      });
     }
 
     loadCards();
