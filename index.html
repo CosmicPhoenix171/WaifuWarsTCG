@@ -245,6 +245,8 @@
         resetTimer: null
       };
 
+      article.setAttribute('aria-pressed', state.isFlipped ? 'true' : 'false');
+
       const maxTiltX = 10;
       const maxTiltY = 16;
 
@@ -273,6 +275,7 @@
       const toggleFlip = () => {
         state.isFlipped = !state.isFlipped;
         flipEl.classList.toggle('is-flipped', state.isFlipped);
+        article.setAttribute('aria-pressed', state.isFlipped ? 'true' : 'false');
       };
 
       const handleHoverTilt = (event) => {
@@ -289,6 +292,9 @@
 
       const handlePointerDown = (event) => {
         event.preventDefault();
+        if (document.activeElement !== article && typeof article.focus === 'function') {
+          article.focus({ preventScroll: true });
+        }
         state.pointerId = event.pointerId;
         state.startX = event.clientX;
         state.startY = event.clientY;
@@ -479,6 +485,7 @@
           }
           article.setAttribute('role', 'button');
           article.setAttribute('tabindex', '0');
+          article.setAttribute('aria-pressed', 'false');
           article.setAttribute('aria-label', `${card.name || 'Card'} preview. Drag sideways to flip.`);
 
           article.innerHTML = `
