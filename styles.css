@@ -94,7 +94,7 @@ a:hover { text-decoration:underline; }
 }
 .card-frame {
   width: 100%;
-  aspect-ratio: 5 / 7;
+  height: 520px;
   padding: 1rem 1.1rem 1.2rem;
   border-radius: 20px;
   background: linear-gradient(180deg,#f9fafb 0%,#f1f5f9 100%);
@@ -133,6 +133,7 @@ a:hover { text-decoration:underline; }
   background: linear-gradient(120deg,#e6eefc,#f0f5ff);
   border: 1px solid rgba(148,181,241,0.55);
   flex-shrink: 0;
+  height: 40px;
 }
 .card-rarity-badge {
   display: inline-flex;
@@ -173,8 +174,7 @@ a:hover { text-decoration:underline; }
 }
 .card-art {
   position: relative;
-  flex: 1;
-  min-height: 0;
+  height: 180px;
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid rgba(148,163,184,0.45);
@@ -184,6 +184,7 @@ a:hover { text-decoration:underline; }
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 .card-art::after {
   content: "";
@@ -221,6 +222,8 @@ a:hover { text-decoration:underline; }
   letter-spacing: .5px;
   text-transform: uppercase;
   color: #1f2937;
+  height: 36px;
+  flex-shrink: 0;
 }
 .card-type-label {
   font-weight: 600;
@@ -295,12 +298,16 @@ a:hover { text-decoration:underline; }
   grid-template-columns: repeat(3,minmax(0,1fr));
   gap: .6rem;
   flex-shrink: 0;
+  height: 52px;
 }
 .card-statline div {
   background: #f3f4f6;
   border: 1px solid rgba(203,213,225,0.8);
   border-radius: 10px;
   padding: .5rem .6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .card-statline dt {
   margin: 0 0 .25rem;
@@ -321,6 +328,9 @@ a:hover { text-decoration:underline; }
   gap: .4rem;
   margin-top: .3rem;
   flex-shrink: 0;
+  height: 28px;
+  overflow: hidden;
+  align-items: center;
 }
 .card-tag {
   display: inline-flex;
@@ -346,6 +356,10 @@ a:hover { text-decoration:underline; }
   letter-spacing: .5px;
   text-transform: uppercase;
   color: #6b7280;
+  height: 18px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
 }
 .card-display[data-rarity="common"] .card-rarity-badge {
   background: #e2e8f0;
