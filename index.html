@@ -295,6 +295,12 @@
       const maxTiltX = 10;
       const maxTiltY = 16;
 
+      const updateCursorVars = (nx = 0, ny = 0) => {
+        article.style.setProperty('--cursor-x', Number.isFinite(nx) ? nx.toFixed(3) : '0');
+        article.style.setProperty('--cursor-y', Number.isFinite(ny) ? ny.toFixed(3) : '0');
+      };
+      updateCursorVars(0, 0);
+
       const resetTilt = (smooth = true) => {
         if (state.resetTimer) {
           clearTimeout(state.resetTimer);
@@ -315,6 +321,7 @@
           flipEl.style.setProperty('--tilt-y', '0deg');
           flipEl.style.setProperty('--tilt-scale', '1');
         }
+        updateCursorVars(0, 0);
       };
 
       const toggleFlip = () => {
@@ -330,9 +337,12 @@
         const relativeY = (event.clientY - rect.top) / rect.height;
         const tiltY = clamp((relativeX - 0.5) * 2 * maxTiltY, -maxTiltY, maxTiltY);
         const tiltX = clamp((0.5 - relativeY) * 2 * maxTiltX, -maxTiltX, maxTiltX);
+        const normX = clamp((relativeX - 0.5) * 2, -1, 1);
+        const normY = clamp((0.5 - relativeY) * 2, -1, 1);
         flipEl.style.setProperty('--tilt-x', `${tiltX.toFixed(2)}deg`);
         flipEl.style.setProperty('--tilt-y', `${tiltY.toFixed(2)}deg`);
         flipEl.style.setProperty('--tilt-scale', '1.02');
+        updateCursorVars(normX, normY);
       };
 
       const handlePointerDown = (event) => {
@@ -349,6 +359,7 @@
         flipEl.classList.add('is-grabbing');
         flipEl.style.transition = '';
         flipEl.style.setProperty('--tilt-scale', '1');
+        updateCursorVars(0, 0);
       };
 
       const handlePointerMove = (event) => {
@@ -365,6 +376,12 @@
             const dragTilt = clamp(deltaX / 12, -10, 10);
             flipEl.style.setProperty('--tilt-y', `${dragTilt.toFixed(2)}deg`);
           }
+          const rect = flipEl.getBoundingClientRect();
+          const relativeX = (event.clientX - rect.left) / rect.width;
+          const relativeY = (event.clientY - rect.top) / rect.height;
+          const normX = clamp((relativeX - 0.5) * 2, -1, 1);
+          const normY = clamp((0.5 - relativeY) * 2, -1, 1);
+          updateCursorVars(normX, normY);
         } else {
           handleHoverTilt(event);
         }
@@ -510,6 +527,10 @@
                   <dd>${moodDisplayEsc}</dd>
                 </div>
               </dl>
+              <div class="card-set-emblem" aria-label="Set ${setLabel}">
+                <span class="card-set-icon" aria-hidden="true"></span>
+                <span class="card-set-text">Set ${setLabel}</span>
+              </div>
               <div class="card-tags" aria-label="Card tags">
                 ${tagsHtml || '<span class="card-tag card-tag-empty">No tags yet</span>'}
               </div>
@@ -552,6 +573,8 @@
           article.setAttribute('tabindex', '0');
           article.setAttribute('aria-pressed', 'false');
           article.setAttribute('aria-label', `${card.name || 'Card'} preview. Drag sideways to flip.`);
+          article.style.setProperty('--cursor-x', '0');
+          article.style.setProperty('--cursor-y', '0');
 
           article.innerHTML = `
             <div class="card-flip">
