@@ -247,6 +247,10 @@ a:hover { text-decoration:underline; }
   border: 1px solid rgba(203,213,225,0.7);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.65);
   flex-shrink: 0;
+  height: 120px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 .card-abilities {
   list-style: none;
@@ -255,9 +259,11 @@ a:hover { text-decoration:underline; }
   display: flex;
   flex-direction: column;
   gap: .35rem;
-  font-size: clamp(.8rem, 2vw, .88rem);
-  line-height: 1.4;
+  font-size: .88rem;
+  line-height: 1.35;
   color: #111827;
+  flex: 1;
+  overflow: hidden;
 }
 .card-abilities li {
   position: relative;
@@ -275,11 +281,13 @@ a:hover { text-decoration:underline; }
   font-style: italic;
 }
 .card-flavor {
-  margin: .85rem 0 0;
-  font-size: .85rem;
+  margin: auto 0 0;
+  font-size: .82rem;
   color: #6b7280;
   font-style: italic;
   text-align: left;
+  line-height: 1.3;
+  flex-shrink: 0;
 }
 .card-statline {
   margin: .4rem 0 0;

@@ -293,6 +293,27 @@
         }
 
         cardsGrid.appendChild(frag);
+        
+        // Auto-resize text to fit in text boxes
+        requestAnimationFrame(() => {
+          document.querySelectorAll('.card-text-box').forEach(textBox => {
+            const abilities = textBox.querySelector('.card-abilities');
+            if (!abilities) return;
+            
+            let fontSize = 0.88; // Start with default size in rem
+            const minSize = 0.65;
+            const step = 0.02;
+            
+            // Reset to default
+            abilities.style.fontSize = fontSize + 'rem';
+            
+            // Reduce font size until content fits
+            while (textBox.scrollHeight > textBox.clientHeight && fontSize > minSize) {
+              fontSize -= step;
+              abilities.style.fontSize = fontSize + 'rem';
+            }
+          });
+        });
       } catch (err) {
         cardsStatus.textContent = 'Could not load cards right now. Try refreshing in a moment.';
         cardsStatus.hidden = false;
