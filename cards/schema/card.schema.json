@@ -30,7 +30,21 @@
       ]
     },
     "set": { "type": "string", "default": "CORE-01" },
-    "rarity": { "type": "string", "enum": ["common","uncommon","rare","mythic"] },
+    "rarity": {
+      "type": "string",
+      "enum": [
+        "common",
+        "rare",
+        "super-rare",
+        "special-super-rare",
+        "ultra",
+        "event"
+      ]
+    },
+    "rarityName": { "type": "string" },
+    "rarityCode": { "type": "string" },
+    "raritySymbol": { "type": "string" },
+    "rarityTheme": { "type": "string" },
     "tags": { "type": "array", "items": { "type": "string" } },
     "flavor": { "type": "string" },
     "art": {

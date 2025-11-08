@@ -4,7 +4,7 @@
   "name": "Domination Kamidere",
   "archetype": "Kamidere",
   "set": "CORE-01",
-  "rarity": "mythic",
+  "rarity": "special-super-rare",
   "affection": 8,
   "bonds": { "start": 2, "max": 14 },
   "mood": { "thresholds": { "dere": 5, "extreme": 11 } },

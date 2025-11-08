@@ -3,7 +3,7 @@
   "type": "support",
   "name": "Example Support",
   "set": "CORE-01",
-  "rarity": "uncommon",
+  "rarity": "rare",
   "cost": 1,
   "tags": [],
   "text": "Choose a waifu: do a helpful thing.",

@@ -34,7 +34,7 @@
       "type": "waifu",
       "name": "Sunbeam Deredere",
       "archetype": "Deredere",
-      "rarity": "uncommon",
+      "rarity": "rare",
       "tags": [
         "support",
         "heal"
@@ -63,7 +63,7 @@
       "type": "waifu",
       "name": "Crown Himedere",
       "archetype": "Himedere",
-      "rarity": "rare",
+      "rarity": "super-rare",
       "tags": [
         "leader",
         "aura"
@@ -92,7 +92,7 @@
       "type": "waifu",
       "name": "Domination Kamidere",
       "archetype": "Kamidere",
-      "rarity": "mythic",
+      "rarity": "special-super-rare",
       "tags": [
         "control",
         "command"
@@ -121,7 +121,7 @@
       "type": "waifu",
       "name": "Icebound Kuudere",
       "archetype": "Kuudere",
-      "rarity": "rare",
+      "rarity": "super-rare",
       "tags": [
         "control",
         "counter"
@@ -179,7 +179,7 @@
       "type": "waifu",
       "name": "Crimson Yandere",
       "archetype": "Yandere",
-      "rarity": "rare",
+      "rarity": "super-rare",
       "tags": [
         "burst",
         "marking"
@@ -208,7 +208,10 @@
       "type": "waifu",
       "name": "Fracture Yangire",
       "archetype": "Yangire",
-      "rarity": "mythic",
+      "rarity": "event",
+      "rarityName": "Event Exclusive",
+      "rarityCode": "EX",
+      "rarityTheme": "cosmic",
       "tags": [
         "gamble",
         "burst"

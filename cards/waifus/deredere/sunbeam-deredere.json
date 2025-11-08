@@ -4,7 +4,7 @@
   "name": "Sunbeam Deredere",
   "archetype": "Deredere",
   "set": "CORE-01",
-  "rarity": "uncommon",
+  "rarity": "rare",
   "affection": 9,
   "bonds": { "start": 2, "max": 14 },
   "mood": { "thresholds": { "dere": 5, "extreme": 11 } },

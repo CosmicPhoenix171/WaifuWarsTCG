@@ -3,7 +3,7 @@
   "type": "support",
   "name": "Bond Promise",
   "set": "CORE-01",
-  "rarity": "uncommon",
+  "rarity": "rare",
   "cost": 1,
   "tags": ["bond","ramp"],
   "text": "Choose a waifu. Gain +2 Bonds on that waifu. If that waifu is in Dere or higher, draw a card.",

@@ -222,7 +222,7 @@ a:hover { text-decoration:underline; }
   height: 100%;
   object-fit: cover;
   border-radius: inherit;
-  filter: drop-shadow(0 12px 24px rgba(32,212,255,0.25));
+  filter: none;
 }
 .card-header {
   display: grid;
@@ -607,14 +607,18 @@ a:hover { text-decoration:underline; }
   --ultra-accent: #f97316;
 }
 .card-display[data-rarity="ultra"] .card-rarity-badge {
-  background: linear-gradient(120deg, rgba(255,255,255,0.18), rgba(34,211,238,0.3), rgba(139,92,246,0.32));
-  border: 1px solid rgba(139,92,246,0.55);
+  background: linear-gradient(120deg,
+    color-mix(in srgb, var(--ultra-primary) 38%, rgba(255,255,255,0.05)),
+    color-mix(in srgb, var(--ultra-secondary) 42%, rgba(255,255,255,0.1)),
+    color-mix(in srgb, var(--ultra-accent) 28%, transparent));
+  border: 1px solid color-mix(in srgb, var(--ultra-primary) 60%, rgba(255,255,255,0.2));
   color: #f8fafc;
-  box-shadow: 0 0 26px rgba(34,211,238,0.4);
+  box-shadow: 0 0 26px color-mix(in srgb, var(--ultra-secondary) 55%, rgba(9,9,11,0.65));
 }
 .card-display[data-rarity="ultra"] .card-rarity-symbol,
 .card-display[data-rarity="ultra"] .card-rarity-code {
-  text-shadow: 0 0 10px rgba(34,211,238,0.8);
+  color: #fdfcff;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--ultra-secondary) 60%, rgba(2,6,23,0.85));
 }
 .card-display[data-rarity="ultra"] .card-frame {
   background: radial-gradient(circle at 20% 15%, rgba(34,211,238,0.28), transparent 65%),
@@ -672,6 +676,20 @@ a:hover { text-decoration:underline; }
     color-mix(in srgb, var(--ultra-primary) 55%, transparent) 45%,
     color-mix(in srgb, var(--ultra-accent) 55%, transparent) 65%,
     transparent 100%);
+}
+
+.card-display[data-rarity-tier="event"] .card-rarity-badge {
+  border-width: 2px;
+  box-shadow: 0 0 34px color-mix(in srgb, var(--ultra-secondary) 65%, rgba(2,6,23,0.65)), 0 0 12px rgba(255,255,255,0.35);
+}
+.card-display[data-rarity-tier="event"] .card-frame {
+  box-shadow: 0 34px 80px -28px color-mix(in srgb, var(--ultra-primary) 60%, rgba(8,47,73,0.85));
+}
+.card-display[data-rarity-tier="event"] .card-frame:before {
+  animation-duration: 4.4s;
+}
+.card-display[data-rarity-tier="event"] .card-frame:after {
+  animation-duration: 4.8s;
 }
 
 /* Archetype-Specific Borders */

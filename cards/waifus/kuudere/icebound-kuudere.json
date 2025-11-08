@@ -4,7 +4,7 @@
   "name": "Icebound Kuudere",
   "archetype": "Kuudere",
   "set": "CORE-01",
-  "rarity": "rare",
+  "rarity": "super-rare",
   "affection": 8,
   "bonds": { "start": 1, "max": 12 },
   "mood": { "thresholds": { "dere": 4, "extreme": 9 } },

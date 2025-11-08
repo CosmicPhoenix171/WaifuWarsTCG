@@ -4,7 +4,7 @@
   "name": "Crimson Yandere",
   "archetype": "Yandere",
   "set": "CORE-01",
-  "rarity": "rare",
+  "rarity": "super-rare",
   "affection": 7,
   "bonds": { "start": 1, "max": 12 },
   "mood": { "thresholds": { "dere": 4, "extreme": 9 } },

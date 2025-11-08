@@ -4,7 +4,7 @@
   "name": "Crown Himedere",
   "archetype": "Himedere",
   "set": "CORE-01",
-  "rarity": "rare",
+  "rarity": "super-rare",
   "affection": 9,
   "bonds": { "start": 1, "max": 13 },
   "mood": { "thresholds": { "dere": 5, "extreme": 10 } },
