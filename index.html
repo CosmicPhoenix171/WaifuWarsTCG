@@ -406,7 +406,6 @@
           const setLabel = escapeHtml(card.set || 'TBA');
           const idLabel = escapeHtml((card.id || '').toUpperCase());
           const artRoleEsc = escapeHtml(artRole);
-          const backMeta = escapeHtml(`${card.set ? `Set ${card.set}` : 'Set TBA'} • ${card.id ? card.id.toUpperCase() : 'ID TBA'}`);
 
           const tagsHtml = (card.tags || [])
             .map(tag => `<span class="card-tag">${escapeHtml(tag)}</span>`)
@@ -462,14 +461,9 @@
           `;
 
           const backHtml = `
-            <div class="card-back-frame">
+            <div class="card-back-frame" aria-hidden="true">
               <div class="card-back-art">
                 <img src="${backArt}" alt="Waifu Wars card back" onerror="this.onerror=null;this.src='${fallbackCardBack}';">
-              </div>
-              <div class="card-back-caption">
-                <span class="card-back-caption-title">${cardTitle}</span>
-                <span class="card-back-caption-meta">${backMeta}</span>
-                <span class="card-back-caption-note">Drag or swipe sideways to flip</span>
               </div>
             </div>
           `;

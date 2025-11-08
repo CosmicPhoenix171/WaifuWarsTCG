@@ -195,7 +195,7 @@ a:hover { text-decoration:underline; }
   border: 1px solid rgba(96,165,250,0.35);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   position: relative;
   overflow: hidden;
@@ -221,35 +221,6 @@ a:hover { text-decoration:underline; }
   height: 100%;
   object-fit: contain;
   filter: drop-shadow(0 12px 24px rgba(32,212,255,0.25));
-}
-.card-back-caption {
-  width: 100%;
-  margin-top: 1.4rem;
-  text-align: center;
-  color: #cbd5f5;
-  font-size: .78rem;
-  letter-spacing: 1.2px;
-  text-transform: uppercase;
-  display: flex;
-  flex-direction: column;
-  gap: .3rem;
-}
-.card-back-caption span {
-  display: block;
-}
-.card-back-caption .card-back-caption-title {
-  font-size: .88rem;
-  font-weight: 700;
-  color: #e0e7ff;
-}
-.card-back-caption .card-back-caption-meta {
-  font-size: .74rem;
-  opacity: .82;
-}
-.card-back-caption .card-back-caption-note {
-  font-size: .7rem;
-  opacity: .6;
-  letter-spacing: 1.6px;
 }
 .card-header {
   display: grid;
