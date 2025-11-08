@@ -427,11 +427,14 @@
 
         for (const card of waifus) {
     const rarityKey = (card.rarity || 'common').toLowerCase();
-    const rarityMeta = RARITY_META[rarityKey] || RARITY_META.common;
-    const rarityDatasetKey = rarityMeta.datasetKey || rarityMeta.key;
-    const rarityName = escapeHtml(card.rarityName || rarityMeta.name);
-    const rarityCode = escapeHtml(card.rarityCode || rarityMeta.code);
-    const raritySymbol = escapeHtml(card.raritySymbol || rarityMeta.symbol);
+  const rarityMeta = RARITY_META[rarityKey] || RARITY_META.common;
+  const rarityDatasetKey = rarityMeta.datasetKey || rarityMeta.key;
+  const rawRarityName = card.rarityName || rarityMeta.name;
+  const rawRarityCode = card.rarityCode || rarityMeta.code;
+  const rawRaritySymbol = card.raritySymbol || rarityMeta.symbol;
+  const rarityName = escapeHtml(rawRarityName);
+  const rarityCode = escapeHtml(rawRarityCode);
+  const raritySymbol = escapeHtml(rawRaritySymbol);
 
     const typeLabel = capitalize(card.type || 'waifu');
           const abilityLines = formatSentences(card.text);
@@ -540,7 +543,10 @@
             article.dataset.rarityTheme = rarityTheme;
           }
           if (card.rarityCode) {
-            article.dataset.rarityCode = rarityCode;
+            article.dataset.rarityCode = rawRarityCode;
+          }
+          if (card.rarityName) {
+            article.dataset.rarityName = rawRarityName;
           }
           article.setAttribute('role', 'button');
           article.setAttribute('tabindex', '0');

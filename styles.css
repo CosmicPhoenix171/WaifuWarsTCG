@@ -568,6 +568,7 @@ a:hover { text-decoration:underline; }
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  background-size: 200% 200%;
   animation: spectral-shift 5s linear infinite;
 }
 .card-display[data-rarity="special-super-rare"] .card-rarity-code {
@@ -575,6 +576,7 @@ a:hover { text-decoration:underline; }
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  background-size: 180% 180%;
   animation: spectral-shift 4s linear infinite reverse;
 }
 .card-display[data-rarity="special-super-rare"] .card-frame {
@@ -676,6 +678,17 @@ a:hover { text-decoration:underline; }
     color-mix(in srgb, var(--ultra-primary) 55%, transparent) 45%,
     color-mix(in srgb, var(--ultra-accent) 55%, transparent) 65%,
     transparent 100%);
+}
+
+.card-display[data-rarity-tier="event"] .card-rarity-badge {
+  box-shadow: 0 0 28px color-mix(in srgb, var(--ultra-accent, #f97316) 55%, rgba(15,23,42,0.7));
+  border-width: 2px;
+}
+.card-display[data-rarity-tier="event"] .card-frame {
+  box-shadow: 0 32px 80px -26px color-mix(in srgb, var(--ultra-accent, #f97316) 60%, rgba(15,23,42,0.65));
+}
+.card-display[data-rarity-tier="event"] .card-frame:after {
+  animation-duration: 4.5s;
 }
 
 .card-display[data-rarity-tier="event"] .card-rarity-badge {
