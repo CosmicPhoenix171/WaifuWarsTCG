@@ -178,6 +178,51 @@
 
     const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 
+    const RARITY_META = {
+      common: {
+        key: 'common',
+        datasetKey: 'common',
+        name: 'Common',
+        code: 'C',
+        symbol: '●'
+      },
+      rare: {
+        key: 'rare',
+        datasetKey: 'rare',
+        name: 'Rare',
+        code: 'R',
+        symbol: '★'
+      },
+      'super-rare': {
+        key: 'super-rare',
+        datasetKey: 'super-rare',
+        name: 'Super Rare',
+        code: 'SR',
+        symbol: '★★'
+      },
+      'special-super-rare': {
+        key: 'special-super-rare',
+        datasetKey: 'special-super-rare',
+        name: 'Special Super Rare',
+        code: 'SSR',
+        symbol: '★★★'
+      },
+      ultra: {
+        key: 'ultra',
+        datasetKey: 'ultra',
+        name: 'Ultra Rare',
+        code: 'UR',
+        symbol: '✪'
+      },
+      event: {
+        key: 'event',
+        datasetKey: 'ultra',
+        name: 'Event Exclusive',
+        code: 'EX',
+        symbol: '✪'
+      }
+    };
+
     function escapeHtml(str = '') {
       return String(str).replace(/[&<>"']/g, ch => ({
         '&': '&amp;',
@@ -381,8 +426,14 @@
         const fallbackCardBack = 'assets/images/card-back-default.svg';
 
         for (const card of waifus) {
-          const rarity = (card.rarity || 'common').toLowerCase();
-          const typeLabel = capitalize(card.type || 'waifu');
+    const rarityKey = (card.rarity || 'common').toLowerCase();
+    const rarityMeta = RARITY_META[rarityKey] || RARITY_META.common;
+    const rarityDatasetKey = rarityMeta.datasetKey || rarityMeta.key;
+    const rarityName = escapeHtml(card.rarityName || rarityMeta.name);
+    const rarityCode = escapeHtml(card.rarityCode || rarityMeta.code);
+    const raritySymbol = escapeHtml(card.raritySymbol || rarityMeta.symbol);
+
+    const typeLabel = capitalize(card.type || 'waifu');
           const abilityLines = formatSentences(card.text);
           const flavor = card.flavor ? card.flavor.replace(/^“|”$/g, '') : '';
           const moodDisplay = formatMood(card.mood);
@@ -397,7 +448,6 @@
             : `<img src="${backArt}" alt="Waifu Wars card back" class="card-art-img-back" onerror="this.onerror=null;this.src='${fallbackCardBack}';">`;
 
           const cardTitle = escapeHtml(card.name || 'Unnamed Card');
-          const rarityLabel = escapeHtml((card.rarity || 'common').toUpperCase());
           const typeDescriptor = card.archetype ? `${typeLabel} — ${card.archetype}` : typeLabel;
           const typeDescriptorEsc = escapeHtml(typeDescriptor);
           const archetypeChip = escapeHtml((card.archetype || typeLabel).toUpperCase());
@@ -422,7 +472,11 @@
           const frontHtml = `
             <div class="card-frame">
               <header class="card-header">
-                <span class="card-rarity-badge">${rarityLabel}</span>
+                <span class="card-rarity-badge">
+                  <span class="card-rarity-symbol" aria-hidden="true">${raritySymbol}</span>
+                  <span class="sr-only">${rarityName} rarity</span>
+                  <span class="card-rarity-code">${rarityCode}</span>
+                </span>
                 <h3 class="card-title">${cardTitle}</h3>
                 <span class="card-aff-chip"><span aria-hidden="true">❤</span><span class="sr-only">Affection</span>${card.affection ?? '—'}</span>
               </header>
@@ -470,12 +524,23 @@
 
           const article = document.createElement('article');
           article.className = 'card-display';
-          article.dataset.rarity = rarity;
+          article.dataset.rarity = rarityDatasetKey;
+          article.dataset.rarityTier = rarityMeta.key;
           if (card.archetype) {
             article.dataset.archetype = card.archetype.toLowerCase();
           }
           if (card.id) {
             article.dataset.cardId = card.id;
+          }
+          if (rarityKey === 'event') {
+            article.dataset.rarityVariant = 'event';
+          }
+          const rarityTheme = (card.rarityTheme || '').toLowerCase();
+          if (rarityTheme) {
+            article.dataset.rarityTheme = rarityTheme;
+          }
+          if (card.rarityCode) {
+            article.dataset.rarityCode = rarityCode;
           }
           article.setAttribute('role', 'button');
           article.setAttribute('tabindex', '0');
