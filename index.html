@@ -223,6 +223,9 @@
         cardsStatus.hidden = true;
         const frag = document.createDocumentFragment();
 
+        const customCardBack = 'assets/images/card-back.png';
+        const fallbackCardBack = 'assets/images/card-back-default.svg';
+
         for (const card of waifus) {
           const rarity = (card.rarity || 'common').toLowerCase();
           const typeLabel = card.type ? capitalize(card.type) : 'Waifu';
@@ -231,6 +234,11 @@
           const moodDisplay = formatMood(card.mood);
           const bondsDisplay = formatBonds(card.bonds);
           const artDefault = card.art?.default;
+          const hasArt = Boolean(artDefault);
+          const artRole = hasArt ? `${card.name} artwork` : 'Card back artwork';
+          const artMarkup = hasArt
+            ? `<img src="${artDefault}" alt="">`
+            : `<img src="${customCardBack}" alt="Waifu Wars card back" class="card-art-img-back" onerror="this.onerror=null;this.src='${fallbackCardBack}';">`;
 
           const article = document.createElement('article');
           article.className = 'card-display';
@@ -261,8 +269,8 @@
                 <h3 class="card-title">${card.name}</h3>
                 <span class="card-aff-chip"><span aria-hidden="true">❤</span><span class="sr-only">Affection</span>${card.affection ?? '—'}</span>
               </header>
-              <div class="card-art" role="img" aria-label="${card.name} artwork">
-                ${artDefault ? `<img src="${artDefault}" alt="">` : '<div class="card-art-placeholder"></div>'}
+              <div class="${hasArt ? 'card-art' : 'card-art card-art--back'}" role="img" aria-label="${artRole}">
+                ${artMarkup}
               </div>
               <div class="card-type-row">
                 <span class="card-type-label">${card.archetype ? `${typeLabel} — ${card.archetype}` : typeLabel}</span>
