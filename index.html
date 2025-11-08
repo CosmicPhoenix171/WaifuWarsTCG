@@ -276,6 +276,31 @@
       });
     }
 
+    function syncCardHeight(article) {
+      if (!article) return;
+      const flipEl = article.querySelector('.card-flip');
+      if (!flipEl) return;
+      const front = flipEl.querySelector('.card-face--front');
+      const back = flipEl.querySelector('.card-face--back');
+      const frontHeight = front ? front.offsetHeight : 0;
+      const backHeight = back ? back.offsetHeight : 0;
+      const targetHeight = Math.max(frontHeight, backHeight);
+      if (targetHeight) {
+        flipEl.style.height = `${targetHeight}px`;
+        flipEl.style.setProperty('--card-height', `${targetHeight}px`);
+      }
+    }
+
+    let syncHeightsFrame = null;
+    function scheduleSyncAllCardHeights(scope = document) {
+      if (syncHeightsFrame) cancelAnimationFrame(syncHeightsFrame);
+      syncHeightsFrame = requestAnimationFrame(() => {
+        syncHeightsFrame = null;
+        const root = scope instanceof Element ? scope : document;
+        root.querySelectorAll('.card-display').forEach(syncCardHeight);
+      });
+    }
+
     function setupInteractiveCard(article) {
       const flipEl = article.querySelector('.card-flip');
       if (!flipEl) return;
@@ -594,8 +619,12 @@
         cardsGrid.appendChild(frag);
 
         balanceAbilityText(cardsGrid);
+        scheduleSyncAllCardHeights(cardsGrid);
         requestAnimationFrame(() => {
-          interactiveArticles.forEach(setupInteractiveCard);
+          interactiveArticles.forEach((article) => {
+            syncCardHeight(article);
+            setupInteractiveCard(article);
+          });
         });
       } catch (err) {
         cardsStatus.textContent = 'Could not load cards right now. Try refreshing in a moment.';
@@ -604,7 +633,15 @@
       }
     }
 
-    window.addEventListener('resize', () => balanceAbilityText(cardsGrid));
+    window.addEventListener('resize', () => {
+      balanceAbilityText(cardsGrid);
+      scheduleSyncAllCardHeights(cardsGrid);
+    });
+
+    if (document.fonts && typeof document.fonts.ready?.then === 'function') {
+      document.fonts.ready.then(() => scheduleSyncAllCardHeights(cardsGrid)).catch(() => {});
+    }
+
     loadCards();
   </script>
 </body>
