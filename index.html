@@ -235,6 +235,9 @@
           const article = document.createElement('article');
           article.className = 'card-display';
           article.dataset.rarity = rarity;
+          if (card.archetype) {
+            article.dataset.archetype = card.archetype.toLowerCase();
+          }
           article.setAttribute('tabindex', '0');
           article.setAttribute('role', 'button');
           article.setAttribute('aria-label', `View ${card.name} details`);
@@ -362,8 +365,10 @@
         ? `<p class="card-flavor">"${flavor}"</p>`
         : '';
 
+      const archetypeAttr = card.archetype ? ` data-archetype="${card.archetype.toLowerCase()}"` : '';
+      
       modalContent.innerHTML = `
-        <article class="card-display" data-rarity="${rarity}">
+        <article class="card-display" data-rarity="${rarity}"${archetypeAttr}>
           <div class="card-frame">
             <header class="card-header">
               <span class="card-rarity-badge">${(card.rarity || 'common').toUpperCase()}</span>
