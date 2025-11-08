@@ -521,6 +521,50 @@ a:hover { text-decoration:underline; }
   transform: translate3d(calc(var(--cursor-x) * 4px), calc(var(--cursor-y) * -4px), 0);
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 16px 28px -18px rgba(59,130,246,0.55);
 }
+.card-set-emblem {
+  margin-top: .55rem;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .4rem .75rem .4rem .55rem;
+  border-radius: 14px;
+  background: var(--set-bg);
+  border: 1px solid var(--set-border);
+  color: var(--set-text);
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: .85px;
+  text-transform: uppercase;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.65), 0 10px 22px -16px rgba(15,23,42,0.55);
+  transition: transform .3s ease, box-shadow .3s ease;
+  transform: translate3d(0,0,0);
+}
+.card-set-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 9px;
+  border: 1px solid var(--set-icon-border);
+  background:
+    conic-gradient(from 160deg, rgba(255,255,255,0.36), rgba(255,255,255,0) 55%, rgba(255,255,255,0.24) 75%, rgba(255,255,255,0.4)),
+    linear-gradient(140deg, rgba(255,255,255,0.12), rgba(15,23,42,0.14));
+  display: grid;
+  place-items: center;
+  position: relative;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75), 0 0 16px -4px var(--set-icon-glow);
+  color: var(--set-text);
+  font-size: .9rem;
+}
+.card-set-icon::before {
+  content: "✧";
+}
+.card-display:hover .card-set-emblem {
+  transform: translate3d(calc(var(--cursor-x) * 5px), calc(var(--cursor-y) * -5px), 0);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 14px 28px -18px rgba(59,130,246,0.55);
+}
+.card-set-text {
+  letter-spacing: .85px;
+}
 .card-tags {
   display: flex;
   flex-wrap: wrap;
@@ -742,6 +786,14 @@ a:hover { text-decoration:underline; }
 .card-display[data-rarity="ultra"] {
   --foil-strength: 0.72;
   --art-border-gradient: linear-gradient(135deg, color-mix(in srgb, var(--ultra-secondary) 65%, transparent), color-mix(in srgb, var(--ultra-accent) 55%, transparent));
+  --set-bg: linear-gradient(145deg,
+    color-mix(in srgb, var(--ultra-primary) 28%, rgba(15,23,42,0.05)),
+    color-mix(in srgb, var(--ultra-secondary) 22%, rgba(15,23,42,0.1)),
+    color-mix(in srgb, var(--ultra-accent) 18%, rgba(15,23,42,0.12)));
+  --set-border: color-mix(in srgb, var(--ultra-primary) 55%, rgba(255,255,255,0.2));
+  --set-text: #f8fafc;
+  --set-icon-border: color-mix(in srgb, var(--ultra-secondary) 65%, rgba(255,255,255,0.2));
+  --set-icon-glow: color-mix(in srgb, var(--ultra-secondary) 55%, rgba(15,23,42,0.35));
 }
 .card-display[data-rarity="ultra"] .card-rarity-symbol,
 .card-display[data-rarity="ultra"] .card-rarity-code {
