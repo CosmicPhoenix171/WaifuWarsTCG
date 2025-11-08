@@ -176,14 +176,26 @@
     const cardsGrid = document.getElementById('cards-grid');
     const cardsStatus = document.getElementById('cards-status');
 
+    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+
+    function escapeHtml(str = '') {
+      return String(str).replace(/[&<>"']/g, ch => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[ch]));
+    }
+
     function capitalize(word = '') {
       return word.charAt(0).toUpperCase() + word.slice(1);
     }
 
     function formatSentences(text) {
       if (!text) return [];
-      return text
-        .split(/(?<=[.!?])\s+/)
+      return String(text)
+        .split(/(?:\r?\n|\r)+|(?<=[.!?])\s+/)
         .map(line => line.trim())
         .filter(Boolean);
     }
@@ -204,6 +216,139 @@
       return `${dere} / ${extreme}`;
     }
 
+    function balanceAbilityText(root = document) {
+      if (!root || typeof root.querySelectorAll !== 'function') return;
+      root.querySelectorAll('.card-text-box').forEach((textBox) => {
+        const abilities = textBox.querySelector('.card-abilities');
+        if (!abilities) return;
+        abilities.style.fontSize = '';
+        let fontSize = parseFloat(getComputedStyle(abilities).fontSize) || 14;
+        const minFontSize = 11;
+        while (textBox.scrollHeight > textBox.clientHeight && fontSize > minFontSize) {
+          fontSize -= 0.5;
+          abilities.style.fontSize = `${fontSize}px`;
+        }
+      });
+    }
+
+    function setupInteractiveCard(article) {
+      const flipEl = article.querySelector('.card-flip');
+      if (!flipEl) return;
+
+      const state = {
+        pointerId: null,
+        startX: 0,
+        startY: 0,
+        isDragging: false,
+        hasFlipped: false,
+        isFlipped: flipEl.classList.contains('is-flipped'),
+        resetTimer: null
+      };
+
+      const maxTiltX = 10;
+      const maxTiltY = 16;
+
+      const resetTilt = (smooth = true) => {
+        if (state.resetTimer) {
+          clearTimeout(state.resetTimer);
+          state.resetTimer = null;
+        }
+        if (smooth) {
+          flipEl.style.transition = 'transform .26s ease, box-shadow .26s ease';
+          flipEl.style.setProperty('--tilt-x', '0deg');
+          flipEl.style.setProperty('--tilt-y', '0deg');
+          flipEl.style.setProperty('--tilt-scale', '1');
+          state.resetTimer = setTimeout(() => {
+            flipEl.style.transition = '';
+            state.resetTimer = null;
+          }, 260);
+        } else {
+          flipEl.style.transition = '';
+          flipEl.style.setProperty('--tilt-x', '0deg');
+          flipEl.style.setProperty('--tilt-y', '0deg');
+          flipEl.style.setProperty('--tilt-scale', '1');
+        }
+      };
+
+      const toggleFlip = () => {
+        state.isFlipped = !state.isFlipped;
+        flipEl.classList.toggle('is-flipped', state.isFlipped);
+      };
+
+      const handleHoverTilt = (event) => {
+        if (state.isDragging) return;
+        const rect = flipEl.getBoundingClientRect();
+        const relativeX = (event.clientX - rect.left) / rect.width;
+        const relativeY = (event.clientY - rect.top) / rect.height;
+        const tiltY = clamp((relativeX - 0.5) * 2 * maxTiltY, -maxTiltY, maxTiltY);
+        const tiltX = clamp((0.5 - relativeY) * 2 * maxTiltX, -maxTiltX, maxTiltX);
+        flipEl.style.setProperty('--tilt-x', `${tiltX.toFixed(2)}deg`);
+        flipEl.style.setProperty('--tilt-y', `${tiltY.toFixed(2)}deg`);
+        flipEl.style.setProperty('--tilt-scale', '1.02');
+      };
+
+      const handlePointerDown = (event) => {
+        event.preventDefault();
+        state.pointerId = event.pointerId;
+        state.startX = event.clientX;
+        state.startY = event.clientY;
+        state.isDragging = true;
+        state.hasFlipped = false;
+        flipEl.setPointerCapture(event.pointerId);
+        flipEl.classList.add('is-grabbing');
+        flipEl.style.transition = '';
+        flipEl.style.setProperty('--tilt-scale', '1');
+      };
+
+      const handlePointerMove = (event) => {
+        if (state.isDragging) {
+          if (state.pointerId !== event.pointerId) return;
+          const deltaX = event.clientX - state.startX;
+          const deltaY = event.clientY - state.startY;
+
+          if (!state.hasFlipped && Math.abs(deltaX) > 80 && Math.abs(deltaY) < 120) {
+            toggleFlip();
+            state.hasFlipped = true;
+            resetTilt(false);
+          } else if (!state.hasFlipped) {
+            const dragTilt = clamp(deltaX / 12, -10, 10);
+            flipEl.style.setProperty('--tilt-y', `${dragTilt.toFixed(2)}deg`);
+          }
+        } else {
+          handleHoverTilt(event);
+        }
+      };
+
+      const handlePointerEnd = (event) => {
+        if (state.pointerId !== event.pointerId) return;
+        flipEl.releasePointerCapture(event.pointerId);
+        state.pointerId = null;
+        state.isDragging = false;
+        flipEl.classList.remove('is-grabbing');
+        resetTilt();
+      };
+
+      flipEl.addEventListener('pointerenter', handleHoverTilt);
+      flipEl.addEventListener('pointermove', handlePointerMove);
+      flipEl.addEventListener('pointerleave', () => {
+        if (state.isDragging) return;
+        resetTilt();
+      });
+      flipEl.addEventListener('pointerdown', handlePointerDown);
+      flipEl.addEventListener('pointerup', handlePointerEnd);
+      flipEl.addEventListener('pointercancel', handlePointerEnd);
+
+      article.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          toggleFlip();
+          resetTilt();
+        }
+      });
+
+      resetTilt(false);
+    }
+
     async function loadCards() {
       if (!cardsGrid || !cardsStatus) return;
       try {
@@ -221,60 +366,67 @@
 
         cardsStatus.textContent = '';
         cardsStatus.hidden = true;
+        cardsGrid.innerHTML = '';
+
         const frag = document.createDocumentFragment();
+        const interactiveArticles = [];
 
         const customCardBack = 'assets/images/card-back.png';
         const fallbackCardBack = 'assets/images/card-back-default.svg';
 
         for (const card of waifus) {
           const rarity = (card.rarity || 'common').toLowerCase();
-          const typeLabel = card.type ? capitalize(card.type) : 'Waifu';
+          const typeLabel = capitalize(card.type || 'waifu');
           const abilityLines = formatSentences(card.text);
           const flavor = card.flavor ? card.flavor.replace(/^“|”$/g, '') : '';
           const moodDisplay = formatMood(card.mood);
           const bondsDisplay = formatBonds(card.bonds);
           const artDefault = card.art?.default;
+          const backArt = card.art?.back || customCardBack;
           const hasArt = Boolean(artDefault);
-          const artRole = hasArt ? `${card.name} artwork` : 'Card back artwork';
+
+          const artRole = hasArt ? `${card.name || 'Card'} artwork` : 'Card back artwork';
           const artMarkup = hasArt
             ? `<img src="${artDefault}" alt="">`
-            : `<img src="${customCardBack}" alt="Waifu Wars card back" class="card-art-img-back" onerror="this.onerror=null;this.src='${fallbackCardBack}';">`;
+            : `<img src="${backArt}" alt="Waifu Wars card back" class="card-art-img-back" onerror="this.onerror=null;this.src='${fallbackCardBack}';">`;
 
-          const article = document.createElement('article');
-          article.className = 'card-display';
-          article.dataset.rarity = rarity;
-          if (card.archetype) {
-            article.dataset.archetype = card.archetype.toLowerCase();
-          }
-          article.setAttribute('tabindex', '0');
-          article.setAttribute('role', 'button');
-          article.setAttribute('aria-label', `View ${card.name} details`);
+          const cardTitle = escapeHtml(card.name || 'Unnamed Card');
+          const rarityLabel = escapeHtml((card.rarity || 'common').toUpperCase());
+          const typeDescriptor = card.archetype ? `${typeLabel} — ${card.archetype}` : typeLabel;
+          const typeDescriptorEsc = escapeHtml(typeDescriptor);
+          const archetypeChip = escapeHtml((card.archetype || typeLabel).toUpperCase());
+          const moodDisplayEsc = escapeHtml(moodDisplay);
+          const bondsDisplayEsc = escapeHtml(bondsDisplay);
+          const setLabel = escapeHtml(card.set || 'TBA');
+          const idLabel = escapeHtml((card.id || '').toUpperCase());
+          const artRoleEsc = escapeHtml(artRole);
+          const backMeta = escapeHtml(`${card.set ? `Set ${card.set}` : 'Set TBA'} • ${card.id ? card.id.toUpperCase() : 'ID TBA'}`);
 
           const tagsHtml = (card.tags || [])
-            .map(tag => `<span class="card-tag">${tag}</span>`)
+            .map(tag => `<span class="card-tag">${escapeHtml(tag)}</span>`)
             .join('');
 
           const abilitiesHtml = abilityLines.length
-            ? abilityLines.map(line => `<li>${line}</li>`).join('')
+            ? abilityLines.map(line => `<li>${escapeHtml(line)}</li>`).join('')
             : '<li class="card-ability-empty">Ability text coming soon.</li>';
 
           const flavorHtml = flavor
-            ? `<p class="card-flavor">“${flavor}”</p>`
+            ? `<p class="card-flavor">“${escapeHtml(flavor)}”</p>`
             : '';
 
-          article.innerHTML = `
+          const frontHtml = `
             <div class="card-frame">
               <header class="card-header">
-                <span class="card-rarity-badge">${(card.rarity || 'common').toUpperCase()}</span>
-                <h3 class="card-title">${card.name}</h3>
+                <span class="card-rarity-badge">${rarityLabel}</span>
+                <h3 class="card-title">${cardTitle}</h3>
                 <span class="card-aff-chip"><span aria-hidden="true">❤</span><span class="sr-only">Affection</span>${card.affection ?? '—'}</span>
               </header>
-              <div class="${hasArt ? 'card-art' : 'card-art card-art--back'}" role="img" aria-label="${artRole}">
+              <div class="${hasArt ? 'card-art' : 'card-art card-art--back'}" role="img" aria-label="${artRoleEsc}">
                 ${artMarkup}
               </div>
               <div class="card-type-row">
-                <span class="card-type-label">${card.archetype ? `${typeLabel} — ${card.archetype}` : typeLabel}</span>
-                <span class="card-archetype-chip">${(card.archetype || typeLabel).toUpperCase()}</span>
+                <span class="card-type-label">${typeDescriptorEsc}</span>
+                <span class="card-archetype-chip">${archetypeChip}</span>
               </div>
               <div class="card-text-box">
                 <ul class="card-abilities">
@@ -289,53 +441,66 @@
                 </div>
                 <div>
                   <dt>Bonds</dt>
-                  <dd>${bondsDisplay}</dd>
+                  <dd>${bondsDisplayEsc}</dd>
                 </div>
                 <div>
                   <dt>Mood</dt>
-                  <dd>${moodDisplay}</dd>
+                  <dd>${moodDisplayEsc}</dd>
                 </div>
               </dl>
               <div class="card-tags" aria-label="Card tags">
                 ${tagsHtml || '<span class="card-tag card-tag-empty">No tags yet</span>'}
               </div>
-              <footer class="card-footer">Set ${card.set || 'TBA'} • ${card.id?.toUpperCase() || ''}</footer>
+              <footer class="card-footer">Set ${setLabel} • ${idLabel}</footer>
             </div>
           `;
 
-          // Add click handler for modal
-          article.addEventListener('click', () => openCardModal(card, rarity));
-          article.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              openCardModal(card, rarity);
-            }
-          });
+          const backHtml = `
+            <div class="card-back-frame">
+              <div class="card-back-art">
+                <img src="${backArt}" alt="Waifu Wars card back" onerror="this.onerror=null;this.src='${fallbackCardBack}';">
+              </div>
+              <div class="card-back-caption">
+                <span class="card-back-caption-title">${cardTitle}</span>
+                <span class="card-back-caption-meta">${backMeta}</span>
+                <span class="card-back-caption-note">Drag or swipe sideways to flip</span>
+              </div>
+            </div>
+          `;
+
+          const article = document.createElement('article');
+          article.className = 'card-display';
+          article.dataset.rarity = rarity;
+          if (card.archetype) {
+            article.dataset.archetype = card.archetype.toLowerCase();
+          }
+          if (card.id) {
+            article.dataset.cardId = card.id;
+          }
+          article.setAttribute('role', 'button');
+          article.setAttribute('tabindex', '0');
+          article.setAttribute('aria-label', `${card.name || 'Card'} preview. Drag sideways to flip.`);
+
+          article.innerHTML = `
+            <div class="card-flip">
+              <div class="card-face card-face--front">
+                ${frontHtml}
+              </div>
+              <div class="card-face card-face--back">
+                ${backHtml}
+              </div>
+            </div>
+          `;
 
           frag.appendChild(article);
+          interactiveArticles.push(article);
         }
 
         cardsGrid.appendChild(frag);
-        
-        // Auto-resize text to fit in text boxes
+
+        balanceAbilityText(cardsGrid);
         requestAnimationFrame(() => {
-          document.querySelectorAll('.card-text-box').forEach(textBox => {
-            const abilities = textBox.querySelector('.card-abilities');
-            if (!abilities) return;
-            
-            let fontSize = 0.88; // Start with default size in rem
-            const minSize = 0.65;
-            const step = 0.02;
-            
-            // Reset to default
-            abilities.style.fontSize = fontSize + 'rem';
-            
-            // Reduce font size until content fits
-            while (textBox.scrollHeight > textBox.clientHeight && fontSize > minSize) {
-              fontSize -= step;
-              abilities.style.fontSize = fontSize + 'rem';
-            }
-          });
+          interactiveArticles.forEach(setupInteractiveCard);
         });
       } catch (err) {
         cardsStatus.textContent = 'Could not load cards right now. Try refreshing in a moment.';
@@ -344,132 +509,7 @@
       }
     }
 
-    // Card modal functionality
-    function openCardModal(card, rarity) {
-      const modal = document.getElementById('card-modal');
-      if (!modal) {
-        createCardModal();
-        openCardModal(card, rarity);
-        return;
-      }
-
-      const modalContent = modal.querySelector('.modal-card-wrapper');
-      const typeLabel = card.type ? capitalize(card.type) : 'Waifu';
-      const abilityLines = formatSentences(card.text);
-      const flavor = card.flavor ? card.flavor.replace(/^"|"$/g, '') : '';
-      const moodDisplay = formatMood(card.mood);
-      const bondsDisplay = formatBonds(card.bonds);
-      const artDefault = card.art?.default;
-
-      const tagsHtml = (card.tags || [])
-        .map(tag => `<span class="card-tag">${tag}</span>`)
-        .join('');
-
-      const abilitiesHtml = abilityLines.length
-        ? abilityLines.map(line => `<li>${line}</li>`).join('')
-        : '<li class="card-ability-empty">Ability text coming soon.</li>';
-
-      const flavorHtml = flavor
-        ? `<p class="card-flavor">"${flavor}"</p>`
-        : '';
-
-      const archetypeAttr = card.archetype ? ` data-archetype="${card.archetype.toLowerCase()}"` : '';
-      
-      modalContent.innerHTML = `
-        <article class="card-display" data-rarity="${rarity}"${archetypeAttr}>
-          <div class="card-frame">
-            <header class="card-header">
-              <span class="card-rarity-badge">${(card.rarity || 'common').toUpperCase()}</span>
-              <h3 class="card-title">${card.name}</h3>
-              <span class="card-aff-chip"><span aria-hidden="true">❤</span><span class="sr-only">Affection</span>${card.affection ?? '—'}</span>
-            </header>
-            <div class="card-art" role="img" aria-label="${card.name} artwork">
-              ${artDefault ? `<img src="${artDefault}" alt="">` : '<div class="card-art-placeholder"></div>'}
-            </div>
-            <div class="card-type-row">
-              <span class="card-type-label">${card.archetype ? `${typeLabel} — ${card.archetype}` : typeLabel}</span>
-              <span class="card-archetype-chip">${(card.archetype || typeLabel).toUpperCase()}</span>
-            </div>
-            <div class="card-text-box">
-              <ul class="card-abilities">
-                ${abilitiesHtml}
-              </ul>
-              ${flavorHtml}
-            </div>
-            <dl class="card-statline">
-              <div>
-                <dt>Affection</dt>
-                <dd>${card.affection ?? '—'}</dd>
-              </div>
-              <div>
-                <dt>Bonds</dt>
-                <dd>${bondsDisplay}</dd>
-              </div>
-              <div>
-                <dt>Mood</dt>
-                <dd>${moodDisplay}</dd>
-              </div>
-            </dl>
-            <div class="card-tags" aria-label="Card tags">
-              ${tagsHtml || '<span class="card-tag card-tag-empty">No tags yet</span>'}
-            </div>
-            <footer class="card-footer">Set ${card.set || 'TBA'} • ${card.id?.toUpperCase() || ''}</footer>
-          </div>
-        </article>
-      `;
-
-      modal.classList.add('active');
-      document.body.style.overflow = 'hidden';
-      
-      // Focus the close button for accessibility
-      setTimeout(() => {
-        const closeBtn = modal.querySelector('.modal-close');
-        if (closeBtn) closeBtn.focus();
-      }, 100);
-    }
-
-    function closeCardModal() {
-      const modal = document.getElementById('card-modal');
-      if (modal) {
-        modal.classList.remove('active');
-        document.body.style.overflow = '';
-      }
-    }
-
-    function createCardModal() {
-      const modal = document.createElement('div');
-      modal.id = 'card-modal';
-      modal.className = 'card-modal';
-      modal.setAttribute('role', 'dialog');
-      modal.setAttribute('aria-modal', 'true');
-      modal.setAttribute('aria-labelledby', 'modal-card-title');
-
-      modal.innerHTML = `
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-          <button class="modal-close" aria-label="Close card preview">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-          <div class="modal-card-wrapper"></div>
-        </div>
-      `;
-
-      document.body.appendChild(modal);
-
-      // Close handlers
-      modal.querySelector('.modal-overlay').addEventListener('click', closeCardModal);
-      modal.querySelector('.modal-close').addEventListener('click', closeCardModal);
-      
-      modal.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          closeCardModal();
-        }
-      });
-    }
-
+    window.addEventListener('resize', () => balanceAbilityText(cardsGrid));
     loadCards();
   </script>
 </body>
