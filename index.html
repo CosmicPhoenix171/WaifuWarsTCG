@@ -538,6 +538,20 @@
       });
     }
 
+    // Observe front/back faces for any size change (text wrap, style tweaks, etc.)
+    const _roMap = new WeakMap();
+    function attachResizeObservers(article) {
+      if (!article || _roMap.has(article)) return;
+      const flipEl = article.querySelector('.card-flip');
+      const front = flipEl?.querySelector('.card-face--front');
+      const back = flipEl?.querySelector('.card-face--back');
+      if (!front || !back) return;
+      const ro = new ResizeObserver(() => syncCardHeight(article));
+      ro.observe(front);
+      ro.observe(back);
+      _roMap.set(article, ro);
+    }
+
     function watchCardMedia(article) {
       if (!article) {
         return;
@@ -925,7 +939,8 @@
 
           fragment.appendChild(article);
           interactiveArticles.push(article);
-            watchCardMedia(article);
+          watchCardMedia(article);
+          attachResizeObservers(article);
         }
 
         cardsGrid.appendChild(fragment);

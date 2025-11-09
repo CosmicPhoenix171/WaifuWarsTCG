@@ -119,7 +119,8 @@ a:hover { text-decoration:underline; }
 .card-flip {
   position: relative;
   width: min(100%, 340px);
-  height: var(--card-height, auto);
+  /* Must have a non-zero fallback because faces are absolutely positioned */
+  height: var(--card-height, 520px);
   --flip-angle: 0deg;
   --tilt-x: 0deg;
   --tilt-y: 0deg;
