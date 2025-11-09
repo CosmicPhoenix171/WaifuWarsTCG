@@ -518,13 +518,42 @@
       const frontFrame = flipEl.querySelector('.card-face--front .card-frame');
       if (!frontFrame) return;
 
+      // Temporarily unfix the height so we can measure the natural content size.
+      const prevInlineHeight = flipEl.style.height;
+      const prevInlineVar = flipEl.style.getPropertyValue('--card-height');
+      flipEl.style.height = 'auto';
+      flipEl.style.setProperty('--card-height', 'auto');
+
       const measured = Math.round(frontFrame.getBoundingClientRect().height);
-      if (!measured) return;
+      if (!measured) {
+        if (prevInlineHeight) {
+          flipEl.style.height = prevInlineHeight;
+        } else {
+          flipEl.style.removeProperty('height');
+        }
+        if (prevInlineVar) {
+          flipEl.style.setProperty('--card-height', prevInlineVar);
+        } else {
+          flipEl.style.removeProperty('--card-height');
+        }
+        return;
+      }
 
       const targetHeight = Math.min(CARD_HEIGHT_MAX, measured);
       const previous = CARD_HEIGHT_CACHE.get(flipEl);
 
       if (previous !== undefined && Math.abs(targetHeight - previous) < HEIGHT_JITTER_THRESHOLD) {
+        // Restore previous explicit height to keep front/back faces aligned.
+        if (prevInlineHeight) {
+          flipEl.style.height = prevInlineHeight;
+        } else {
+          flipEl.style.removeProperty('height');
+        }
+        if (prevInlineVar) {
+          flipEl.style.setProperty('--card-height', prevInlineVar);
+        } else {
+          flipEl.style.removeProperty('--card-height');
+        }
         return; // ignore tiny jitter
       }
 
