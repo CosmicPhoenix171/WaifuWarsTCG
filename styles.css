@@ -314,8 +314,8 @@ a:hover { text-decoration:underline; }
 }
 .card-aff-chip {
   --aff-heart-gradient: linear-gradient(135deg, #fde1f0 0%, #f9a8d4 45%, #f472b6 75%, #db2777 100%);
-  --aff-w: clamp(62px, 7.2vw, 96px);
-  --aff-h: calc(var(--aff-w) * 0.78);
+  --aff-w: clamp(56px, 5.8vw, 88px);
+  --aff-h: calc(var(--aff-w) * 0.74);
   position: relative;
   display: grid;
   grid-auto-flow: row;
@@ -330,7 +330,7 @@ a:hover { text-decoration:underline; }
   letter-spacing: .65px;
   text-transform: uppercase;
   flex-shrink: 0;
-  filter: drop-shadow(0 5px 10px rgba(249,168,212,0.4));
+  filter: drop-shadow(0 4px 8px rgba(249,168,212,0.35));
   isolation: isolate;
   /* Heart shape using widely-supported polygon clip-path */
   clip-path: polygon(
@@ -370,7 +370,7 @@ a:hover { text-decoration:underline; }
 .card-aff-label {
   position: relative;
   z-index: 1;
-  font-size: clamp(.52rem, .45vw + .38rem, .66rem);
+  font-size: clamp(.48rem, .4vw + .36rem, .62rem);
   letter-spacing: .7px;
   opacity: .95;
   text-shadow: 0 1px 2px rgba(219,39,119,0.35);
@@ -378,7 +378,7 @@ a:hover { text-decoration:underline; }
 .card-aff-value {
   position: relative;
   z-index: 1;
-  font-size: clamp(.84rem, .9vw + .46rem, 1.02rem);
+  font-size: clamp(.78rem, .8vw + .42rem, .96rem);
   letter-spacing: .4px;
   line-height: 1;
   text-shadow: 0 1px 2px rgba(219,39,119,0.35);
