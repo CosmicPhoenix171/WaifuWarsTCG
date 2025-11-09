@@ -535,6 +535,29 @@
       });
     }
 
+    function watchCardMedia(article) {
+      if (!article) {
+        return;
+      }
+
+      const resync = () => scheduleSyncAllCardHeights(article);
+
+      article.querySelectorAll('img').forEach((img) => {
+        if (!img) {
+          return;
+        }
+
+        const handle = () => resync();
+
+        if (img.complete) {
+          handle();
+        } else {
+          img.addEventListener('load', handle, { once: true });
+          img.addEventListener('error', handle, { once: true });
+        }
+      });
+    }
+
     // === INTERACTION ===
     function setupInteractiveCard(article) {
       const flipEl = article.querySelector('.card-flip');
@@ -899,6 +922,7 @@
 
           fragment.appendChild(article);
           interactiveArticles.push(article);
+            watchCardMedia(article);
         }
 
         cardsGrid.appendChild(fragment);
