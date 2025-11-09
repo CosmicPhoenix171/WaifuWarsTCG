@@ -531,6 +531,9 @@
       syncHeightsFrame = requestAnimationFrame(() => {
         syncHeightsFrame = null;
         const root = scope instanceof Element ? scope : document;
+        if (root instanceof Element && root.matches('.card-display')) {
+          syncCardHeight(root);
+        }
         root.querySelectorAll('.card-display').forEach(syncCardHeight);
       });
     }
