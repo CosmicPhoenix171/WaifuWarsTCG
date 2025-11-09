@@ -335,22 +335,116 @@
 
     // === LAYOUT HELPERS ===
     function balanceAbilityText(root = document) {
-      if (!root || typeof root.querySelectorAll !== 'function') {
-        return;
-      }
+      if (!root || typeof root.querySelectorAll !== 'function') return;
       root.querySelectorAll('.card-text-box').forEach((textBox) => {
         const abilities = textBox.querySelector('.card-abilities');
-        if (!abilities) {
-          return;
-        }
+        if (!abilities) return;
+
+        // Reset any previous inline tweaks
         abilities.style.fontSize = '';
-        let fontSize = parseFloat(getComputedStyle(abilities).fontSize) || 14;
-        const minFontSize = 11;
-        while (textBox.scrollHeight > textBox.clientHeight && fontSize > minFontSize) {
+        abilities.style.lineHeight = '';
+        abilities.style.gap = '';
+        const flavorEl = textBox.querySelector('.card-flavor');
+        if (flavorEl) flavorEl.style.display = '';
+
+        const cs = getComputedStyle(abilities);
+        let fontSize = parseFloat(cs.fontSize) || 14;
+        let lineHeight = parseFloat(cs.lineHeight) || Math.max(1.2, (fontSize * 1.35));
+        let gap = parseFloat((cs.gap || '0').toString()) || 7.2; // approx .45rem
+
+        const minFont = 9.5;
+        const minLine = Math.max(1.05, fontSize * 1.15);
+        const minGap = 2; // px
+
+        // Helper to check overflow
+        const overflows = () => textBox.scrollHeight > textBox.clientHeight + 1;
+
+        // Step 1: shrink font size
+        while (overflows() && fontSize > minFont) {
           fontSize -= 0.5;
           abilities.style.fontSize = `${fontSize}px`;
         }
+
+        // Step 2: tighten line-height
+        // Re-read lineHeight in px for consistency
+        lineHeight = parseFloat(getComputedStyle(abilities).lineHeight) || lineHeight;
+        while (overflows() && lineHeight > minLine) {
+          lineHeight -= 0.5;
+          abilities.style.lineHeight = `${lineHeight}px`;
+        }
+
+        // Step 3: reduce gap between ability items
+        gap = parseFloat(getComputedStyle(abilities).gap) || gap;
+        while (overflows() && gap > minGap) {
+          gap -= 1;
+          abilities.style.gap = `${gap}px`;
+        }
+
+        // Step 4: hide flavor text as last resort
+        if (overflows() && flavorEl) {
+          flavorEl.style.display = 'none';
+        }
+
+        // Final pass: tiny font bump down if still overflowing
+        let guard = 8;
+        while (overflows() && guard--) {
+          fontSize -= 0.25;
+          abilities.style.fontSize = `${Math.max(minFont - 1, fontSize)}px`;
+        }
       });
+    }
+
+    function fitCardTitle(titleEl) {
+      if (!titleEl) return;
+      // Preserve original inline values we touch
+      const original = {
+        display: titleEl.style.display,
+        webkitLineClamp: titleEl.style.webkitLineClamp,
+        lineClamp: titleEl.style.lineClamp,
+        webkitBoxOrient: titleEl.style.webkitBoxOrient,
+        overflow: titleEl.style.overflow,
+        fontSize: titleEl.style.fontSize
+      };
+
+      const computed = getComputedStyle(titleEl);
+      let fontSize = parseFloat(computed.fontSize) || 18;
+      const minFont = 12; // don't go too tiny
+
+      // Temporarily remove clamp to measure full height
+      titleEl.style.display = 'block';
+      titleEl.style.webkitLineClamp = 'unset';
+      titleEl.style.lineClamp = 'unset';
+      titleEl.style.webkitBoxOrient = 'unset';
+      titleEl.style.overflow = 'visible';
+
+      // Compute allowed height for two lines
+      const lhPx = (() => {
+        const lh = computed.lineHeight;
+        const num = parseFloat(lh);
+        if (lh.endsWith('px')) return num;
+        // fallback: scale of font size
+        return (parseFloat(computed.fontSize) || 18) * 1.3;
+      })();
+      const allowed = lhPx * 2.05; // slightly generous
+
+      // Reduce font until fits within 2 lines
+      while (titleEl.scrollHeight > allowed && fontSize > minFont) {
+        fontSize -= 0.5;
+        titleEl.style.fontSize = `${fontSize}px`;
+      }
+
+      // Restore clamp behavior
+      titleEl.style.display = original.display || '-webkit-box';
+      titleEl.style.webkitLineClamp = original.webkitLineClamp || '2';
+      titleEl.style.lineClamp = original.lineClamp || '2';
+      titleEl.style.webkitBoxOrient = original.webkitBoxOrient || 'vertical';
+      titleEl.style.overflow = original.overflow || 'hidden';
+      // Keep the adjusted fontSize
+    }
+
+    function fitAllTitles(root = document) {
+      const titles = root.querySelectorAll('.card-title');
+      titles.forEach(fitCardTitle);
     }
 
     function syncCardHeight(article) {
@@ -752,8 +846,9 @@
 
         cardsGrid.appendChild(fragment);
 
-        balanceAbilityText(cardsGrid);
-        scheduleSyncAllCardHeights(cardsGrid);
+  balanceAbilityText(cardsGrid);
+  fitAllTitles(cardsGrid);
+  scheduleSyncAllCardHeights(cardsGrid);
 
         requestAnimationFrame(() => {
           interactiveArticles.forEach((article) => {
@@ -770,12 +865,17 @@
 
     // === LIFECYCLE ===
     window.addEventListener('resize', () => {
-      balanceAbilityText(cardsGrid);
-      scheduleSyncAllCardHeights(cardsGrid);
+  balanceAbilityText(cardsGrid);
+  fitAllTitles(cardsGrid);
+  scheduleSyncAllCardHeights(cardsGrid);
     });
 
     if (document.fonts && typeof document.fonts.ready?.then === 'function') {
-      document.fonts.ready.then(() => scheduleSyncAllCardHeights(cardsGrid)).catch(() => {});
+      document.fonts.ready.then(() => {
+        balanceAbilityText(cardsGrid);
+        fitAllTitles(cardsGrid);
+        scheduleSyncAllCardHeights(cardsGrid);
+      }).catch(() => {});
     }
 
     loadCards();
