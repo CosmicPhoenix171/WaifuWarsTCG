@@ -184,42 +184,48 @@
         datasetKey: 'common',
         name: 'Common',
         code: 'C',
-        symbol: '●'
+        symbol: '●',
+        stars: '•'
       },
       rare: {
         key: 'rare',
         datasetKey: 'rare',
         name: 'Rare',
         code: 'R',
-        symbol: '★'
+        symbol: '★',
+        stars: '★'
       },
       'super-rare': {
         key: 'super-rare',
         datasetKey: 'super-rare',
         name: 'Super Rare',
         code: 'SR',
-        symbol: '★★'
+        symbol: '★★',
+        stars: '★★'
       },
       'special-super-rare': {
         key: 'special-super-rare',
         datasetKey: 'special-super-rare',
         name: 'Special Super Rare',
         code: 'SSR',
-        symbol: '★★★'
+        symbol: '★★★',
+        stars: '★★★'
       },
       ultra: {
         key: 'ultra',
         datasetKey: 'ultra',
         name: 'Ultra Rare',
         code: 'UR',
-        symbol: '✪'
+        symbol: '✪',
+        stars: '✪'
       },
       event: {
         key: 'event',
         datasetKey: 'ultra',
         name: 'Event Exclusive',
         code: 'EX',
-        symbol: '✪'
+        symbol: '✪',
+        stars: '✪'
       }
     };
 
@@ -259,6 +265,48 @@
       const dere = mood.dere ?? '—';
       const extreme = mood.extreme ?? '—';
       return `${dere} / ${extreme}`;
+    }
+
+    function prettifyLabel(value = '') {
+      return value
+        .toString()
+        .replace(/[_-]+/g, ' ')
+        .replace(/\b\w/g, ch => ch.toUpperCase())
+        .trim();
+    }
+
+    function getPrimaryRole(card = {}) {
+      if (!card) return '';
+      if (card.role) return card.role;
+      if (Array.isArray(card.tags) && card.tags.length) return card.tags[0];
+      return '';
+    }
+
+    function decorateAbilityText(text = '') {
+      let output = escapeHtml(text);
+      const replacements = [
+        { pattern: /\{?BOND\}?/gi, markup: '<span class="card-icon card-icon--bond" aria-hidden="true"></span><span class="sr-only">Bond</span>' },
+        { pattern: /\bATK\b/g, markup: '<span class="card-icon card-icon--atk" aria-hidden="true"></span><span class="sr-only">Attack</span>' },
+        { pattern: /\bDEF\b/g, markup: '<span class="card-icon card-icon--def" aria-hidden="true"></span><span class="sr-only">Defense</span>' },
+        { pattern: /\bHP\b/gi, markup: '<span class="card-icon card-icon--hp" aria-hidden="true"></span><span class="sr-only">Health</span>' },
+        { pattern: /\bAFFECTION\b/gi, markup: '<span class="card-icon card-icon--aff" aria-hidden="true"></span><span class="sr-only">Affection</span>' }
+      ];
+      replacements.forEach(({ pattern, markup }) => {
+        output = output.replace(pattern, markup);
+      });
+      return output;
+    }
+
+    function formatAbilityLine(line = '') {
+      const trimmed = line.trim();
+      if (!trimmed) return '';
+      const keywordMatch = trimmed.match(/^([^:\u2014\u2013\-]{1,48}?)[\s]*(?:[:\u2014\u2013\-])\s+(.+)$/u);
+      if (keywordMatch) {
+        const keyword = decorateAbilityText(keywordMatch[1]);
+        const body = decorateAbilityText(keywordMatch[2]);
+        return `<span class="card-ability-keyword">${keyword}<span aria-hidden="true"> —</span></span><span class="card-ability-body">${body}</span>`;
+      }
+      return `<span class="card-ability-body">${decorateAbilityText(trimmed)}</span>`;
     }
 
     function balanceAbilityText(root = document) {
@@ -461,13 +509,13 @@
         cardsStatus.hidden = true;
         cardsGrid.innerHTML = '';
 
-        const frag = document.createDocumentFragment();
-        const interactiveArticles = [];
+  const frag = document.createDocumentFragment();
+  const interactiveArticles = [];
 
         const customCardBack = 'assets/images/card-back.png';
         const fallbackCardBack = 'assets/images/card-back-default.svg';
 
-        for (const card of waifus) {
+  for (const card of waifus) {
     const rarityKey = (card.rarity || 'common').toLowerCase();
   const rarityMeta = RARITY_META[rarityKey] || RARITY_META.common;
   const rarityDatasetKey = rarityMeta.datasetKey || rarityMeta.key;
@@ -486,6 +534,14 @@
           const artDefault = card.art?.default;
           const backArt = card.art?.back || customCardBack;
           const hasArt = Boolean(artDefault);
+
+          const roleRaw = getPrimaryRole(card);
+          const roleSlug = roleRaw ? roleRaw.toLowerCase().replace(/[^a-z0-9]+/g, '-') : '';
+          const roleLabel = roleRaw ? prettifyLabel(roleRaw) : '';
+          const roleEsc = roleLabel ? escapeHtml(roleLabel) : '';
+          const roleBadge = roleLabel
+            ? `<span class="card-role-badge" data-role="${escapeHtml(roleSlug)}" title="${roleEsc}"><span aria-hidden="true">${roleEsc}</span><span class="sr-only">${roleEsc} role</span></span>`
+            : '';
 
           const artRole = hasArt ? `${card.name || 'Card'} artwork` : 'Card back artwork';
           const artMarkup = hasArt
@@ -507,25 +563,33 @@
             .join('');
 
           const abilitiesHtml = abilityLines.length
-            ? abilityLines.map(line => `<li>${escapeHtml(line)}</li>`).join('')
+            ? abilityLines.map(line => `<li>${formatAbilityLine(line)}</li>`).join('')
             : '<li class="card-ability-empty">Ability text coming soon.</li>';
 
           const flavorHtml = flavor
             ? `<p class="card-flavor">“${escapeHtml(flavor)}”</p>`
             : '';
 
+          const rarityStars = rarityMeta.stars || raritySymbol;
+          const rarityStarsHtml = rarityStars
+            ? `<span class="card-rarity-stars" aria-hidden="true">${escapeHtml(rarityStars)}</span>`
+            : '';
+
           const frontHtml = `
             <div class="card-frame">
               <header class="card-header">
                 <span class="card-rarity-badge">
-                  <span class="card-rarity-symbol" aria-hidden="true">${raritySymbol}</span>
                   <span class="sr-only">${rarityName} rarity</span>
                   <span class="card-rarity-code">${rarityCode}</span>
                 </span>
-                <h3 class="card-title">${cardTitle}</h3>
+                <div class="card-header-title">
+                  ${rarityStarsHtml}
+                  <h3 class="card-title">${cardTitle}</h3>
+                </div>
                 <span class="card-aff-chip">${card.affection ?? '—'}</span>
               </header>
               <div class="${hasArt ? 'card-art' : 'card-art card-art--back'}" role="img" aria-label="${artRoleEsc}">
+                ${roleBadge}
                 ${artMarkup}
               </div>
               <div class="card-type-row">
@@ -577,6 +641,9 @@
           article.dataset.rarityTier = rarityMeta.key;
           if (card.archetype) {
             article.dataset.archetype = card.archetype.toLowerCase();
+          }
+          if (roleLabel) {
+            article.dataset.role = roleSlug;
           }
           if (card.id) {
             article.dataset.cardId = card.id;

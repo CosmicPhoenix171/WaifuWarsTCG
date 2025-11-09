@@ -150,13 +150,13 @@ a:hover { text-decoration:underline; }
 }
 .card-frame {
   width: 100%;
-  height: 520px;
+  min-height: 520px;
   padding: 0.9rem;
   border-radius: 20px;
   background: linear-gradient(180deg,#f9fafb 0%,#f1f5f9 100%);
   border: 3px solid rgba(148,163,184,0.5);
-  box-shadow: 0 24px 48px -12px rgba(15,23,42,0.75),
-              0 8px 16px -8px rgba(15,23,42,0.5),
+  box-shadow: 0 26px 54px -14px rgba(15,23,42,0.78),
+              0 10px 20px -10px rgba(15,23,42,0.52),
               inset 0 0 0 1px rgba(255,255,255,0.5);
   display: flex;
   flex-direction: column;
@@ -182,7 +182,9 @@ a:hover { text-decoration:underline; }
   position: absolute;
   inset: 0;
   border-radius: 20px;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(15,23,42,0) 0%, rgba(15,23,42,0.12) 80%, rgba(15,23,42,0.25) 100%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
   pointer-events: none;
   z-index: 3;
   mix-blend-mode: overlay;
@@ -246,80 +248,100 @@ a:hover { text-decoration:underline; }
   display: grid;
   grid-template-columns: auto 1fr auto;
   align-items: center;
-  gap: .7rem;
-  padding: .5rem .75rem;
+  gap: .65rem;
+  padding: .55rem .8rem;
   border-radius: 12px;
-  background: linear-gradient(120deg,#e6eefc,#f0f5ff);
-  border: 1px solid rgba(148,181,241,0.55);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  background: var(--header-bg, linear-gradient(120deg,#e6eefc,#f0f5ff));
+  border: 1px solid var(--header-border, rgba(148,181,241,0.55));
+  box-shadow: var(--header-shadow, 0 2px 4px rgba(0,0,0,0.08));
   flex-shrink: 0;
-  min-height: 44px;
+  min-height: 46px;
   height: auto;
+}
+.card-header-title {
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  min-width: 0;
 }
 .card-rarity-badge {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: .35rem;
-  min-width: 86px;
-  padding: .35rem .85rem;
-  border-radius: 999px;
-  font-size: .75rem;
-  font-weight: 600;
-  letter-spacing: .95px;
+  min-width: 54px;
+  padding: .3rem .55rem;
+  border-radius: 12px;
+  font-size: .72rem;
+  font-weight: 700;
+  letter-spacing: 1px;
   text-transform: uppercase;
-  color: #1f2937;
-  background: linear-gradient(120deg, rgba(226,232,240,0.95), rgba(226,232,240,0.75));
-  border: 1px solid rgba(148,163,184,0.6);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
-}
-.card-rarity-symbol {
-  font-size: 1.05rem;
-  line-height: 1;
+  color: var(--header-code-color, #1f2937);
+  background: var(--header-badge-bg, linear-gradient(120deg, rgba(226,232,240,0.95), rgba(226,232,240,0.75)));
+  border: 1px solid var(--header-badge-border, rgba(148,163,184,0.6));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
+  flex-shrink: 0;
 }
 .card-rarity-code {
   font-size: .82rem;
-  font-weight: 700;
-  letter-spacing: 1.1px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+}
+.card-rarity-stars {
+  font-size: .95rem;
+  line-height: 1;
+  color: var(--header-star-color, #1e1b4b);
+  text-shadow: var(--header-star-shadow, none);
 }
 .card-title {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: clamp(.95rem, 2.6vw, 1.15rem);
   font-weight: 700;
-  letter-spacing: .4px;
-  color: #0f172a;
+  letter-spacing: .35px;
+  color: var(--header-title-color, #0f172a);
   line-height: 1.3;
   display: -webkit-box;
+  line-clamp: 2;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   word-break: break-word;
 }
 .card-aff-chip {
+  position: relative;
   display: inline-flex;
   align-items: center;
-  gap: .25rem;
-  padding: .4rem .65rem;
-  border-radius: 8px;
-  background: #fce7f3;
+  gap: .35rem;
+  padding: .45rem .7rem .45rem .9rem;
+  border-radius: 14px;
+  background: #fbeff5;
   border: 1.5px solid #f9a8d4;
   color: #9d174d;
-  font-size: .75rem;
+  font-size: .76rem;
   font-weight: 800;
-  box-shadow: 0 2px 4px rgba(249,168,212,0.3);
+  box-shadow: 0 3px 6px rgba(249,168,212,0.35);
   flex-shrink: 0;
   white-space: nowrap;
+  letter-spacing: .6px;
 }
 .card-aff-chip::before {
   content: "AFF";
   font-size: .65rem;
   letter-spacing: .5px;
-  opacity: 0.8;
-  font-weight: 600;
+  opacity: 0.85;
+  font-weight: 700;
+}
+.card-aff-chip::after {
+  content: "❤";
+  position: absolute;
+  left: .35rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: .85rem;
+  color: #f472b6;
 }
 .card-art {
   position: relative;
-  height: 180px;
+  height: 240px;
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid rgba(148,163,184,0.35);
@@ -328,7 +350,7 @@ a:hover { text-decoration:underline; }
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 18px 28px -22px rgba(15,23,42,0.55);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 20px 32px -22px rgba(15,23,42,0.6);
   transition: box-shadow .3s ease, transform .3s ease;
   transform: translate3d(0, 0, 0);
 }
@@ -394,6 +416,61 @@ a:hover { text-decoration:underline; }
   color: rgba(100,116,139,0.3);
   font-family: var(--font-display);
 }
+.card-role-badge {
+  position: absolute;
+  top: .7rem;
+  left: .7rem;
+  display: inline-flex;
+  align-items: center;
+  padding: .25rem .6rem;
+  border-radius: 999px;
+  font-size: .68rem;
+  font-weight: 700;
+  letter-spacing: .75px;
+  text-transform: uppercase;
+  background: rgba(15,23,42,0.65);
+  color: #f8fafc;
+  border: 1px solid rgba(255,255,255,0.35);
+  box-shadow: 0 8px 14px -10px rgba(15,23,42,0.75);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+}
+.card-role-badge[data-role="leader"] {
+  background: linear-gradient(135deg, rgba(250,204,21,0.92), rgba(249,115,22,0.9));
+  color: #3b1f00;
+  border-color: rgba(245,158,11,0.65);
+}
+.card-role-badge[data-role="support"],
+.card-role-badge[data-role="heal"] {
+  background: linear-gradient(135deg, rgba(45,212,191,0.88), rgba(59,130,246,0.82));
+  color: #042f2e;
+  border-color: rgba(45,212,191,0.6);
+}
+.card-role-badge[data-role="tempo"],
+.card-role-badge[data-role="poke"],
+.card-role-badge[data-role="burst"] {
+  background: linear-gradient(135deg, rgba(248,113,113,0.9), rgba(249,115,22,0.85));
+  color: #fff7ed;
+  border-color: rgba(248,113,113,0.6);
+}
+.card-role-badge[data-role="control"],
+.card-role-badge[data-role="command"],
+.card-role-badge[data-role="counter"] {
+  background: linear-gradient(135deg, rgba(96,165,250,0.9), rgba(129,140,248,0.85));
+  color: #0f172a;
+  border-color: rgba(99,102,241,0.6);
+}
+.card-role-badge[data-role="defense"],
+.card-role-badge[data-role="stealth"] {
+  background: linear-gradient(135deg, rgba(148,163,184,0.9), rgba(79,70,229,0.8));
+  color: #0f172a;
+  border-color: rgba(79,70,229,0.6);
+}
+.card-role-badge[data-role="gamble"] {
+  background: linear-gradient(135deg, rgba(190,24,93,0.9), rgba(56,189,248,0.85));
+  color: #fff0f6;
+  border-color: rgba(236,72,153,0.6);
+}
 .card-type-row {
   display: flex;
   align-items: center;
@@ -451,9 +528,9 @@ a:hover { text-decoration:underline; }
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: .4rem;
-  font-size: .88rem;
-  line-height: 1.4;
+  gap: .45rem;
+  font-size: .9rem;
+  line-height: 1.45;
   color: #111827;
   flex: 1;
   overflow: hidden;
@@ -461,6 +538,24 @@ a:hover { text-decoration:underline; }
 .card-abilities li {
   position: relative;
   padding-left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .35rem;
+}
+.card-ability-keyword {
+  font-weight: 700;
+  letter-spacing: .55px;
+  text-transform: uppercase;
+  color: #1f2937;
+  flex-shrink: 0;
+}
+.card-ability-keyword span {
+  font-weight: inherit;
+}
+.card-ability-body {
+  flex: 1;
+  min-width: 0;
 }
 .card-abilities li::before {
   display: none;
@@ -657,7 +752,7 @@ a:hover { text-decoration:underline; }
   --set-icon-border: rgba(148,163,184,0.5);
   --set-icon-glow: rgba(148,163,184,0.35);
 }
-.card-display[data-rarity="common"] .card-rarity-symbol {
+.card-display[data-rarity="common"] .card-rarity-stars {
   color: #818cf8;
 }
 .card-display[data-rarity="common"] .card-frame {
@@ -682,7 +777,7 @@ a:hover { text-decoration:underline; }
   --set-icon-border: rgba(236,72,153,0.6);
   --set-icon-glow: rgba(236,72,153,0.4);
 }
-.card-display[data-rarity="rare"] .card-rarity-symbol,
+.card-display[data-rarity="rare"] .card-rarity-stars,
 .card-display[data-rarity="rare"] .card-rarity-code {
   color: #fff7fb;
   text-shadow: 0 0 6px rgba(236,72,153,0.6);
@@ -724,7 +819,7 @@ a:hover { text-decoration:underline; }
   --set-icon-border: rgba(245,158,11,0.65);
   --set-icon-glow: rgba(245,158,11,0.45);
 }
-.card-display[data-rarity="super-rare"] .card-rarity-symbol {
+.card-display[data-rarity="super-rare"] .card-rarity-stars {
   color: #fbbf24;
   text-shadow: 0 0 10px rgba(245,158,11,0.5);
 }
@@ -770,7 +865,7 @@ a:hover { text-decoration:underline; }
   --set-icon-border: rgba(129,140,248,0.65);
   --set-icon-glow: rgba(129,140,248,0.55);
 }
-.card-display[data-rarity="special-super-rare"] .card-rarity-symbol {
+.card-display[data-rarity="special-super-rare"] .card-rarity-stars {
   background: linear-gradient(120deg,#f472b6,#38bdf8,#facc15,#a855f7);
   -webkit-background-clip: text;
   background-clip: text;
@@ -837,7 +932,7 @@ a:hover { text-decoration:underline; }
   --set-icon-border: color-mix(in srgb, var(--ultra-secondary) 65%, rgba(255,255,255,0.2));
   --set-icon-glow: color-mix(in srgb, var(--ultra-secondary) 55%, rgba(15,23,42,0.35));
 }
-.card-display[data-rarity="ultra"] .card-rarity-symbol,
+.card-display[data-rarity="ultra"] .card-rarity-stars,
 .card-display[data-rarity="ultra"] .card-rarity-code {
   color: #fdfcff;
   text-shadow: 0 0 12px color-mix(in srgb, var(--ultra-secondary) 70%, rgba(2,6,23,0.75));
