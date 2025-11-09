@@ -616,6 +616,8 @@
           const archetypeChip = escapeHtml((card.archetype || typeLabel).toUpperCase());
           const moodDisplayEsc = escapeHtml(moodDisplay);
           const bondsDisplayEsc = escapeHtml(bondsDisplay);
+          const affectionValue = card.affection ?? '—';
+          const affectionEsc = escapeHtml(String(affectionValue));
           const setLabel = escapeHtml(card.set || 'TBA');
           const idLabel = escapeHtml((card.id || '').toUpperCase());
           const artRoleEsc = escapeHtml(artRole);
@@ -648,7 +650,10 @@
                   ${rarityStarsHtml}
                   <h3 class="card-title">${cardTitle}</h3>
                 </div>
-                <span class="card-aff-chip">${card.affection ?? '—'}</span>
+                <span class="card-aff-chip">
+                  <span class="card-aff-label">AFF</span>
+                  <span class="card-aff-value">${affectionEsc}</span>
+                </span>
               </header>
               <div class="${hasArt ? 'card-art' : 'card-art card-art--back'}" role="img" aria-label="${artRoleEsc}">
                 ${roleBadge}
@@ -667,7 +672,7 @@
               <dl class="card-statline">
                 <div>
                   <dt>Affection</dt>
-                  <dd>${card.affection ?? '—'}</dd>
+                  <dd>${affectionEsc}</dd>
                 </div>
                 <div>
                   <dt>Bonds</dt>
