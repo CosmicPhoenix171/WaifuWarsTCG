@@ -504,11 +504,11 @@
       cards.forEach(detectCardOverflow);
     }
 
-  const CARD_HEIGHT_CACHE = new WeakMap();
-  const HEIGHT_JITTER_THRESHOLD = 2;
-  const CARD_HEIGHT_MAX = 1600; // guard against pathological runaway
+    const CARD_HEIGHT_CACHE = new WeakMap();
+    const HEIGHT_JITTER_THRESHOLD = 2;
+    const CARD_HEIGHT_MAX = 1600; // guard against pathological runaway
 
-  function syncCardHeight(article) {
+    function syncCardHeight(article) {
       if (!article) return;
       const flipEl = article.querySelector('.card-flip');
       if (!flipEl) return;
