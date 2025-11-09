@@ -762,6 +762,7 @@
             : '<span class="card-identity-chip card-identity-chip--strategy card-identity-chip--empty">Flexible</span>';
 
           const speciesEsc = escapeHtml(speciesSource ? prettifyLabel(speciesSource) : 'Unknown');
+          const speciesSlug = speciesSource ? speciesSource.toLowerCase().replace(/[^a-z0-9]+/g, '-') : '';
 
           const abilitiesHtml = abilityLines.length
             ? abilityLines.map((line) => `<li>${formatAbilityLine(line)}</li>`).join('')
@@ -857,6 +858,9 @@
           if (card.id) {
             article.dataset.cardId = card.id;
           }
+          if (speciesSlug) {
+            article.dataset.species = speciesSlug;
+          }
           if (rarityKey === 'event') {
             article.dataset.rarityVariant = 'event';
           }
@@ -869,6 +873,9 @@
           }
           if (card.rarityName) {
             article.dataset.rarityName = rawRarityName;
+          }
+          if (strategyLabel) {
+            article.dataset.strategy = strategyLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-');
           }
           article.setAttribute('role', 'button');
           article.setAttribute('tabindex', '0');

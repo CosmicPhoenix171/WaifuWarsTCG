@@ -7,6 +7,7 @@
     "rarity": "common",
     "tags": [],
     "strategy": "Shield / Barrier",
+    "species": "Human",
     "set": "CORE-01",
     "affection": 10,
     "mood": {
@@ -32,6 +33,7 @@
     "rarity": "rare",
     "tags": [],
     "strategy": "Heal / Restore",
+    "species": "Human",
     "set": "CORE-01",
     "affection": 9,
     "mood": {
@@ -57,6 +59,7 @@
     "rarity": "super-rare",
     "tags": [],
     "strategy": "Inspire",
+    "species": "Human",
     "set": "CORE-01",
     "affection": 9,
     "mood": {
@@ -82,6 +85,7 @@
     "rarity": "special-super-rare",
     "tags": [],
     "strategy": "Charm",
+    "species": "Human",
     "set": "CORE-01",
     "affection": 8,
     "mood": {
@@ -107,6 +111,7 @@
     "rarity": "super-rare",
     "tags": [],
     "strategy": "Freeze / Immobilize",
+    "species": "Human",
     "set": "CORE-01",
     "affection": 8,
     "mood": {
@@ -132,6 +137,7 @@
     "rarity": "common",
     "tags": [],
     "strategy": "Burn",
+    "species": "Human",
     "set": "CORE-01",
     "affection": 8,
     "mood": {
@@ -157,6 +163,7 @@
     "rarity": "super-rare",
     "tags": [],
     "strategy": "Bleed",
+    "species": "Human",
     "set": "CORE-01",
     "affection": 7,
     "mood": {
@@ -185,6 +192,7 @@
     "rarityTheme": "cosmic",
     "tags": [],
     "strategy": "Berserk",
+    "species": "Human",
     "set": "CORE-01",
     "affection": 6,
     "mood": {

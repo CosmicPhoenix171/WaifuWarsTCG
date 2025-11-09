@@ -43,6 +43,7 @@ function slim(card) {
     rarityTheme: card.rarityTheme,
     tags,
     strategy,
+  species: card.species,
     set: card.set,
     affection: card.affection,
     mood: card.mood?.thresholds,
