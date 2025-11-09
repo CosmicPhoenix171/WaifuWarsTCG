@@ -511,6 +511,56 @@ a:hover { text-decoration:underline; }
   color: #fff0f6;
   border-color: rgba(236,72,153,0.6);
 }
+.card-type-overlay {
+  position: absolute;
+  left: 0.9rem;
+  right: 0.9rem;
+  bottom: 0.9rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  justify-content: center;
+  padding: .5rem .6rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(15,23,42,0.75), rgba(30,41,59,0.55));
+  border: 1px solid rgba(148,163,184,0.55);
+  box-shadow: 0 10px 22px -16px rgba(15,23,42,0.7), inset 0 1px 0 rgba(255,255,255,0.35);
+  backdrop-filter: blur(14px);
+  color: #f8fafc;
+  font-size: .72rem;
+  letter-spacing: .35px;
+}
+.card-identity-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .28rem .65rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148,163,184,0.55);
+  background: rgba(15,23,42,0.35);
+  text-transform: uppercase;
+  letter-spacing: .75px;
+  font-size: .64rem;
+  font-weight: 700;
+  color: #f8fafc;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.35);
+}
+.card-identity-chip--archetype {
+  background: linear-gradient(135deg, rgba(239,68,68,0.85), rgba(248,113,113,0.65));
+  border-color: rgba(248,113,113,0.65);
+}
+.card-identity-chip--strategy {
+  border-color: rgba(34,209,243,0.55);
+  background: linear-gradient(135deg, rgba(34,209,243,0.32), rgba(79,70,229,0.28));
+}
+.card-identity-chip--species {
+  border-color: rgba(245,200,66,0.55);
+  background: linear-gradient(135deg, rgba(245,200,66,0.35), rgba(248,181,0,0.2));
+  color: #fff7dc;
+}
+.card-art--back .card-type-overlay {
+  display: none;
+}
 .card-text-box {
   padding: .85rem .9rem 2.2rem; /* bottom padding supports statline overlap */
   border-radius: 10px;

@@ -730,6 +730,27 @@
             : `<img src="${backArt}" alt="Waifu Wars card back" class="card-art-img-back" onerror="this.onerror=null;this.src='${fallbackCardBack}';">`;
 
           const cardTitle = escapeHtml(card.name || 'Unnamed Card');
+          const speciesSource = [
+            card.species,
+            card.girlType,
+            card.originType,
+            card.origin,
+            card.subtype,
+            card.affinity?.type,
+            card.profile?.species,
+            card.profile?.origin,
+            card.traits?.species,
+            card.traits?.origin
+          ].find((value) => typeof value === 'string' && value.trim().length);
+          const speciesEsc = escapeHtml(speciesSource ? prettifyLabel(speciesSource) : 'Unknown');
+          const typeLabel = capitalize(card.type || 'waifu');
+          const archetypeChip = escapeHtml((card.archetype || typeLabel).toUpperCase());
+          const strategyRaw = typeof card.strategy === 'string' ? card.strategy.trim() : '';
+          const strategyEsc = escapeHtml(strategyRaw || roleLabel || 'Flexible');
+          const overlayLabelParts = [card.archetype, strategyRaw, speciesSource]
+            .filter((part) => typeof part === 'string' && part.trim().length)
+            .map((part) => prettifyLabel(part));
+          const overlayAriaLabel = escapeHtml(overlayLabelParts.length ? overlayLabelParts.join(', ') : `${card.name || 'Card'} traits`);
           const moodDisplayEsc = escapeHtml(moodDisplay);
           const bondsDisplayEsc = escapeHtml(bondsDisplay);
           const affectionValue = card.affection ?? '—';
@@ -770,6 +791,11 @@
               <div class="${hasArt ? 'card-art' : 'card-art card-art--back'}" role="img" aria-label="${artRoleEsc}">
                 ${roleBadge}
                 ${artMarkup}
+                <div class="card-type-overlay" role="group" aria-label="${overlayAriaLabel}">
+                  <span class="card-identity-chip card-identity-chip--archetype">${archetypeChip}</span>
+                  <span class="card-identity-chip card-identity-chip--strategy">${strategyEsc}</span>
+                  <span class="card-identity-chip card-identity-chip--species">${speciesEsc}</span>
+                </div>
               </div>
               <div class="card-text-box">
                 <ul class="card-abilities">
