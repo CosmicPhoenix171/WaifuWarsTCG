@@ -573,7 +573,7 @@
 .card-statline {
   margin: -1.65rem 0 0;
   display: grid;
-  grid-template-columns: repeat(3,minmax(0,1fr));
+  grid-template-columns: repeat(2,minmax(0,1fr));
   gap: .65rem;
   flex-shrink: 0;
   position: relative;
@@ -623,20 +623,13 @@
   z-index: 1;
 }
 .card-statline div:nth-child(1) {
-  --chip-bg-top: rgba(254,226,226,0.95);
-  --chip-bg-bottom: rgba(252,165,165,0.88);
-  --chip-border: rgba(239,68,68,0.55);
-  --chip-text: #9f1239;
-  --chip-label: rgba(185,28,28,0.85);
-}
-.card-statline div:nth-child(2) {
   --chip-bg-top: rgba(219,234,254,0.92);
   --chip-bg-bottom: rgba(191,219,254,0.88);
   --chip-border: rgba(59,130,246,0.55);
   --chip-text: #1d4ed8;
   --chip-label: rgba(37,99,235,0.8);
 }
-.card-statline div:nth-child(3) {
+.card-statline div:nth-child(2) {
   --chip-bg-top: rgba(221,214,254,0.94);
   --chip-bg-bottom: rgba(196,181,253,0.9);
   --chip-border: rgba(139,92,246,0.6);
