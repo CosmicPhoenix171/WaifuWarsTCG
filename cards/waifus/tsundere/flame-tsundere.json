@@ -2,13 +2,14 @@
   "id": "flame-tsundere",
   "type": "waifu",
   "name": "Flame Tsundere",
-  "archetype": "Tsundere",
   "set": "CORE-01",
   "rarity": "common",
   "affection": 8,
   "bonds": { "start": 0, "max": 12 },
   "mood": { "thresholds": { "dere": 5, "extreme": 10 } },
-  "tags": ["poke","tempo","human"],
+  "tags": ["poke","tempo"],
+  "archetype": "Tsundere",
+  "species": "Human",
   "text": "On Summon: Deal 1 damage to a target waifu. Extreme: +2 damage on first attack each turn.",
   "effects": [
     {

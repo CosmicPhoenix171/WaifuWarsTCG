@@ -2,13 +2,14 @@
   "id": "domination-kamidere",
   "type": "waifu",
   "name": "Domination Kamidere",
-  "archetype": "Kamidere",
   "set": "CORE-01",
   "rarity": "special-super-rare",
   "affection": 8,
   "bonds": { "start": 2, "max": 14 },
   "mood": { "thresholds": { "dere": 5, "extreme": 11 } },
-  "tags": ["control","command","human"],
+  "tags": ["control","command"],
+  "archetype": "Kamidere",
+  "species": "Human",
   "text": "Command Phase: Spend 2 {BOND} to choose an enemy waifu; it must attack a target you pick this turn. Dere: Opponents can't ready more than one waifu during End Phase. Extreme: When you issue a command, ready one of your waifus.",
   "effects": [
     {

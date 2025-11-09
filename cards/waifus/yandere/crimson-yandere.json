@@ -2,13 +2,14 @@
   "id": "crimson-yandere",
   "type": "waifu",
   "name": "Crimson Yandere",
-  "archetype": "Yandere",
   "set": "CORE-01",
   "rarity": "super-rare",
   "affection": 7,
   "bonds": { "start": 1, "max": 12 },
   "mood": { "thresholds": { "dere": 4, "extreme": 9 } },
-  "tags": ["burst","marking","human"],
+  "tags": ["burst","marking"],
+  "archetype": "Yandere",
+  "species": "Human",
   "text": "On Summon: Mark a rival waifu. Activated: Spend 2 {BOND} to deal 3 damage to the marked target. Extreme: When the mark is cleared, gain +3 bonds.",
   "effects": [
     {

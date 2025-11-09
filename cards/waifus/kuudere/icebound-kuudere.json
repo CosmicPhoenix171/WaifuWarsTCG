@@ -2,13 +2,14 @@
   "id": "icebound-kuudere",
   "type": "waifu",
   "name": "Icebound Kuudere",
-  "archetype": "Kuudere",
   "set": "CORE-01",
   "rarity": "super-rare",
   "affection": 8,
   "bonds": { "start": 1, "max": 12 },
   "mood": { "thresholds": { "dere": 4, "extreme": 9 } },
-  "tags": ["control","counter","human"],
+  "tags": ["control","counter"],
+  "archetype": "Kuudere",
+  "species": "Human",
   "text": "Reaction: When an opponent plays a Support, spend 1 {BOND} to cancel it. Dere: Opponents cannot gain bonus bonds outside their turn. Extreme: First trap each turn resets to face-down after resolving.",
   "effects": [
     {
