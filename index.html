@@ -779,8 +779,13 @@
                 ${roleBadge}
                 ${artMarkup}
                 <div class="card-type-overlay" role="group" aria-label="${typeDescriptorEsc}">
-                  <span class="card-type-label">${typeDescriptorEsc}</span>
-                  <span class="card-archetype-chip">${archetypeChip}</span>
+                  <div class="card-type-heading">
+                    <span class="card-type-label">${typeDescriptorEsc}</span>
+                    <span class="card-archetype-chip">${archetypeChip}</span>
+                  </div>
+                  <div class="card-tags" aria-label="Card tags">
+                    ${tagsHtml || '<span class="card-tag card-tag-empty">No tags yet</span>'}
+                  </div>
                 </div>
               </div>
               <div class="card-text-box">
@@ -802,10 +807,7 @@
                   <dt>Mood</dt>
                   <dd>${moodDisplayEsc}</dd>
                 </div>
-              </dl>
-              <div class="card-tags" aria-label="Card tags">
-                ${tagsHtml || '<span class="card-tag card-tag-empty">No tags yet</span>'}
-              </div>
+                </dl>
               <footer class="card-footer">Set ${setLabel} • ${idLabel}</footer>
             </div>
           `;
