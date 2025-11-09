@@ -7,7 +7,7 @@
   "affection": 10,
   "bonds": { "start": 0, "max": 12 },
   "mood": { "thresholds": { "dere": 6, "extreme": 10 } },
-  "tags": ["defense","stealth"],
+  "strategy": "Shield / Barrier",
   "archetype": "Dandere",
   "species": "Human",
   "text": "Passive: Cannot be targeted by opponent Support cards while Neutral. Dere: Gain +2 shield counters. Extreme: When you speak (play a Support), draw a card.",

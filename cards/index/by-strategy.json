@@ -1,5 +1,5 @@
 {
-  "waifu": [
+  "Shield / Barrier": [
     {
       "id": "whisper-dandere",
       "type": "waifu",
@@ -24,7 +24,9 @@
         "default": "cards/waifus/dandere/whisper-dandere-default.png",
         "extreme": "cards/waifus/dandere/whisper-dandere-extreme.png"
       }
-    },
+    }
+  ],
+  "Heal / Restore": [
     {
       "id": "sunbeam-deredere",
       "type": "waifu",
@@ -49,7 +51,9 @@
         "default": "cards/waifus/deredere/sunbeam-deredere-default.png",
         "extreme": "cards/waifus/deredere/sunbeam-deredere-extreme.png"
       }
-    },
+    }
+  ],
+  "Inspire": [
     {
       "id": "crown-himedere",
       "type": "waifu",
@@ -74,7 +78,9 @@
         "default": "cards/waifus/himedere/crown-himedere-default.png",
         "extreme": "cards/waifus/himedere/crown-himedere-extreme.png"
       }
-    },
+    }
+  ],
+  "Charm": [
     {
       "id": "domination-kamidere",
       "type": "waifu",
@@ -99,7 +105,9 @@
         "default": "cards/waifus/kamidere/domination-kamidere-default.png",
         "extreme": "cards/waifus/kamidere/domination-kamidere-extreme.png"
       }
-    },
+    }
+  ],
+  "Freeze / Immobilize": [
     {
       "id": "icebound-kuudere",
       "type": "waifu",
@@ -124,7 +132,9 @@
         "default": "cards/waifus/kuudere/icebound-kuudere-default.png",
         "extreme": "cards/waifus/kuudere/icebound-kuudere-extreme.png"
       }
-    },
+    }
+  ],
+  "Burn": [
     {
       "id": "flame-tsundere",
       "type": "waifu",
@@ -149,7 +159,9 @@
         "default": "cards/waifus/tsundere/flame-tsundere-default.png",
         "extreme": "cards/waifus/tsundere/flame-tsundere-extreme.png"
       }
-    },
+    }
+  ],
+  "Bleed": [
     {
       "id": "crimson-yandere",
       "type": "waifu",
@@ -174,7 +186,9 @@
         "default": "cards/waifus/yandere/crimson-yandere-default.png",
         "extreme": "cards/waifus/yandere/crimson-yandere-extreme.png"
       }
-    },
+    }
+  ],
+  "Berserk": [
     {
       "id": "fracture-yangire",
       "type": "waifu",
@@ -204,7 +218,7 @@
       }
     }
   ],
-  "support": [
+  "bond": [
     {
       "id": "bond-promise",
       "type": "support",
@@ -224,7 +238,7 @@
       "cost": 1
     }
   ],
-  "trap": [
+  "defense": [
     {
       "id": "reversal-strike",
       "type": "trap",

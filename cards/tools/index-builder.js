@@ -27,6 +27,10 @@ async function walk(dir) {
 }
 
 function slim(card) {
+  const tags = Array.isArray(card.tags) ? card.tags : [];
+  const strategy = typeof card.strategy === 'string' && card.strategy.trim().length
+    ? card.strategy.trim()
+    : (tags.length ? tags[0] : null);
   return {
     id: card.id,
     type: card.type,
@@ -37,7 +41,8 @@ function slim(card) {
     rarityCode: card.rarityCode,
     raritySymbol: card.raritySymbol,
     rarityTheme: card.rarityTheme,
-    tags: card.tags || [],
+    tags,
+    strategy,
     set: card.set,
     affection: card.affection,
     mood: card.mood?.thresholds,
@@ -52,7 +57,11 @@ function slim(card) {
 async function main() {
   await fs.mkdir(INDEX_DIR, { recursive: true });
   const all = [];
-  const byId = {}; const byTag = {}; const byArchetype = {}; const byType = {};
+  const byId = {};
+  const byTag = {};
+  const byStrategy = {};
+  const byArchetype = {};
+  const byType = {};
 
   for (const t of TYPES) {
     const base = path.join(ROOT, t);
@@ -66,6 +75,7 @@ async function main() {
         (byType[data.type] ||= []).push(data);
         if (data.archetype) (byArchetype[data.archetype] ||= []).push(data);
         for (const tag of data.tags || []) (byTag[tag] ||= []).push(data);
+        if (data.strategy) (byStrategy[data.strategy] ||= []).push(data);
       }
     } catch (err) {
       // ignore missing type dirs
@@ -78,6 +88,7 @@ async function main() {
   await write('by-id.json', byId);
   await write('by-type.json', byType);
   await write('by-tag.json', byTag);
+  await write('by-strategy.json', byStrategy);
   await write('by-archetype.json', byArchetype);
 
   console.log(`Indexed ${all.length} cards.`);

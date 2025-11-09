@@ -5,10 +5,8 @@
     "name": "Whisper Dandere",
     "archetype": "Dandere",
     "rarity": "common",
-    "tags": [
-      "defense",
-      "stealth"
-    ],
+    "tags": [],
+    "strategy": "Shield / Barrier",
     "set": "CORE-01",
     "affection": 10,
     "mood": {
@@ -32,10 +30,8 @@
     "name": "Sunbeam Deredere",
     "archetype": "Deredere",
     "rarity": "rare",
-    "tags": [
-      "support",
-      "heal"
-    ],
+    "tags": [],
+    "strategy": "Heal / Restore",
     "set": "CORE-01",
     "affection": 9,
     "mood": {
@@ -59,10 +55,8 @@
     "name": "Crown Himedere",
     "archetype": "Himedere",
     "rarity": "super-rare",
-    "tags": [
-      "leader",
-      "aura"
-    ],
+    "tags": [],
+    "strategy": "Inspire",
     "set": "CORE-01",
     "affection": 9,
     "mood": {
@@ -86,10 +80,8 @@
     "name": "Domination Kamidere",
     "archetype": "Kamidere",
     "rarity": "special-super-rare",
-    "tags": [
-      "control",
-      "command"
-    ],
+    "tags": [],
+    "strategy": "Charm",
     "set": "CORE-01",
     "affection": 8,
     "mood": {
@@ -113,10 +105,8 @@
     "name": "Icebound Kuudere",
     "archetype": "Kuudere",
     "rarity": "super-rare",
-    "tags": [
-      "control",
-      "counter"
-    ],
+    "tags": [],
+    "strategy": "Freeze / Immobilize",
     "set": "CORE-01",
     "affection": 8,
     "mood": {
@@ -140,10 +130,8 @@
     "name": "Flame Tsundere",
     "archetype": "Tsundere",
     "rarity": "common",
-    "tags": [
-      "poke",
-      "tempo"
-    ],
+    "tags": [],
+    "strategy": "Burn",
     "set": "CORE-01",
     "affection": 8,
     "mood": {
@@ -167,10 +155,8 @@
     "name": "Crimson Yandere",
     "archetype": "Yandere",
     "rarity": "super-rare",
-    "tags": [
-      "burst",
-      "marking"
-    ],
+    "tags": [],
+    "strategy": "Bleed",
     "set": "CORE-01",
     "affection": 7,
     "mood": {
@@ -197,10 +183,8 @@
     "rarityName": "Event Exclusive",
     "rarityCode": "EX",
     "rarityTheme": "cosmic",
-    "tags": [
-      "gamble",
-      "burst"
-    ],
+    "tags": [],
+    "strategy": "Berserk",
     "set": "CORE-01",
     "affection": 6,
     "mood": {
@@ -227,6 +211,7 @@
       "bond",
       "ramp"
     ],
+    "strategy": "bond",
     "set": "CORE-01",
     "text": "Choose a waifu. Gain +2 Bonds on that waifu. If that waifu is in Dere or higher, draw a card.",
     "flavor": "Pinky swear now, panic later.",
@@ -244,6 +229,7 @@
       "defense",
       "burst"
     ],
+    "strategy": "defense",
     "set": "CORE-01",
     "text": "Trap Trigger: When an opponent declares an attack, prevent 2 damage and deal 1 damage to the attacker. If your defending waifu is Extreme, deal 2 instead.",
     "flavor": "Tension flips momentum faster than you can say 'baka'.",

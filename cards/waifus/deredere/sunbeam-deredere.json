@@ -7,7 +7,7 @@
   "affection": 9,
   "bonds": { "start": 2, "max": 14 },
   "mood": { "thresholds": { "dere": 5, "extreme": 11 } },
-  "tags": ["support","heal"],
+  "strategy": "Heal / Restore",
   "archetype": "Deredere",
   "species": "Human",
   "text": "Start of Turn: Give bonded allies +1 {BOND}. Activated: Spend 1 {BOND} to heal 2 Affection to another waifu. Extreme: Your bonded allies gain +1 Affection when they attack.",
