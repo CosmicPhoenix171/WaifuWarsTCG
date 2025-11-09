@@ -523,7 +523,7 @@
                   <span class="card-rarity-code">${rarityCode}</span>
                 </span>
                 <h3 class="card-title">${cardTitle}</h3>
-                <span class="card-aff-chip"><span aria-hidden="true">❤</span><span class="sr-only">Affection</span>${card.affection ?? '—'}</span>
+                <span class="card-aff-chip">${card.affection ?? '—'}</span>
               </header>
               <div class="${hasArt ? 'card-art' : 'card-art card-art--back'}" role="img" aria-label="${artRoleEsc}">
                 ${artMarkup}
