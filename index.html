@@ -504,26 +504,30 @@
       cards.forEach(detectCardOverflow);
     }
 
+    const _heightCache = new WeakMap();
+
     function syncCardHeight(article) {
       if (!article) return;
       const flipEl = article.querySelector('.card-flip');
       if (!flipEl) return;
 
-      // Measure only the front content frame. The back face is 100% of the container and
-      // can create a feedback loop if included in measurements.
+      // Measure only the front content frame. The back face mirrors container size and
+      // will cause feedback if we include it in calculations.
       const frontFrame = flipEl.querySelector('.card-face--front .card-frame');
-      const frontHeight = frontFrame ? Math.ceil(frontFrame.scrollHeight) : 0;
+      if (!frontFrame) return;
 
-      // Clamp to sensible bounds to prevent runaway growth due to sub‑pixel oscillations.
-      const MIN_H = 420; // visually reasonable minimum for a card
-      const MAX_H = 1600; // safety guard
-      const targetHeight = Math.max(MIN_H, Math.min(MAX_H, frontHeight));
+      const measured = Math.round(frontFrame.getBoundingClientRect().height);
+      if (!measured) return;
 
-      const current = Math.ceil(flipEl.getBoundingClientRect().height);
-      if (!targetHeight || Math.abs(targetHeight - current) < 1) {
-        return; // no meaningful change
+      const MAX_H = 1600; // guard against pathological runaway
+      const targetHeight = Math.min(MAX_H, measured);
+      const previous = _heightCache.get(flipEl) ?? Math.round(flipEl.getBoundingClientRect().height);
+
+      if (Math.abs(targetHeight - previous) < 2) {
+        return; // ignore tiny jitter
       }
 
+      _heightCache.set(flipEl, targetHeight);
       flipEl.style.height = `${targetHeight}px`;
       flipEl.style.setProperty('--card-height', `${targetHeight}px`);
     }
@@ -544,7 +548,7 @@
     }
 
     // Observe front/back faces for any size change (text wrap, style tweaks, etc.)
-    const _roMap = new WeakMap();
+  const _roMap = new WeakMap();
     function attachResizeObservers(article) {
       if (!article || _roMap.has(article)) return;
       const flipEl = article.querySelector('.card-flip');
