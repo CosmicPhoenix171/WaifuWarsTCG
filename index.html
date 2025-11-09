@@ -742,7 +742,7 @@
           const idLabel = escapeHtml((card.id || '').toUpperCase());
           const artRoleEsc = escapeHtml(artRole);
 
-          const girlTypeSource = [
+          const speciesSource = [
             card.species,
             card.girlType,
             card.originType,
@@ -761,7 +761,7 @@
             ? `<span class="card-identity-chip card-identity-chip--strategy">${escapeHtml(strategyLabel)}</span>`
             : '<span class="card-identity-chip card-identity-chip--strategy card-identity-chip--empty">Flexible</span>';
 
-          const girlTypeEsc = escapeHtml(girlTypeSource ? prettifyLabel(girlTypeSource) : 'Unknown');
+          const speciesEsc = escapeHtml(speciesSource ? prettifyLabel(speciesSource) : 'Unknown');
 
           const abilitiesHtml = abilityLines.length
             ? abilityLines.map((line) => `<li>${formatAbilityLine(line)}</li>`).join('')
@@ -807,8 +807,8 @@
                     </div>
                   </div>
                   <div class="card-identity-row">
-                    <span class="card-identity-label">Origin</span>
-                    <span class="card-identity-chip card-identity-chip--origin">${girlTypeEsc}</span>
+                    <span class="card-identity-label">Species</span>
+                    <span class="card-identity-chip card-identity-chip--species">${speciesEsc}</span>
                   </div>
                 </div>
               </div>

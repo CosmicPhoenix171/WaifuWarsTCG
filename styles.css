@@ -576,7 +576,7 @@ a:hover { text-decoration:underline; }
   border-color: rgba(34,209,243,0.55);
   background: linear-gradient(135deg, rgba(34,209,243,0.32), rgba(79,70,229,0.28));
 }
-.card-identity-chip--origin {
+.card-identity-chip--species {
   border-color: rgba(245,200,66,0.55);
   background: linear-gradient(135deg, rgba(245,200,66,0.35), rgba(248,181,0,0.2));
   color: #fff7dc;
