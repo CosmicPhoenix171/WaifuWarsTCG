@@ -26,7 +26,8 @@
 
 .card-chip--archetype {
   top: .7rem;
-  right: .7rem;
+  left: .7rem;
+  right: auto;
   background: linear-gradient(135deg, rgba(239,68,68,0.9), rgba(248,113,113,0.8));
   border-color: rgba(248,113,113,0.65);
 }

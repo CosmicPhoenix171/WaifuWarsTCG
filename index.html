@@ -720,10 +720,6 @@
           const roleSlug = roleRaw ? roleRaw.toLowerCase().replace(/[^a-z0-9]+/g, '-') : '';
           const roleLabel = roleRaw ? prettifyLabel(roleRaw) : '';
           const roleEsc = roleLabel ? escapeHtml(roleLabel) : '';
-          const roleBadge = roleLabel
-            ? `<span class="card-role-badge" data-role="${escapeHtml(roleSlug)}" title="${roleEsc}"><span aria-hidden="true">${roleEsc}</span><span class="sr-only">${roleEsc} role</span></span>`
-            : '';
-
           const artRole = hasArt ? `${card.name || 'Card'} artwork` : 'Card back artwork';
           const artMarkup = hasArt
             ? `<img src="${artDefault}" alt="">`
@@ -787,7 +783,6 @@
                 </span>
               </header>
               <div class="${hasArt ? 'card-art' : 'card-art card-art--back'}" role="img" aria-label="${artRoleEsc}">
-                ${roleBadge}
                 ${artMarkup}
                 <span class="card-chip card-chip--archetype" title="Archetype ${escapeHtml(card.archetype || typeLabel)}">${archetypeChip}</span>
                 <span class="card-chip card-chip--strategy" title="Signature effect ${strategyEsc}">${strategyEsc}</span>
