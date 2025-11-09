@@ -562,7 +562,7 @@ a:hover { text-decoration:underline; }
   display: none;
 }
 .card-text-box {
-  padding: .8rem .9rem 1rem; /* extra bottom pad to avoid clipping in rounded corners */
+  padding: .85rem .9rem 1.35rem; /* bottom padding supports statline overlap */
   border-radius: 10px;
   background: #ffffff;
   border: 2px solid rgba(203,213,225,0.8);
@@ -626,11 +626,13 @@ a:hover { text-decoration:underline; }
   border-top: 1px solid rgba(203,213,225,0.4);
 }
 .card-statline {
-  margin: .5rem 0 0;
+  margin: -.85rem 0 0;
   display: grid;
   grid-template-columns: repeat(3,minmax(0,1fr));
   gap: .65rem;
   flex-shrink: 0;
+  position: relative;
+  z-index: 6;
 }
 .card-statline div {
   position: relative;
