@@ -179,7 +179,7 @@
     }
 
     // === CONFIGURATION ===
-    const RARITY_META = {
+  const RARITY_META = {
       common: {
         key: 'common',
         datasetKey: 'common',
@@ -231,6 +231,10 @@
     };
 
     // === UTILITY HELPERS ===
+    const SPECIES_HINTS = new Set([
+      'ai','android','angel','beast','beastkin','beastfolk','celestial','cyborg','demon','dragon','elf','fairy','fox','ghost','goblin','golem','goddess','gynoid','human','idol','kitsune','mermaid','neko','oni','robot','slime','spirit','succubus','vampire','witch','wolf','yokai','yuki-onna','uma'
+    ]);
+
     function clamp(value, min, max) {
       return Math.min(Math.max(value, min), max);
     }
@@ -742,9 +746,57 @@
           const idLabel = escapeHtml((card.id || '').toUpperCase());
           const artRoleEsc = escapeHtml(artRole);
 
-          const tagsHtml = (card.tags || [])
-            .map((tag) => `<span class="card-tag">${escapeHtml(tag)}</span>`)
-            .join('');
+          const rawTags = Array.isArray(card.tags)
+            ? card.tags.filter((tag) => typeof tag === 'string' && tag.trim().length)
+            : [];
+          const normalizedTags = rawTags.map((tag) => tag.trim().toLowerCase());
+          let speciesHint = '';
+          for (const tag of normalizedTags) {
+            if (SPECIES_HINTS.has(tag)) {
+              speciesHint = tag;
+              break;
+            }
+          }
+
+          const strategyValues = [];
+          const seenStrategy = new Set();
+          normalizedTags
+            .filter((tag) => tag !== speciesHint)
+            .forEach((tag) => {
+              const pretty = prettifyLabel(tag);
+              const key = pretty.toLowerCase();
+              if (seenStrategy.has(key)) {
+                return;
+              }
+              seenStrategy.add(key);
+              strategyValues.push(pretty);
+            });
+
+          if (!strategyValues.length && roleLabel) {
+            strategyValues.push(roleLabel);
+          }
+
+          const strategyChipsHtml = strategyValues.length
+            ? strategyValues
+                .map((value) => `<span class="card-identity-chip card-identity-chip--strategy">${escapeHtml(value)}</span>`)
+                .join('')
+            : '<span class="card-identity-chip card-identity-chip--strategy card-identity-chip--empty">Flexible</span>';
+
+          const girlTypeSource = [
+            card.girlType,
+            card.species,
+            card.originType,
+            card.origin,
+            card.subtype,
+            card.affinity?.type,
+            card.profile?.species,
+            card.profile?.origin,
+            card.traits?.species,
+            card.traits?.origin,
+            speciesHint ? prettifyLabel(speciesHint) : ''
+          ].find((value) => typeof value === 'string' && value.trim().length);
+
+          const girlTypeEsc = escapeHtml(girlTypeSource ? prettifyLabel(girlTypeSource) : 'Unknown');
 
           const abilitiesHtml = abilityLines.length
             ? abilityLines.map((line) => `<li>${formatAbilityLine(line)}</li>`).join('')
@@ -779,12 +831,19 @@
                 ${roleBadge}
                 ${artMarkup}
                 <div class="card-type-overlay" role="group" aria-label="${typeDescriptorEsc}">
-                  <div class="card-type-heading">
-                    <span class="card-type-label">${typeDescriptorEsc}</span>
+                  <div class="card-identity-row">
+                    <span class="card-identity-label">Archetype</span>
                     <span class="card-archetype-chip">${archetypeChip}</span>
                   </div>
-                  <div class="card-tags" aria-label="Card tags">
-                    ${tagsHtml || '<span class="card-tag card-tag-empty">No tags yet</span>'}
+                  <div class="card-identity-row" aria-label="Strategy focus">
+                    <span class="card-identity-label">Strategy</span>
+                    <div class="card-identity-chiprow">
+                      ${strategyChipsHtml}
+                    </div>
+                  </div>
+                  <div class="card-identity-row">
+                    <span class="card-identity-label">Origin</span>
+                    <span class="card-identity-chip card-identity-chip--origin">${girlTypeEsc}</span>
                   </div>
                 </div>
               </div>
