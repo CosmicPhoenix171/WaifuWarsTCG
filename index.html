@@ -504,116 +504,6 @@
       cards.forEach(detectCardOverflow);
     }
 
-    const CARD_HEIGHT_CACHE = new WeakMap();
-    const HEIGHT_JITTER_THRESHOLD = 2;
-    const CARD_HEIGHT_MAX = 1600; // guard against pathological runaway
-
-    function syncCardHeight(article) {
-      if (!article) return;
-      const flipEl = article.querySelector('.card-flip');
-      if (!flipEl) return;
-
-      // Measure only the front content frame. The back face mirrors container size and
-      // will cause feedback if we include it in calculations.
-      const frontFrame = flipEl.querySelector('.card-face--front .card-frame');
-      if (!frontFrame) return;
-
-      // Temporarily unfix the height so we can measure the natural content size.
-      const prevInlineHeight = flipEl.style.height;
-      const prevInlineVar = flipEl.style.getPropertyValue('--card-height');
-      flipEl.style.height = 'auto';
-      flipEl.style.setProperty('--card-height', 'auto');
-
-      const measured = Math.round(frontFrame.getBoundingClientRect().height);
-      if (!measured) {
-        if (prevInlineHeight) {
-          flipEl.style.height = prevInlineHeight;
-        } else {
-          flipEl.style.removeProperty('height');
-        }
-        if (prevInlineVar) {
-          flipEl.style.setProperty('--card-height', prevInlineVar);
-        } else {
-          flipEl.style.removeProperty('--card-height');
-        }
-        return;
-      }
-
-      const targetHeight = Math.min(CARD_HEIGHT_MAX, measured);
-      const previous = CARD_HEIGHT_CACHE.get(flipEl);
-
-      if (previous !== undefined && Math.abs(targetHeight - previous) < HEIGHT_JITTER_THRESHOLD) {
-        // Restore previous explicit height to keep front/back faces aligned.
-        if (prevInlineHeight) {
-          flipEl.style.height = prevInlineHeight;
-        } else {
-          flipEl.style.removeProperty('height');
-        }
-        if (prevInlineVar) {
-          flipEl.style.setProperty('--card-height', prevInlineVar);
-        } else {
-          flipEl.style.removeProperty('--card-height');
-        }
-        return; // ignore tiny jitter
-      }
-
-      CARD_HEIGHT_CACHE.set(flipEl, targetHeight);
-      flipEl.style.height = `${targetHeight}px`;
-      flipEl.style.setProperty('--card-height', `${targetHeight}px`);
-    }
-
-    let syncHeightsFrame = null;
-    function scheduleSyncAllCardHeights(scope = document) {
-      if (syncHeightsFrame) {
-        cancelAnimationFrame(syncHeightsFrame);
-      }
-      syncHeightsFrame = requestAnimationFrame(() => {
-        syncHeightsFrame = null;
-        const root = scope instanceof Element ? scope : document;
-        if (root instanceof Element && root.matches('.card-display')) {
-          syncCardHeight(root);
-        }
-        root.querySelectorAll('.card-display').forEach(syncCardHeight);
-      });
-    }
-
-    // Observe front/back faces for any size change (text wrap, style tweaks, etc.)
-    const _roMap = new WeakMap();
-    function attachResizeObservers(article) {
-      if (!article || _roMap.has(article)) return;
-      const flipEl = article.querySelector('.card-flip');
-      if (!flipEl) return;
-      // Observe only the front content frame to avoid loops with 100% back face
-      const frontFrame = flipEl.querySelector('.card-face--front .card-frame');
-      if (!frontFrame) return;
-      const ro = new ResizeObserver(() => syncCardHeight(article));
-      ro.observe(frontFrame);
-      _roMap.set(article, ro);
-    }
-
-    function watchCardMedia(article) {
-      if (!article) {
-        return;
-      }
-
-      const resync = () => scheduleSyncAllCardHeights(article);
-
-      article.querySelectorAll('img').forEach((img) => {
-        if (!img) {
-          return;
-        }
-
-        const handle = () => resync();
-
-        if (img.complete) {
-          handle();
-        } else {
-          img.addEventListener('load', handle, { once: true });
-          img.addEventListener('error', handle, { once: true });
-        }
-      });
-    }
-
     // === INTERACTION ===
     function setupInteractiveCard(article) {
       const flipEl = article.querySelector('.card-flip');
@@ -978,20 +868,16 @@
 
           fragment.appendChild(article);
           interactiveArticles.push(article);
-          watchCardMedia(article);
-          attachResizeObservers(article);
         }
 
         cardsGrid.appendChild(fragment);
 
-  balanceAbilityText(cardsGrid);
-  fitAllTitles(cardsGrid);
-  scheduleSyncAllCardHeights(cardsGrid);
-  detectAllOverflow(cardsGrid);
+        balanceAbilityText(cardsGrid);
+        fitAllTitles(cardsGrid);
+        detectAllOverflow(cardsGrid);
 
         requestAnimationFrame(() => {
           interactiveArticles.forEach((article) => {
-            syncCardHeight(article);
             setupInteractiveCard(article);
           });
         });
@@ -1004,18 +890,16 @@
 
     // === LIFECYCLE ===
     window.addEventListener('resize', () => {
-  balanceAbilityText(cardsGrid);
-  fitAllTitles(cardsGrid);
-  scheduleSyncAllCardHeights(cardsGrid);
-  detectAllOverflow(cardsGrid);
+      balanceAbilityText(cardsGrid);
+      fitAllTitles(cardsGrid);
+      detectAllOverflow(cardsGrid);
     });
 
     if (document.fonts && typeof document.fonts.ready?.then === 'function') {
       document.fonts.ready.then(() => {
         balanceAbilityText(cardsGrid);
         fitAllTitles(cardsGrid);
-        scheduleSyncAllCardHeights(cardsGrid);
-          detectAllOverflow(cardsGrid);
+        detectAllOverflow(cardsGrid);
       }).catch(() => {});
     }
 

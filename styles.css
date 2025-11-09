@@ -119,8 +119,7 @@ a:hover { text-decoration:underline; }
 .card-flip {
   position: relative;
   width: min(100%, 340px);
-  /* Must have a non-zero fallback because faces are absolutely positioned */
-  height: var(--card-height, 520px);
+  display: grid;
   --flip-angle: 0deg;
   --tilt-x: 0deg;
   --tilt-y: 0deg;
@@ -143,8 +142,7 @@ a:hover { text-decoration:underline; }
   cursor: grabbing;
 }
 .card-face {
-  position: absolute;
-  inset: 0;
+  grid-area: 1 / 1;
   display: flex;
   justify-content: center;
   align-items: stretch;
