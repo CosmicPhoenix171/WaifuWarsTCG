@@ -312,25 +312,36 @@ a:hover { text-decoration:underline; }
 }
 .card-aff-chip {
   --aff-heart-gradient: linear-gradient(135deg, #fde1f0 0%, #f9a8d4 45%, #f472b6 75%, #db2777 100%);
+  --aff-w: clamp(74px, 9vw, 108px);
+  --aff-h: calc(var(--aff-w) * 0.82);
   position: relative;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: .1rem;
-  padding: clamp(.9rem, 1.1vw + .55rem, 1.1rem) clamp(1.2rem, 1.4vw + .75rem, 1.5rem);
-  min-width: clamp(4.75rem, 4vw + 3.6rem, 5.6rem);
+  display: grid;
+  grid-auto-flow: row;
+  justify-items: center;
+  align-content: center;
+  gap: .12rem;
+  inline-size: var(--aff-w);
+  block-size: var(--aff-h);
   background: var(--aff-heart-gradient);
   color: #fff5fa;
-  font-size: .66rem;
   font-weight: 800;
   letter-spacing: .65px;
   text-transform: uppercase;
   flex-shrink: 0;
   filter: drop-shadow(0 6px 12px rgba(249,168,212,0.45));
   isolation: isolate;
-  clip-path: path('M50% 6% C 64% -6%, 90% 7%, 90% 30% C 90% 49%, 72% 64%, 50% 86% C 28% 64%, 10% 49%, 10% 30% C 10% 7%, 36% -6%, 50% 6%');
-  -webkit-clip-path: path('M50% 6% C 64% -6%, 90% 7%, 90% 30% C 90% 49%, 72% 64%, 50% 86% C 28% 64%, 10% 49%, 10% 30% C 10% 7%, 36% -6%, 50% 6%');
+  /* Heart shape using widely-supported polygon clip-path */
+  clip-path: polygon(
+    50% 6%, 61% 0, 74% 2%, 84% 9%, 90% 20%, 90% 31%, 86% 41%, 79% 50%,
+    50% 80%,
+    21% 50%, 14% 41%, 10% 31%, 10% 20%, 16% 9%, 26% 2%, 39% 0
+  );
+  -webkit-clip-path: polygon(
+    50% 6%, 61% 0, 74% 2%, 84% 9%, 90% 20%, 90% 31%, 86% 41%, 79% 50%,
+    50% 80%,
+    21% 50%, 14% 41%, 10% 31%, 10% 20%, 16% 9%, 26% 2%, 39% 0
+  );
+  overflow: hidden; /* ensure inner highlight stays clipped on browsers with partial clip-path support */
 }
 .card-aff-chip::before {
   content: "";
@@ -357,16 +368,18 @@ a:hover { text-decoration:underline; }
 .card-aff-label {
   position: relative;
   z-index: 1;
-  font-size: .58rem;
+  font-size: clamp(.55rem, .6vw + .42rem, .7rem);
   letter-spacing: .7px;
-  opacity: .92;
+  opacity: .95;
+  text-shadow: 0 1px 2px rgba(219,39,119,0.35);
 }
 .card-aff-value {
   position: relative;
   z-index: 1;
-  font-size: .95rem;
+  font-size: clamp(.9rem, 1.1vw + .5rem, 1.1rem);
   letter-spacing: .4px;
   line-height: 1;
+  text-shadow: 0 1px 2px rgba(219,39,119,0.35);
 }
 .card-art {
   position: relative;
