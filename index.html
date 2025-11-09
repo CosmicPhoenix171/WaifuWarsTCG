@@ -708,7 +708,6 @@
           const rarityName = escapeHtml(rawRarityName);
           const rarityCode = escapeHtml(rawRarityCode);
           const raritySymbol = escapeHtml(rawRaritySymbol);
-          const typeLabel = capitalize(card.type || 'waifu');
           const abilityLines = formatSentences(card.text);
           const flavor = card.flavor ? card.flavor.replace(/^“|”$/g, '') : '';
           const moodDisplay = formatMood(card.mood);
@@ -731,9 +730,6 @@
             : `<img src="${backArt}" alt="Waifu Wars card back" class="card-art-img-back" onerror="this.onerror=null;this.src='${fallbackCardBack}';">`;
 
           const cardTitle = escapeHtml(card.name || 'Unnamed Card');
-          const typeDescriptor = card.archetype ? `${typeLabel} — ${card.archetype}` : typeLabel;
-          const typeDescriptorEsc = escapeHtml(typeDescriptor);
-          const archetypeChip = escapeHtml((card.archetype || typeLabel).toUpperCase());
           const moodDisplayEsc = escapeHtml(moodDisplay);
           const bondsDisplayEsc = escapeHtml(bondsDisplay);
           const affectionValue = card.affection ?? '—';
@@ -741,28 +737,6 @@
           const setLabel = escapeHtml(card.set || 'TBA');
           const idLabel = escapeHtml((card.id || '').toUpperCase());
           const artRoleEsc = escapeHtml(artRole);
-
-          const speciesSource = [
-            card.species,
-            card.girlType,
-            card.originType,
-            card.origin,
-            card.subtype,
-            card.affinity?.type,
-            card.profile?.species,
-            card.profile?.origin,
-            card.traits?.species,
-            card.traits?.origin
-          ].find((value) => typeof value === 'string' && value.trim().length);
-
-          const strategyRaw = typeof card.strategy === 'string' ? card.strategy.trim() : '';
-          const strategyLabel = strategyRaw || roleLabel;
-          const strategyChipsHtml = strategyLabel
-            ? `<span class="card-identity-chip card-identity-chip--strategy">${escapeHtml(strategyLabel)}</span>`
-            : '<span class="card-identity-chip card-identity-chip--strategy card-identity-chip--empty">Flexible</span>';
-
-          const speciesEsc = escapeHtml(speciesSource ? prettifyLabel(speciesSource) : 'Unknown');
-          const speciesSlug = speciesSource ? speciesSource.toLowerCase().replace(/[^a-z0-9]+/g, '-') : '';
 
           const abilitiesHtml = abilityLines.length
             ? abilityLines.map((line) => `<li>${formatAbilityLine(line)}</li>`).join('')
@@ -796,22 +770,6 @@
               <div class="${hasArt ? 'card-art' : 'card-art card-art--back'}" role="img" aria-label="${artRoleEsc}">
                 ${roleBadge}
                 ${artMarkup}
-                <div class="card-type-overlay" role="group" aria-label="${typeDescriptorEsc}">
-                  <div class="card-identity-row">
-                    <span class="card-identity-label">Archetype</span>
-                    <span class="card-archetype-chip">${archetypeChip}</span>
-                  </div>
-                  <div class="card-identity-row" aria-label="Signature effect">
-                    <span class="card-identity-label">Effect</span>
-                    <div class="card-identity-chiprow">
-                      ${strategyChipsHtml}
-                    </div>
-                  </div>
-                  <div class="card-identity-row">
-                    <span class="card-identity-label">Species</span>
-                    <span class="card-identity-chip card-identity-chip--species">${speciesEsc}</span>
-                  </div>
-                </div>
               </div>
               <div class="card-text-box">
                 <ul class="card-abilities">
@@ -858,9 +816,6 @@
           if (card.id) {
             article.dataset.cardId = card.id;
           }
-          if (speciesSlug) {
-            article.dataset.species = speciesSlug;
-          }
           if (rarityKey === 'event') {
             article.dataset.rarityVariant = 'event';
           }
@@ -873,9 +828,6 @@
           }
           if (card.rarityName) {
             article.dataset.rarityName = rawRarityName;
-          }
-          if (strategyLabel) {
-            article.dataset.strategy = strategyLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-');
           }
           article.setAttribute('role', 'button');
           article.setAttribute('tabindex', '0');
