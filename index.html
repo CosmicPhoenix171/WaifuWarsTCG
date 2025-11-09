@@ -849,10 +849,10 @@
               <div class="${hasArt ? 'card-art' : 'card-art card-art--back'}" role="img" aria-label="${artRoleEsc}">
                 ${roleBadge}
                 ${artMarkup}
-              </div>
-              <div class="card-type-row">
-                <span class="card-type-label">${typeDescriptorEsc}</span>
-                <span class="card-archetype-chip">${archetypeChip}</span>
+                <div class="card-type-overlay" role="group" aria-label="${typeDescriptorEsc}">
+                  <span class="card-type-label">${typeDescriptorEsc}</span>
+                  <span class="card-archetype-chip">${archetypeChip}</span>
+                </div>
               </div>
               <div class="card-text-box" data-fluid="true">
                 <ul class="card-abilities">
