@@ -505,19 +505,19 @@
     }
 
     function syncCardHeight(article) {
-      if (!article) {
-        return;
-      }
+      if (!article) return;
       const flipEl = article.querySelector('.card-flip');
-      if (!flipEl) {
-        return;
-      }
-      const front = flipEl.querySelector('.card-face--front');
-      const back = flipEl.querySelector('.card-face--back');
-      const frontHeight = front ? front.offsetHeight : 0;
-      const backHeight = back ? back.offsetHeight : 0;
+      if (!flipEl) return;
+
+      // Measure the actual content frames, not the absolutely-positioned faces
+      const frontFrame = flipEl.querySelector('.card-face--front .card-frame');
+      const backFrame = flipEl.querySelector('.card-face--back .card-back-frame, .card-face--back .card-frame');
+
+  const frontHeight = frontFrame ? frontFrame.scrollHeight : 0;
+  const backHeight = backFrame ? backFrame.scrollHeight : 0;
       const targetHeight = Math.max(frontHeight, backHeight);
-      if (targetHeight) {
+
+      if (targetHeight > 0) {
         flipEl.style.height = `${targetHeight}px`;
         flipEl.style.setProperty('--card-height', `${targetHeight}px`);
       }
@@ -543,12 +543,14 @@
     function attachResizeObservers(article) {
       if (!article || _roMap.has(article)) return;
       const flipEl = article.querySelector('.card-flip');
-      const front = flipEl?.querySelector('.card-face--front');
-      const back = flipEl?.querySelector('.card-face--back');
-      if (!front || !back) return;
+      if (!flipEl) return;
+      // Observe the inner content frames so height grows when content wraps
+      const frontFrame = flipEl.querySelector('.card-face--front .card-frame');
+      const backFrame = flipEl.querySelector('.card-face--back .card-back-frame, .card-face--back .card-frame');
+      if (!frontFrame && !backFrame) return;
       const ro = new ResizeObserver(() => syncCardHeight(article));
-      ro.observe(front);
-      ro.observe(back);
+      if (frontFrame) ro.observe(frontFrame);
+      if (backFrame) ro.observe(backFrame);
       _roMap.set(article, ro);
     }
 
