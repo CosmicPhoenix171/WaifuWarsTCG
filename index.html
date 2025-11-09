@@ -337,6 +337,7 @@
     function balanceAbilityText(root = document) {
       if (!root || typeof root.querySelectorAll !== 'function') return;
       root.querySelectorAll('.card-text-box').forEach((textBox) => {
+        if (textBox.dataset.fluid === 'true') return; // skip auto-fit for fluid boxes
         const abilities = textBox.querySelector('.card-abilities');
         if (!abilities) return;
 
@@ -813,7 +814,7 @@
                 <span class="card-type-label">${typeDescriptorEsc}</span>
                 <span class="card-archetype-chip">${archetypeChip}</span>
               </div>
-              <div class="card-text-box">
+              <div class="card-text-box" data-fluid="true">
                 <ul class="card-abilities">
                   ${abilitiesHtml}
                 </ul>
