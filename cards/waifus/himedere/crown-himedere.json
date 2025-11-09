@@ -8,7 +8,7 @@
   "affection": 9,
   "bonds": { "start": 1, "max": 13 },
   "mood": { "thresholds": { "dere": 5, "extreme": 10 } },
-  "tags": ["leader","aura"],
+  "tags": ["leader","aura","human"],
   "text": "Leader Aura: Other allied waifus gain +1 ATK while you have the highest Affection. Dere: Your Support cards cost 1 less. Extreme: When you defeat a waifu, gain +2 {BOND} and heal 2 Affection.",
   "effects": [
     {

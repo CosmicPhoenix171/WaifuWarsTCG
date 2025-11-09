@@ -11,7 +11,7 @@
   "affection": 6,
   "bonds": { "start": 0, "max": 12 },
   "mood": { "thresholds": { "dere": 3, "extreme": 8 } },
-  "tags": ["gamble","burst"],
+  "tags": ["gamble","burst","human"],
   "text": "When you attack: Flip a coin. Heads — deal +4 damage. Tails — take 2 self-damage. Dere: Gain +1 {BOND} on heads. Extreme: You may flip twice and choose the result, but suffer both tails outcomes.",
   "effects": [
     {
