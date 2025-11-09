@@ -353,9 +353,9 @@
         let lineHeight = parseFloat(cs.lineHeight) || Math.max(1.2, (fontSize * 1.35));
         let gap = parseFloat((cs.gap || '0').toString()) || 7.2; // approx .45rem
 
-        const minFont = 9.5;
-        const minLine = Math.max(1.05, fontSize * 1.15);
-        const minGap = 2; // px
+  const minFont = 8.5;
+  const minLine = Math.max(1.02, fontSize * 1.12);
+  const minGap = 1; // px
 
         // Helper to check overflow
         const overflows = () => textBox.scrollHeight > textBox.clientHeight + 1;
@@ -387,10 +387,10 @@
         }
 
         // Final pass: tiny font bump down if still overflowing
-        let guard = 8;
+        let guard = 10;
         while (overflows() && guard--) {
           fontSize -= 0.25;
-          abilities.style.fontSize = `${Math.max(minFont - 1, fontSize)}px`;
+          abilities.style.fontSize = `${Math.max(minFont - 1.5, fontSize)}px`;
         }
       });
     }

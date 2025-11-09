@@ -562,7 +562,7 @@ a:hover { text-decoration:underline; }
   display: none;
 }
 .card-text-box {
-  padding: .85rem .95rem 1.1rem; /* extra bottom pad to avoid clipping in rounded corners */
+  padding: .8rem .9rem 1rem; /* extra bottom pad to avoid clipping in rounded corners */
   border-radius: 10px;
   background: #ffffff;
   border: 2px solid rgba(203,213,225,0.8);
