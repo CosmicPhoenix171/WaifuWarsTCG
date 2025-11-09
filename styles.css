@@ -314,7 +314,7 @@ a:hover { text-decoration:underline; }
 }
 .card-aff-chip {
   --aff-heart-gradient: linear-gradient(135deg, #fde1f0 0%, #f9a8d4 45%, #f472b6 75%, #db2777 100%);
-  --aff-w: clamp(56px, 5.8vw, 88px);
+  --aff-w: clamp(52px, 5vw, 76px);
   --aff-h: calc(var(--aff-w) * 0.74);
   position: relative;
   display: grid;
