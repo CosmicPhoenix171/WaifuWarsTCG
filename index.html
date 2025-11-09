@@ -742,16 +742,13 @@
             card.traits?.species,
             card.traits?.origin
           ].find((value) => typeof value === 'string' && value.trim().length);
-          const speciesEsc = escapeHtml(speciesSource ? prettifyLabel(speciesSource) : 'Unknown');
+          const speciesLabel = speciesSource ? prettifyLabel(speciesSource) : 'Unknown';
+          const speciesEsc = escapeHtml(speciesLabel);
           const typeLabel = capitalize(card.type || 'waifu');
           const archetypeChip = escapeHtml((card.archetype || typeLabel).toUpperCase());
           const strategyRaw = typeof card.strategy === 'string' ? card.strategy.trim() : '';
-          const strategyAbbrev = strategyRaw ? strategyRaw.split(/[\s/-]+/).map((word) => word.charAt(0)).join('').slice(0, 3).toUpperCase() : 'FX';
-          const strategyEsc = escapeHtml(strategyAbbrev);
-          const overlayLabelParts = [card.archetype, strategyRaw, speciesSource]
-            .filter((part) => typeof part === 'string' && part.trim().length)
-            .map((part) => prettifyLabel(part));
-          const overlayAriaLabel = escapeHtml(overlayLabelParts.length ? overlayLabelParts.join(', ') : `${card.name || 'Card'} traits`);
+          const strategyLabel = strategyRaw ? prettifyLabel(strategyRaw) : (roleLabel || 'Flexible');
+          const strategyEsc = escapeHtml(strategyLabel);
           const moodDisplayEsc = escapeHtml(moodDisplay);
           const bondsDisplayEsc = escapeHtml(bondsDisplay);
           const affectionValue = card.affection ?? '—';
@@ -792,11 +789,9 @@
               <div class="${hasArt ? 'card-art' : 'card-art card-art--back'}" role="img" aria-label="${artRoleEsc}">
                 ${roleBadge}
                 ${artMarkup}
-                <div class="card-type-overlay" role="group" aria-label="${overlayAriaLabel}">
-                  <span class="card-identity-chip card-identity-chip--archetype">${archetypeChip}</span>
-                  <span class="card-identity-chip card-identity-chip--strategy">${strategyEsc}</span>
-                  <span class="card-identity-chip card-identity-chip--species">${speciesEsc.charAt(0)}</span>
-                </div>
+                <span class="card-chip card-chip--archetype" title="Archetype ${escapeHtml(card.archetype || typeLabel)}">${archetypeChip}</span>
+                <span class="card-chip card-chip--strategy" title="Signature effect ${strategyEsc}">${strategyEsc}</span>
+                <span class="card-chip card-chip--species" title="Species ${speciesEsc}">${speciesEsc}</span>
               </div>
               <div class="card-text-box">
                 <ul class="card-abilities">
