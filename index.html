@@ -446,6 +446,62 @@
       const titles = root.querySelectorAll('.card-title');
       titles.forEach(fitCardTitle);
     }
+    // === OVERFLOW DETECTION ===
+    function titleWouldOverflow(titleEl) {
+      if (!titleEl) return false;
+      const prev = {
+        display: titleEl.style.display,
+        webkitLineClamp: titleEl.style.webkitLineClamp,
+        lineClamp: titleEl.style.lineClamp,
+        webkitBoxOrient: titleEl.style.webkitBoxOrient,
+        overflow: titleEl.style.overflow
+      };
+      const computed = getComputedStyle(titleEl);
+      // Temporarily remove clamp & overflow to measure full height
+      titleEl.style.display = 'block';
+      titleEl.style.webkitLineClamp = 'unset';
+      titleEl.style.lineClamp = 'unset';
+      titleEl.style.webkitBoxOrient = 'unset';
+      titleEl.style.overflow = 'visible';
+      const lhPx = (() => {
+        const lh = computed.lineHeight;
+        const num = parseFloat(lh);
+        if (lh.endsWith('px')) return num;
+        return (parseFloat(computed.fontSize) || 18) * 1.3;
+      })();
+      const allowed = lhPx * 2.05;
+      const wouldOverflow = titleEl.scrollHeight > allowed + 0.5;
+      // restore
+      titleEl.style.display = prev.display || '-webkit-box';
+      titleEl.style.webkitLineClamp = prev.webkitLineClamp || '2';
+      titleEl.style.lineClamp = prev.lineClamp || '2';
+      titleEl.style.webkitBoxOrient = prev.webkitBoxOrient || 'vertical';
+      titleEl.style.overflow = prev.overflow || 'hidden';
+      return wouldOverflow;
+    }
+
+    function detectCardOverflow(article) {
+      if (!article) return;
+      const textBox = article.querySelector('.card-text-box');
+      const title = article.querySelector('.card-title');
+      let overflow = false;
+      if (textBox) {
+        overflow = overflow || (textBox.scrollHeight > textBox.clientHeight + 1);
+      }
+      if (title) {
+        overflow = overflow || titleWouldOverflow(title);
+      }
+      if (overflow) {
+        article.dataset.overflow = 'true';
+      } else {
+        delete article.dataset.overflow;
+      }
+    }
+
+    function detectAllOverflow(root = document) {
+      const cards = root.querySelectorAll('.card-display');
+      cards.forEach(detectCardOverflow);
+    }
 
     function syncCardHeight(article) {
       if (!article) {
@@ -849,6 +905,7 @@
   balanceAbilityText(cardsGrid);
   fitAllTitles(cardsGrid);
   scheduleSyncAllCardHeights(cardsGrid);
+  detectAllOverflow(cardsGrid);
 
         requestAnimationFrame(() => {
           interactiveArticles.forEach((article) => {
@@ -868,6 +925,7 @@
   balanceAbilityText(cardsGrid);
   fitAllTitles(cardsGrid);
   scheduleSyncAllCardHeights(cardsGrid);
+  detectAllOverflow(cardsGrid);
     });
 
     if (document.fonts && typeof document.fonts.ready?.then === 'function') {
@@ -875,6 +933,7 @@
         balanceAbilityText(cardsGrid);
         fitAllTitles(cardsGrid);
         scheduleSyncAllCardHeights(cardsGrid);
+          detectAllOverflow(cardsGrid);
       }).catch(() => {});
     }
 

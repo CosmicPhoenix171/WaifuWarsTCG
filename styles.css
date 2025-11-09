@@ -779,6 +779,22 @@ a:hover { text-decoration:underline; }
   font-size: .7rem;
   opacity: 0.5;
 }
+/* Overflow indicator when content had to be force-fitted */
+.card-display[data-overflow="true"] .card-footer::after {
+  content: "OVF";
+  font-size: .55rem;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg,#ef4444,#f59e0b);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 6px rgba(239,68,68,0.45);
+  opacity: 0.9;
+}
+.card-display[data-overflow="true"] .card-text-box {
+  outline: 2px dashed rgba(239,68,68,0.4);
+  outline-offset: -2px;
+}
 /* === Rarity Themes === */
 .card-display[data-rarity="common"] .card-rarity-badge {
   background: linear-gradient(120deg, rgba(226,232,240,0.95), rgba(226,232,240,0.75));
