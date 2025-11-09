@@ -3,18 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-   <title>Waifu Wars TCG – Emotional Strategy Card Game</title>
-   <meta name="description" content="Waifu Wars TCG: fast tactical anime card game where Bonds, moods, and archetypes forge dramatic comebacks." />
-   <meta name="color-scheme" content="dark light" />
-   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%236d5dfc'/%3E%3Cpath d='M20 38c6 6 12 6 18 0 5-5 5-13 0-18-4-4-10-4-14 0-5 5-5 13 0 18z' fill='%23fff'/%3E%3C/svg%3E" />
-  <meta name="description" content="Waifu Wars TCG — a sleek, modern anime card battler with emotional mechanics, bond meters, and dramatic trope moments." />
+  <title>Waifu Wars TCG – Emotional Strategy Card Game</title>
+  <meta name="description" content="Waifu Wars TCG: fast tactical anime card game where Bonds, moods, and archetypes forge dramatic comebacks." />
+  <meta name="color-scheme" content="dark light" />
+  <meta name="theme-color" content="#ee2e8b" />
   <meta property="og:title" content="Waifu Wars TCG" />
   <meta property="og:description" content="Tactical anime card battler with bonds, mood states, and archetype matchups." />
   <meta property="og:type" content="website" />
-  <meta name="theme-color" content="#ee2e8b" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='64' height='64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%236d5dfc'/%3E%3Cpath d='M20 38c6 6 12 6 18 0 5-5 5-13 0-18-4-4-10-4-14 0-5 5-5 13 0 18z' fill='%23fff'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -147,7 +146,7 @@
       </div>
     </section>
 
-  <section id="join" class="cta">
+    <section id="join" class="cta">
       <div class="container">
         <h2 class="section-title">Join The Journey</h2>
         <p>Follow development and get notified when the alpha opens.</p>
@@ -163,21 +162,23 @@
     <div class="container footer-inner">
       <div>© <span id="year"></span> Waifu Wars TCG</div>
       <div class="footer-links">
-  <a href="#join">Contact</a>
+        <a href="#join">Contact</a>
         <a href="https://github.com/CosmicPhoenix171/WaifuWarsTCG" target="_blank" rel="noopener">GitHub</a>
       </div>
     </div>
   </footer>
 
   <script type="module">
+    // === DOM REFERENCES ===
     const yearEl = document.getElementById('year');
-    if (yearEl) yearEl.textContent = new Date().getFullYear();
-
     const cardsGrid = document.getElementById('cards-grid');
     const cardsStatus = document.getElementById('cards-status');
 
-    const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
+    if (yearEl) {
+      yearEl.textContent = new Date().getFullYear();
+    }
 
+    // === CONFIGURATION ===
     const RARITY_META = {
       common: {
         key: 'common',
@@ -229,8 +230,13 @@
       }
     };
 
+    // === UTILITY HELPERS ===
+    function clamp(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
+
     function escapeHtml(str = '') {
-      return String(str).replace(/[&<>"']/g, ch => ({
+      return String(str).replace(/[&<>"']/g, (ch) => ({
         '&': '&amp;',
         '<': '&lt;',
         '>': '&gt;',
@@ -244,24 +250,34 @@
     }
 
     function formatSentences(text) {
-      if (!text) return [];
+      if (!text) {
+        return [];
+      }
       return String(text)
         .split(/(?:\r?\n|\r)+|(?<=[.!?])\s+/)
-        .map(line => line.trim())
+        .map((line) => line.trim())
         .filter(Boolean);
     }
 
     function formatBonds(bonds) {
-      if (!bonds) return '—';
+      if (!bonds) {
+        return '—';
+      }
       const start = typeof bonds.start === 'number' ? bonds.start : null;
       const max = typeof bonds.max === 'number' ? bonds.max : null;
-      if (start !== null && max !== null) return `${start} / ${max}`;
-      if (max !== null) return `${max}`;
+      if (start !== null && max !== null) {
+        return `${start} / ${max}`;
+      }
+      if (max !== null) {
+        return `${max}`;
+      }
       return '—';
     }
 
     function formatMood(mood) {
-      if (!mood) return '— / —';
+      if (!mood) {
+        return '— / —';
+      }
       const dere = mood.dere ?? '—';
       const extreme = mood.extreme ?? '—';
       return `${dere} / ${extreme}`;
@@ -271,14 +287,20 @@
       return value
         .toString()
         .replace(/[_-]+/g, ' ')
-        .replace(/\b\w/g, ch => ch.toUpperCase())
+        .replace(/\b\w/g, (ch) => ch.toUpperCase())
         .trim();
     }
 
     function getPrimaryRole(card = {}) {
-      if (!card) return '';
-      if (card.role) return card.role;
-      if (Array.isArray(card.tags) && card.tags.length) return card.tags[0];
+      if (!card) {
+        return '';
+      }
+      if (card.role) {
+        return card.role;
+      }
+      if (Array.isArray(card.tags) && card.tags.length) {
+        return card.tags[0];
+      }
       return '';
     }
 
@@ -299,7 +321,9 @@
 
     function formatAbilityLine(line = '') {
       const trimmed = line.trim();
-      if (!trimmed) return '';
+      if (!trimmed) {
+        return '';
+      }
       const keywordMatch = trimmed.match(/^([^:\u2014\u2013\-]{1,48}?)[\s]*(?:[:\u2014\u2013\-])\s+(.+)$/u);
       if (keywordMatch) {
         const keyword = decorateAbilityText(keywordMatch[1]);
@@ -309,11 +333,16 @@
       return `<span class="card-ability-body">${decorateAbilityText(trimmed)}</span>`;
     }
 
+    // === LAYOUT HELPERS ===
     function balanceAbilityText(root = document) {
-      if (!root || typeof root.querySelectorAll !== 'function') return;
+      if (!root || typeof root.querySelectorAll !== 'function') {
+        return;
+      }
       root.querySelectorAll('.card-text-box').forEach((textBox) => {
         const abilities = textBox.querySelector('.card-abilities');
-        if (!abilities) return;
+        if (!abilities) {
+          return;
+        }
         abilities.style.fontSize = '';
         let fontSize = parseFloat(getComputedStyle(abilities).fontSize) || 14;
         const minFontSize = 11;
@@ -325,9 +354,13 @@
     }
 
     function syncCardHeight(article) {
-      if (!article) return;
+      if (!article) {
+        return;
+      }
       const flipEl = article.querySelector('.card-flip');
-      if (!flipEl) return;
+      if (!flipEl) {
+        return;
+      }
       const front = flipEl.querySelector('.card-face--front');
       const back = flipEl.querySelector('.card-face--back');
       const frontHeight = front ? front.offsetHeight : 0;
@@ -341,7 +374,9 @@
 
     let syncHeightsFrame = null;
     function scheduleSyncAllCardHeights(scope = document) {
-      if (syncHeightsFrame) cancelAnimationFrame(syncHeightsFrame);
+      if (syncHeightsFrame) {
+        cancelAnimationFrame(syncHeightsFrame);
+      }
       syncHeightsFrame = requestAnimationFrame(() => {
         syncHeightsFrame = null;
         const root = scope instanceof Element ? scope : document;
@@ -349,9 +384,12 @@
       });
     }
 
+    // === INTERACTION ===
     function setupInteractiveCard(article) {
       const flipEl = article.querySelector('.card-flip');
-      if (!flipEl) return;
+      if (!flipEl) {
+        return;
+      }
 
       const state = {
         pointerId: null,
@@ -379,6 +417,7 @@
           clearTimeout(state.resetTimer);
           state.resetTimer = null;
         }
+
         if (smooth) {
           flipEl.style.transition = 'transform .26s ease, box-shadow .26s ease';
           flipEl.style.setProperty('--tilt-x', '0deg');
@@ -394,6 +433,7 @@
           flipEl.style.setProperty('--tilt-y', '0deg');
           flipEl.style.setProperty('--tilt-scale', '1');
         }
+
         updateCursorVars(0, 0);
       };
 
@@ -404,7 +444,10 @@
       };
 
       const handleHoverTilt = (event) => {
-        if (state.isDragging) return;
+        if (state.isDragging) {
+          return;
+        }
+
         const rect = flipEl.getBoundingClientRect();
         const relativeX = (event.clientX - rect.left) / rect.width;
         const relativeY = (event.clientY - rect.top) / rect.height;
@@ -412,6 +455,7 @@
         const tiltX = clamp((0.5 - relativeY) * 2 * maxTiltX, -maxTiltX, maxTiltX);
         const normX = clamp((relativeX - 0.5) * 2, -1, 1);
         const normY = clamp((0.5 - relativeY) * 2, -1, 1);
+
         flipEl.style.setProperty('--tilt-x', `${tiltX.toFixed(2)}deg`);
         flipEl.style.setProperty('--tilt-y', `${tiltY.toFixed(2)}deg`);
         flipEl.style.setProperty('--tilt-scale', '1.02');
@@ -420,14 +464,17 @@
 
       const handlePointerDown = (event) => {
         event.preventDefault();
+
         if (document.activeElement !== article && typeof article.focus === 'function') {
           article.focus({ preventScroll: true });
         }
+
         state.pointerId = event.pointerId;
         state.startX = event.clientX;
         state.startY = event.clientY;
         state.isDragging = true;
         state.hasFlipped = false;
+
         flipEl.setPointerCapture(event.pointerId);
         flipEl.classList.add('is-grabbing');
         flipEl.style.transition = '';
@@ -437,7 +484,10 @@
 
       const handlePointerMove = (event) => {
         if (state.isDragging) {
-          if (state.pointerId !== event.pointerId) return;
+          if (state.pointerId !== event.pointerId) {
+            return;
+          }
+
           const deltaX = event.clientX - state.startX;
           const deltaY = event.clientY - state.startY;
 
@@ -449,6 +499,7 @@
             const dragTilt = clamp(deltaX / 12, -10, 10);
             flipEl.style.setProperty('--tilt-y', `${dragTilt.toFixed(2)}deg`);
           }
+
           const rect = flipEl.getBoundingClientRect();
           const relativeX = (event.clientX - rect.left) / rect.width;
           const relativeY = (event.clientY - rect.top) / rect.height;
@@ -461,7 +512,10 @@
       };
 
       const handlePointerEnd = (event) => {
-        if (state.pointerId !== event.pointerId) return;
+        if (state.pointerId !== event.pointerId) {
+          return;
+        }
+
         flipEl.releasePointerCapture(event.pointerId);
         state.pointerId = null;
         state.isDragging = false;
@@ -472,7 +526,9 @@
       flipEl.addEventListener('pointerenter', handleHoverTilt);
       flipEl.addEventListener('pointermove', handlePointerMove);
       flipEl.addEventListener('pointerleave', () => {
-        if (state.isDragging) return;
+        if (state.isDragging) {
+          return;
+        }
         resetTilt();
       });
       flipEl.addEventListener('pointerdown', handlePointerDown);
@@ -490,14 +546,22 @@
       resetTilt(false);
     }
 
+    // === DATA LOADING ===
     async function loadCards() {
-      if (!cardsGrid || !cardsStatus) return;
+      if (!cardsGrid || !cardsStatus) {
+        return;
+      }
+
       try {
         cardsStatus.hidden = false;
         cardsStatus.textContent = 'Loading card previews…';
-        const res = await fetch('cards/index/by-type.json', { cache: 'no-store' });
-        if (!res.ok) throw new Error(`Request failed: ${res.status}`);
-        const data = await res.json();
+
+        const response = await fetch('cards/index/by-type.json', { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(`Request failed: ${response.status}`);
+        }
+
+        const data = await response.json();
         const waifus = Array.isArray(data?.waifu) ? data.waifu : [];
 
         if (!waifus.length) {
@@ -509,24 +573,22 @@
         cardsStatus.hidden = true;
         cardsGrid.innerHTML = '';
 
-  const frag = document.createDocumentFragment();
-  const interactiveArticles = [];
-
+        const fragment = document.createDocumentFragment();
+        const interactiveArticles = [];
         const customCardBack = 'assets/images/card-back.png';
         const fallbackCardBack = 'assets/images/card-back-default.svg';
 
-  for (const card of waifus) {
-    const rarityKey = (card.rarity || 'common').toLowerCase();
-  const rarityMeta = RARITY_META[rarityKey] || RARITY_META.common;
-  const rarityDatasetKey = rarityMeta.datasetKey || rarityMeta.key;
-  const rawRarityName = card.rarityName || rarityMeta.name;
-  const rawRarityCode = card.rarityCode || rarityMeta.code;
-  const rawRaritySymbol = card.raritySymbol || rarityMeta.symbol;
-  const rarityName = escapeHtml(rawRarityName);
-  const rarityCode = escapeHtml(rawRarityCode);
-  const raritySymbol = escapeHtml(rawRaritySymbol);
-
-    const typeLabel = capitalize(card.type || 'waifu');
+        for (const card of waifus) {
+          const rarityKey = (card.rarity || 'common').toLowerCase();
+          const rarityMeta = RARITY_META[rarityKey] || RARITY_META.common;
+          const rarityDatasetKey = rarityMeta.datasetKey || rarityMeta.key;
+          const rawRarityName = card.rarityName || rarityMeta.name;
+          const rawRarityCode = card.rarityCode || rarityMeta.code;
+          const rawRaritySymbol = card.raritySymbol || rarityMeta.symbol;
+          const rarityName = escapeHtml(rawRarityName);
+          const rarityCode = escapeHtml(rawRarityCode);
+          const raritySymbol = escapeHtml(rawRaritySymbol);
+          const typeLabel = capitalize(card.type || 'waifu');
           const abilityLines = formatSentences(card.text);
           const flavor = card.flavor ? card.flavor.replace(/^“|”$/g, '') : '';
           const moodDisplay = formatMood(card.mood);
@@ -559,11 +621,11 @@
           const artRoleEsc = escapeHtml(artRole);
 
           const tagsHtml = (card.tags || [])
-            .map(tag => `<span class="card-tag">${escapeHtml(tag)}</span>`)
+            .map((tag) => `<span class="card-tag">${escapeHtml(tag)}</span>`)
             .join('');
 
           const abilitiesHtml = abilityLines.length
-            ? abilityLines.map(line => `<li>${formatAbilityLine(line)}</li>`).join('')
+            ? abilityLines.map((line) => `<li>${formatAbilityLine(line)}</li>`).join('')
             : '<li class="card-ability-empty">Ability text coming soon.</li>';
 
           const flavorHtml = flavor
@@ -679,27 +741,29 @@
             </div>
           `;
 
-          frag.appendChild(article);
+          fragment.appendChild(article);
           interactiveArticles.push(article);
         }
 
-        cardsGrid.appendChild(frag);
+        cardsGrid.appendChild(fragment);
 
         balanceAbilityText(cardsGrid);
         scheduleSyncAllCardHeights(cardsGrid);
+
         requestAnimationFrame(() => {
           interactiveArticles.forEach((article) => {
             syncCardHeight(article);
             setupInteractiveCard(article);
           });
         });
-      } catch (err) {
+      } catch (error) {
         cardsStatus.textContent = 'Could not load cards right now. Try refreshing in a moment.';
         cardsStatus.hidden = false;
-        console.error(err);
+        console.error(error);
       }
     }
 
+    // === LIFECYCLE ===
     window.addEventListener('resize', () => {
       balanceAbilityText(cardsGrid);
       scheduleSyncAllCardHeights(cardsGrid);
