@@ -746,7 +746,8 @@
           const typeLabel = capitalize(card.type || 'waifu');
           const archetypeChip = escapeHtml((card.archetype || typeLabel).toUpperCase());
           const strategyRaw = typeof card.strategy === 'string' ? card.strategy.trim() : '';
-          const strategyEsc = escapeHtml(strategyRaw || roleLabel || 'Flexible');
+          const strategyAbbrev = strategyRaw ? strategyRaw.split(/[\s/-]+/).map((word) => word.charAt(0)).join('').slice(0, 3).toUpperCase() : 'FX';
+          const strategyEsc = escapeHtml(strategyAbbrev);
           const overlayLabelParts = [card.archetype, strategyRaw, speciesSource]
             .filter((part) => typeof part === 'string' && part.trim().length)
             .map((part) => prettifyLabel(part));
@@ -794,7 +795,7 @@
                 <div class="card-type-overlay" role="group" aria-label="${overlayAriaLabel}">
                   <span class="card-identity-chip card-identity-chip--archetype">${archetypeChip}</span>
                   <span class="card-identity-chip card-identity-chip--strategy">${strategyEsc}</span>
-                  <span class="card-identity-chip card-identity-chip--species">${speciesEsc}</span>
+                  <span class="card-identity-chip card-identity-chip--species">${speciesEsc.charAt(0)}</span>
                 </div>
               </div>
               <div class="card-text-box">
