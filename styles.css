@@ -97,6 +97,7 @@ a:hover { text-decoration:underline; }
   perspective: 1600px;
   perspective-origin: center 40%;
   touch-action: pan-y;
+  overflow: hidden; /* clip while dynamic height adjusts */
   --cursor-x: 0;
   --cursor-y: 0;
   --foil-strength: 0;
@@ -118,7 +119,7 @@ a:hover { text-decoration:underline; }
 .card-flip {
   position: relative;
   width: min(100%, 340px);
-  height: var(--card-height, 520px);
+  height: var(--card-height, auto);
   --flip-angle: 0deg;
   --tilt-x: 0deg;
   --tilt-y: 0deg;
@@ -148,6 +149,7 @@ a:hover { text-decoration:underline; }
   align-items: stretch;
   backface-visibility: hidden;
   border-radius: 22px;
+  overflow: hidden; /* ensure inner sections cannot bleed beyond face */
 }
 .card-face--back {
   transform: rotateY(180deg);
