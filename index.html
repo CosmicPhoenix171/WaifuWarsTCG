@@ -504,9 +504,11 @@
       cards.forEach(detectCardOverflow);
     }
 
-    const _heightCache = new WeakMap();
+  const CARD_HEIGHT_CACHE = new WeakMap();
+  const HEIGHT_JITTER_THRESHOLD = 2;
+  const CARD_HEIGHT_MAX = 1600; // guard against pathological runaway
 
-    function syncCardHeight(article) {
+  function syncCardHeight(article) {
       if (!article) return;
       const flipEl = article.querySelector('.card-flip');
       if (!flipEl) return;
@@ -519,15 +521,14 @@
       const measured = Math.round(frontFrame.getBoundingClientRect().height);
       if (!measured) return;
 
-      const MAX_H = 1600; // guard against pathological runaway
-      const targetHeight = Math.min(MAX_H, measured);
-      const previous = _heightCache.get(flipEl) ?? Math.round(flipEl.getBoundingClientRect().height);
+      const targetHeight = Math.min(CARD_HEIGHT_MAX, measured);
+      const previous = CARD_HEIGHT_CACHE.get(flipEl);
 
-      if (Math.abs(targetHeight - previous) < 2) {
+      if (previous !== undefined && Math.abs(targetHeight - previous) < HEIGHT_JITTER_THRESHOLD) {
         return; // ignore tiny jitter
       }
 
-      _heightCache.set(flipEl, targetHeight);
+      CARD_HEIGHT_CACHE.set(flipEl, targetHeight);
       flipEl.style.height = `${targetHeight}px`;
       flipEl.style.setProperty('--card-height', `${targetHeight}px`);
     }
@@ -548,7 +549,7 @@
     }
 
     // Observe front/back faces for any size change (text wrap, style tweaks, etc.)
-  const _roMap = new WeakMap();
+    const _roMap = new WeakMap();
     function attachResizeObservers(article) {
       if (!article || _roMap.has(article)) return;
       const flipEl = article.querySelector('.card-flip');
