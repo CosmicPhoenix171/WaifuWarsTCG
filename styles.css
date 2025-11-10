@@ -507,7 +507,7 @@
   border-color: rgba(236,72,153,0.6);
 }
 .card-text-box {
-  padding: .85rem .9rem 2.2rem; /* bottom padding supports statline overlap */
+  padding: .85rem .9rem 2.2rem; /* extra bottom padding keeps space before footer */
   border-radius: 10px;
   background: #ffffff;
   border: 2px solid rgba(203,213,225,0.8);
@@ -517,6 +517,43 @@
   display: flex;
   flex-direction: column;
   overflow: visible; /* allow natural flow */
+  position: relative;
+}
+
+.card-bond-overlay {
+  position: absolute;
+  top: -.35rem;
+  right: .6rem;
+  display: inline-flex;
+  align-items: center;
+  gap: .3rem;
+  padding: .2rem .45rem;
+  border-radius: 999px;
+  background: rgba(15,23,42,0.78);
+  box-shadow: 0 6px 14px -6px rgba(30,41,59,0.55), inset 0 0 0 1px rgba(255,255,255,0.12);
+  pointer-events: none;
+  z-index: 2;
+}
+
+.card-bond-token {
+  width: 22px;
+  height: 22px;
+  background: url("assets/images/Heart-energy.png") center/contain no-repeat;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 3px rgba(15,23,42,0.45));
+}
+
+.card-bond-overlay--condensed {
+  gap: .35rem;
+  padding-right: .55rem;
+}
+
+.card-bond-count {
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .4px;
+  color: #f8fafc;
+  text-transform: uppercase;
 }
 .card-abilities {
   list-style: none;

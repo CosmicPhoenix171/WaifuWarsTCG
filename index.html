@@ -1033,6 +1033,33 @@
           const raritySymbol = escapeHtml(rawRaritySymbol);
           const abilityLines = formatSentences(card.text);
           const flavor = card.flavor ? card.flavor.replace(/^“|”$/g, '') : '';
+          const bondEnergyCount = (() => {
+            const bonds = card.bonds;
+            if (!bonds) {
+              return null;
+            }
+            const parseBondValue = (value) => {
+              if (typeof value === 'number' && Number.isFinite(value)) {
+                return value;
+              }
+              if (typeof value === 'string' && value.trim().length) {
+                const parsed = Number(value);
+                if (Number.isFinite(parsed)) {
+                  return parsed;
+                }
+              }
+              return null;
+            };
+            const max = parseBondValue(bonds.max);
+            if (max !== null) {
+              return max;
+            }
+            const start = parseBondValue(bonds.start);
+            if (start !== null) {
+              return start;
+            }
+            return null;
+          })();
           const artDefault = card.art?.default;
           const backArt = card.art?.back || customCardBack;
           const hasArt = Boolean(artDefault);
@@ -1070,6 +1097,20 @@
           const setLabel = escapeHtml(card.set || 'TBA');
           const idLabel = escapeHtml((card.id || '').toUpperCase());
           const artRoleEsc = escapeHtml(artRole);
+          const bondOverlayMarkup = (() => {
+            if (!Number.isFinite(bondEnergyCount) || bondEnergyCount <= 0) {
+              return '';
+            }
+            const labelEsc = escapeHtml(`${bondEnergyCount} bond energy`);
+            if (bondEnergyCount <= 3) {
+              const tokens = Array.from({ length: bondEnergyCount })
+                .map(() => '<span class="card-bond-token" aria-hidden="true"></span>')
+                .join('');
+              return `<div class="card-bond-overlay">${tokens}<span class="sr-only">${labelEsc}</span></div>`;
+            }
+            const countEsc = escapeHtml(String(bondEnergyCount));
+            return `<div class="card-bond-overlay card-bond-overlay--condensed"><span class="card-bond-token" aria-hidden="true"></span><span class="card-bond-count">x${countEsc}</span><span class="sr-only">${labelEsc}</span></div>`;
+          })();
 
           const abilitiesHtml = abilityLines.length
             ? abilityLines.map((line) => `<li>${formatAbilityLine(line)}</li>`).join('')
@@ -1108,6 +1149,7 @@
                 <span class="card-chip card-chip--species" title="Species ${speciesEsc}">${speciesEsc}</span>
               </div>
               <div class="card-text-box">
+                ${bondOverlayMarkup}
                 <ul class="card-abilities">
                   ${abilitiesHtml}
                 </ul>
