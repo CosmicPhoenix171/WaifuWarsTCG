@@ -514,6 +514,19 @@
         .trim();
     }
 
+    function parseNumericBondValue(value) {
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        return value;
+      }
+      if (typeof value === 'string' && value.trim().length) {
+        const parsed = Number(value);
+        if (Number.isFinite(parsed)) {
+          return parsed;
+        }
+      }
+      return null;
+    }
+
     function getPrimaryRole(card = {}) {
       if (!card) {
         return '';
@@ -542,14 +555,26 @@
       return output;
     }
 
-    function formatAbilityLine(line = '') {
+    function formatAbilityLine(line = '', bondCosts = {}) {
       const trimmed = line.trim();
       if (!trimmed) {
         return '';
       }
       const keywordMatch = trimmed.match(/^([^:\u2014\u2013\-]{1,48}?)[\s]*(?:[:\u2014\u2013\-])\s+(.+)$/u);
       if (keywordMatch) {
-        const keyword = decorateAbilityText(keywordMatch[1]);
+        const keywordRaw = keywordMatch[1].trim();
+        const keywordId = keywordRaw.toLowerCase();
+        let keywordLabel = keywordRaw;
+        if (keywordId === 'dere' || keywordId === 'extreme') {
+          const costs = (bondCosts && typeof bondCosts === 'object') ? bondCosts : {};
+          const costValue = costs[keywordId];
+          if (Number.isFinite(costValue)) {
+            keywordLabel = `Bond Cost ${costValue}`;
+          } else {
+            keywordLabel = 'Bond Cost';
+          }
+        }
+        const keyword = decorateAbilityText(keywordLabel);
         const body = decorateAbilityText(keywordMatch[2]);
         return `<span class="card-ability-keyword">${keyword}<span aria-hidden="true"> —</span></span><span class="card-ability-body">${body}</span>`;
       }
@@ -1038,27 +1063,31 @@
             if (!bonds) {
               return null;
             }
-            const parseBondValue = (value) => {
-              if (typeof value === 'number' && Number.isFinite(value)) {
-                return value;
-              }
-              if (typeof value === 'string' && value.trim().length) {
-                const parsed = Number(value);
-                if (Number.isFinite(parsed)) {
-                  return parsed;
-                }
-              }
-              return null;
-            };
-            const max = parseBondValue(bonds.max);
+            const max = parseNumericBondValue(bonds.max);
             if (max !== null) {
               return max;
             }
-            const start = parseBondValue(bonds.start);
+            const start = parseNumericBondValue(bonds.start);
             if (start !== null) {
               return start;
             }
             return null;
+          })();
+          const bondCostMap = (() => {
+            const thresholds = card.mood?.thresholds;
+            if (!thresholds) {
+              return {};
+            }
+            const dereCost = parseNumericBondValue(thresholds.dere);
+            const extremeCost = parseNumericBondValue(thresholds.extreme);
+            const result = {};
+            if (dereCost !== null) {
+              result.dere = dereCost;
+            }
+            if (extremeCost !== null) {
+              result.extreme = extremeCost;
+            }
+            return result;
           })();
           const artDefault = card.art?.default;
           const backArt = card.art?.back || customCardBack;
@@ -1113,7 +1142,7 @@
           })();
 
           const abilitiesHtml = abilityLines.length
-            ? abilityLines.map((line) => `<li>${formatAbilityLine(line)}</li>`).join('')
+            ? abilityLines.map((line) => `<li>${formatAbilityLine(line, bondCostMap)}</li>`).join('')
             : '<li class="card-ability-empty">Ability text coming soon.</li>';
 
           const flavorHtml = flavor
