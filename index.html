@@ -34,7 +34,66 @@
   </header>
 
   <main id="main">
-    <section class="hero">
+    <section class="splash-hero" id="splash">
+      <div class="splash-hero__glow" aria-hidden="true"></div>
+      <div class="container splash-hero__inner">
+        <div class="splash-copy">
+          <p class="splash-eyebrow">Emotional Strategy TCG</p>
+          <h1 class="splash-title">Outplay With Bonds</h1>
+          <p class="splash-subtitle">Draft dere personalities, flip mood states mid-match, and unleash bond-driven finishers in a web-native anime card experience.</p>
+          <div class="splash-actions">
+            <a class="btn btn-primary" href="#cards">See Card Spotlight</a>
+            <a class="btn btn-ghost" href="#lore-index">Explore the World</a>
+          </div>
+          <ul class="splash-highlights">
+            <li>Bond costs replace energy to pace your power spikes.</li>
+            <li>Mood swings unlock alternate art and upgraded abilities.</li>
+            <li>Play in-browser with tactile card flipping and hover tilt.</li>
+          </ul>
+        </div>
+        <div class="splash-showcase" aria-hidden="true">
+          <div class="splash-card splash-card--front">
+            <span class="splash-card-rarity">SR</span>
+            <span class="splash-card-name">Crown Himedere</span>
+            <span class="splash-card-tag">Leader • Inspire</span>
+          </div>
+          <div class="splash-card splash-card--mid">
+            <span class="splash-card-rarity">SSR</span>
+            <span class="splash-card-name">Domination Kamidere</span>
+            <span class="splash-card-tag">Charm • Control</span>
+          </div>
+          <div class="splash-card splash-card--back">
+            <span class="splash-card-rarity">R</span>
+            <span class="splash-card-name">Sunbeam Deredere</span>
+            <span class="splash-card-tag">Heal • Support</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="lore-index" class="info-section">
+      <div class="container">
+        <h2 class="section-title">Know Your Lineup</h2>
+        <p class="info-intro">Plan team synergy at a glance. Each chart highlights species rosters, combat keywords, and the dere personalities powering your bond plays.</p>
+        <div class="info-tabs" role="tablist" aria-label="Lore Index Tabs" data-tabs>
+          <button type="button" class="info-tab is-active" id="tab-species" role="tab" aria-selected="true" aria-controls="species-panel" data-tab-target="species-panel">Species Lineup</button>
+          <button type="button" class="info-tab" id="tab-effects" role="tab" aria-selected="false" aria-controls="effects-panel" data-tab-target="effects-panel" tabindex="-1">Effect Types</button>
+          <button type="button" class="info-tab" id="tab-dere" role="tab" aria-selected="false" aria-controls="dere-panel" data-tab-target="dere-panel" tabindex="-1">Dere Archetypes</button>
+        </div>
+        <div class="info-panels">
+          <section class="info-panel" role="tabpanel" id="species-panel" aria-labelledby="tab-species">
+            <h3>Species Lineup</h3>
+            <p class="info-panel-copy">Every species leans into a unique combat fantasy—mix and match to balance raw power, control tricks, and narrative flair.</p>
+            <div class="table-scroll" role="group" aria-labelledby="species-table-caption">
+              <table class="info-table" id="species-table">
+                <caption id="species-table-caption" class="sr-only">Species options and their core descriptions</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Species</th>
+                    <th scope="col">Description</th>
+                  </tr>
+                </thead>
+                <tbody>
                   <tr>
                     <th scope="row">Human</th>
                     <td>Baseline; no inherent bonus or penalty.</td>
