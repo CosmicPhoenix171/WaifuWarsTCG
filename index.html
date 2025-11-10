@@ -583,6 +583,20 @@
       }
     };
 
+    const ENERGY_TYPES = [
+      { key: 'passion', label: 'Passion', symbol: '🔥' },
+      { key: 'stoic', label: 'Stoic', symbol: '❄️' },
+      { key: 'heart', label: 'Heart', symbol: '💜' },
+      { key: 'wild', label: 'Wild', symbol: '☆' }
+    ];
+
+    const ENERGY_TYPE_MAP = ENERGY_TYPES.reduce((acc, type) => {
+      acc[type.key] = type;
+      return acc;
+    }, {});
+
+    const energyState = new WeakMap();
+
     // === UTILITY HELPERS ===
     function clamp(value, min, max) {
       return Math.min(Math.max(value, min), max);
@@ -610,30 +624,6 @@
         .split(/(?:\r?\n|\r)+|(?<=[.!?])\s+/)
         .map((line) => line.trim())
         .filter(Boolean);
-    }
-
-    function formatBonds(bonds) {
-      if (!bonds) {
-        return '—';
-      }
-      const start = typeof bonds.start === 'number' ? bonds.start : null;
-      const max = typeof bonds.max === 'number' ? bonds.max : null;
-      if (start !== null && max !== null) {
-        return `${start} / ${max}`;
-      }
-      if (max !== null) {
-        return `${max}`;
-      }
-      return '—';
-    }
-
-    function formatMood(mood) {
-      if (!mood) {
-        return '— / —';
-      }
-      const dere = mood.dere ?? '—';
-      const extreme = mood.extreme ?? '—';
-      return `${dere} / ${extreme}`;
     }
 
     function prettifyLabel(value = '') {
@@ -1018,6 +1008,112 @@
 
       resetTilt(false);
     }
+        function setupEnergyTray(article) {
+          if (!article) {
+            return;
+          }
+
+          const root = article.querySelector('[data-energy-root]');
+          if (!root) {
+            return;
+          }
+
+          const track = root.querySelector('[data-energy-track]');
+          const controlButtons = Array.from(root.querySelectorAll('[data-energy-type]'));
+      const titleEl = root.querySelector('.card-energy-title');
+      const defaultTitle = titleEl?.textContent?.trim() || 'Energy Attachments';
+          if (!track || !controlButtons.length) {
+            return;
+          }
+
+          const state = energyState.get(article) || { tokens: [] };
+          energyState.set(article, state);
+
+          const render = () => {
+            track.innerHTML = '';
+            root.dataset.energyCount = String(state.tokens.length);
+            root.classList.toggle('card-energy--has-energy', state.tokens.length > 0);
+
+            if (titleEl) {
+              titleEl.textContent = state.tokens.length ? `${defaultTitle} (${state.tokens.length})` : defaultTitle;
+            }
+
+            if (!state.tokens.length) {
+              const empty = document.createElement('span');
+              empty.className = 'card-energy-empty';
+              empty.textContent = 'No energy attached yet.';
+              track.appendChild(empty);
+              return;
+            }
+
+            state.tokens.forEach((typeKey, index) => {
+              const type = ENERGY_TYPE_MAP[typeKey] || ENERGY_TYPE_MAP.wild;
+              const token = document.createElement('button');
+              token.type = 'button';
+              token.className = `card-energy-token card-energy-token--${type.key || 'wild'}`;
+              token.dataset.energyToken = 'true';
+              token.dataset.energyIndex = String(index);
+              token.dataset.energyType = type.key;
+              token.setAttribute('aria-label', `Remove ${type.label} energy`);
+              token.setAttribute('title', `Remove ${type.label} energy`);
+
+              const icon = document.createElement('span');
+              icon.setAttribute('aria-hidden', 'true');
+              icon.textContent = type.symbol;
+              const sr = document.createElement('span');
+              sr.className = 'sr-only';
+              sr.textContent = `${type.label} energy attached`;
+
+              token.append(icon, sr);
+              track.appendChild(token);
+            });
+          };
+
+          const addEnergy = (typeKey) => {
+            const type = ENERGY_TYPE_MAP[typeKey] || ENERGY_TYPE_MAP.wild;
+            state.tokens.push(type.key);
+            render();
+          };
+
+          controlButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+              addEnergy(button.dataset.energyType);
+            });
+          });
+
+          track.addEventListener('click', (event) => {
+            const token = event.target.closest('.card-energy-token');
+            if (!token) {
+              return;
+            }
+            const index = Number.parseInt(token.dataset.energyIndex || '', 10);
+            if (Number.isNaN(index)) {
+              return;
+            }
+            state.tokens.splice(index, 1);
+            render();
+          });
+
+          track.addEventListener('keydown', (event) => {
+            const token = event.target.closest('.card-energy-token');
+            if (!token) {
+              return;
+            }
+            if (!['Enter', ' ', 'Backspace', 'Delete'].includes(event.key)) {
+              return;
+            }
+            event.preventDefault();
+            const index = Number.parseInt(token.dataset.energyIndex || '', 10);
+            if (Number.isNaN(index)) {
+              return;
+            }
+            state.tokens.splice(index, 1);
+            render();
+          });
+
+          render();
+        }
+
 
     // === TAB UI ===
     function setupInfoTabs(root = document) {
@@ -1148,6 +1244,7 @@
 
         const fragment = document.createDocumentFragment();
         const interactiveArticles = [];
+  const energyArticles = [];
         const customCardBack = 'assets/images/card-back.png';
         const fallbackCardBack = 'assets/images/card-back-default.svg';
 
@@ -1163,8 +1260,6 @@
           const raritySymbol = escapeHtml(rawRaritySymbol);
           const abilityLines = formatSentences(card.text);
           const flavor = card.flavor ? card.flavor.replace(/^“|”$/g, '') : '';
-          const moodDisplay = formatMood(card.mood);
-          const bondsDisplay = formatBonds(card.bonds);
           const artDefault = card.art?.default;
           const backArt = card.art?.back || customCardBack;
           const hasArt = Boolean(artDefault);
@@ -1172,7 +1267,6 @@
           const roleRaw = getPrimaryRole(card);
           const roleSlug = roleRaw ? roleRaw.toLowerCase().replace(/[^a-z0-9]+/g, '-') : '';
           const roleLabel = roleRaw ? prettifyLabel(roleRaw) : '';
-          const roleEsc = roleLabel ? escapeHtml(roleLabel) : '';
           const artRole = hasArt ? `${card.name || 'Card'} artwork` : 'Card back artwork';
           const artMarkup = hasArt
             ? `<img src="${artDefault}" alt="">`
@@ -1198,8 +1292,11 @@
           const strategyRaw = typeof card.strategy === 'string' ? card.strategy.trim() : '';
           const strategyLabel = strategyRaw ? prettifyLabel(strategyRaw) : (roleLabel || 'Flexible');
           const strategyEsc = escapeHtml(strategyLabel);
-          const moodDisplayEsc = escapeHtml(moodDisplay);
-          const bondsDisplayEsc = escapeHtml(bondsDisplay);
+          const energyControlsMarkup = ENERGY_TYPES.map(({ key, label, symbol }) => {
+            const labelEsc = escapeHtml(label);
+            const symbolEsc = escapeHtml(symbol);
+            return `<button type="button" class="card-energy-btn card-energy-btn--${key}" data-energy-type="${key}" title="Attach ${labelEsc} energy" aria-label="Attach ${labelEsc} energy"><span aria-hidden="true">${symbolEsc}</span><span class="sr-only">${labelEsc} energy</span></button>`;
+          }).join('');
           const affectionValue = card.affection ?? '—';
           const affectionEsc = escapeHtml(String(affectionValue));
           const setLabel = escapeHtml(card.set || 'TBA');
@@ -1248,16 +1345,16 @@
                 </ul>
                 ${flavorHtml}
               </div>
-              <dl class="card-statline">
-                <div>
-                  <dt>Bonds</dt>
-                  <dd>${bondsDisplayEsc}</dd>
+              <div class="card-energy" data-energy-root>
+                <div class="card-energy-header">
+                  <span class="card-energy-title">Energy Attachments</span>
+                  <div class="card-energy-controls" role="group" aria-label="Attach energy">
+                    ${energyControlsMarkup}
+                  </div>
                 </div>
-                <div>
-                  <dt>Mood</dt>
-                  <dd>${moodDisplayEsc}</dd>
-                </div>
-                </dl>
+                <div class="card-energy-track" data-energy-track aria-live="polite" aria-label="Attached energy tokens"></div>
+                <p class="card-energy-hint">Tap an icon above to add energy, tap a token to remove.</p>
+              </div>
               <footer class="card-footer" data-rating-symbol="${ratingEmblem}" title="${rarityName} rating">Set ${setLabel} • ${idLabel}</footer>
             </div>
           `;
@@ -1316,6 +1413,7 @@
 
           fragment.appendChild(article);
           interactiveArticles.push(article);
+          energyArticles.push(article);
         }
 
         cardsGrid.appendChild(fragment);
@@ -1327,6 +1425,9 @@
         requestAnimationFrame(() => {
           interactiveArticles.forEach((article) => {
             setupInteractiveCard(article);
+          });
+          energyArticles.forEach((article) => {
+            setupEnergyTray(article);
           });
         });
       } catch (error) {
