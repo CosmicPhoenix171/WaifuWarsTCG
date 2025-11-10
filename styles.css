@@ -1137,6 +1137,97 @@
   line-height: 1.4;
   opacity: .9;
 }
+.info-section {
+  padding: 4rem 1.5rem 3.6rem;
+  background: radial-gradient(circle at 65% 15%, rgba(121,41,255,0.16), transparent 55%),
+              radial-gradient(circle at 25% 65%, rgba(238,46,139,0.14), transparent 60%),
+              #100b1e;
+}
+.info-intro {
+  max-width: 60ch;
+  margin: 0 auto 2.2rem;
+  text-align: center;
+  color: #d2d0dd;
+  font-size: .94rem;
+  line-height: 1.55;
+}
+.info-grid {
+  display: grid;
+  gap: 1.8rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+.info-panel {
+  background: rgba(18,14,30,0.85);
+  border: 1px solid rgba(121,41,255,0.25);
+  border-radius: 18px;
+  padding: 1.6rem 1.4rem 1.5rem;
+  box-shadow: 0 26px 52px -32px rgba(8,7,18,0.9);
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+.info-panel h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: .4px;
+  color: #f4f3ff;
+}
+.info-panel-copy {
+  margin: 0;
+  color: #c3c1d4;
+  font-size: .87rem;
+  line-height: 1.5;
+}
+.table-scroll {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid rgba(121,41,255,0.2);
+  background: rgba(10,8,20,0.75);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
+}
+.table-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+.table-scroll::-webkit-scrollbar-thumb {
+  background: rgba(121,41,255,0.45);
+  border-radius: 999px;
+}
+.info-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 240px;
+  font-size: .84rem;
+  color: #edeaff;
+}
+.info-table thead {
+  background: rgba(121,41,255,0.28);
+}
+.info-table th,
+.info-table td {
+  padding: .65rem .9rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(121,41,255,0.22);
+  vertical-align: top;
+}
+.info-table th {
+  font-weight: 600;
+  letter-spacing: .35px;
+}
+.info-table th[scope="row"] {
+  white-space: nowrap;
+  color: #f5f3ff;
+}
+.info-table tbody tr:nth-child(even) {
+  background: rgba(121,41,255,0.12);
+}
+.info-table tbody tr:last-child th,
+.info-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.info-panel .table-scroll {
+  flex: 1;
+}
 .section-title { font-family: var(--font-display); font-size:2.2rem; margin:0 0 1.8rem; letter-spacing:.5px; background:linear-gradient(90deg,#ee2e8b,#7929ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
 .grid { display:grid; gap:1.5rem; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); }
 .feature { padding:1.1rem 1rem 1.25rem; background:#171223; border:1px solid #2c253d; border-radius:14px; position:relative; overflow:hidden; }
