@@ -2,6 +2,7 @@
 /* === Base Resets & Globals === */
 :root {
   color-scheme: dark light;
+  --font-display: "Bangers", "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .card-chip {
