@@ -556,21 +556,6 @@
       return `<span class="card-ability-body">${decorateAbilityText(trimmed)}</span>`;
     }
 
-    function formatBonds(bonds) {
-      if (!bonds) {
-        return '—';
-      }
-      const start = typeof bonds.start === 'number' ? bonds.start : null;
-      const max = typeof bonds.max === 'number' ? bonds.max : null;
-      if (start !== null && max !== null) {
-        return `${start} / ${max}`;
-      }
-      if (max !== null) {
-        return `${max}`;
-      }
-      return '—';
-    }
-
     // === LAYOUT HELPERS ===
     function balanceAbilityText(root = document) {
       if (!root || typeof root.querySelectorAll !== 'function') return;
@@ -1048,7 +1033,6 @@
           const raritySymbol = escapeHtml(rawRaritySymbol);
           const abilityLines = formatSentences(card.text);
           const flavor = card.flavor ? card.flavor.replace(/^“|”$/g, '') : '';
-          const bondsDisplay = formatBonds(card.bonds);
           const artDefault = card.art?.default;
           const backArt = card.art?.back || customCardBack;
           const hasArt = Boolean(artDefault);
@@ -1081,7 +1065,6 @@
           const strategyRaw = typeof card.strategy === 'string' ? card.strategy.trim() : '';
           const strategyLabel = strategyRaw ? prettifyLabel(strategyRaw) : (roleLabel || 'Flexible');
           const strategyEsc = escapeHtml(strategyLabel);
-          const bondsDisplayEsc = escapeHtml(bondsDisplay);
           const affectionValue = card.affection ?? '—';
           const affectionEsc = escapeHtml(String(affectionValue));
           const setLabel = escapeHtml(card.set || 'TBA');
@@ -1130,12 +1113,6 @@
                 </ul>
                 ${flavorHtml}
               </div>
-              <dl class="card-statline">
-                <div>
-                  <dt>Bonds</dt>
-                  <dd>${bondsDisplayEsc}</dd>
-                </div>
-              </dl>
               <footer class="card-footer" data-rating-symbol="${ratingEmblem}" title="${rarityName} rating">Set ${setLabel} • ${idLabel}</footer>
             </div>
           `;
