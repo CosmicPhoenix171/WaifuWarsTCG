@@ -656,9 +656,11 @@
   overflow: visible; /* ensure no clipping of indicators */
 }
 .card-footer::after {
-  content: "★";
-  font-size: .7rem;
-  opacity: 0.5;
+  content: attr(data-rating-symbol);
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .45px;
+  opacity: 0.75;
 }
 /* Overflow indicator when content had to be force-fitted */
 .card-display[data-overflow="true"] .card-footer::after {

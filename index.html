@@ -1218,6 +1218,7 @@
           const rarityStarsHtml = rarityStars
             ? `<span class="card-rarity-stars" aria-hidden="true">${escapeHtml(rarityStars)}</span>`
             : '';
+          const ratingEmblem = raritySymbol || rarityCode || '★';
 
           const frontHtml = `
             <div class="card-frame">
@@ -1257,7 +1258,7 @@
                   <dd>${moodDisplayEsc}</dd>
                 </div>
                 </dl>
-              <footer class="card-footer">Set ${setLabel} • ${idLabel}</footer>
+              <footer class="card-footer" data-rating-symbol="${ratingEmblem}" title="${rarityName} rating">Set ${setLabel} • ${idLabel}</footer>
             </div>
           `;
 
