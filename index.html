@@ -122,8 +122,13 @@
       <div class="container">
         <h2 class="section-title">Know Your Lineup</h2>
         <p class="info-intro">Plan team synergy at a glance. Each chart highlights the species roster, core combat effects, and the dere personalities powering your bond plays.</p>
-        <div class="info-grid">
-          <article class="info-panel">
+        <div class="info-tabs" role="tablist" aria-label="Lore Index Tabs" data-tabs>
+          <button type="button" class="info-tab is-active" id="tab-species" role="tab" aria-selected="true" aria-controls="species-panel" data-tab-target="species-panel">Species Lineup</button>
+          <button type="button" class="info-tab" id="tab-effects" role="tab" aria-selected="false" aria-controls="effects-panel" data-tab-target="effects-panel" tabindex="-1">Effect Types</button>
+          <button type="button" class="info-tab" id="tab-dere" role="tab" aria-selected="false" aria-controls="dere-panel" data-tab-target="dere-panel" tabindex="-1">Dere Archetypes</button>
+        </div>
+        <div class="info-panels">
+          <section class="info-panel" role="tabpanel" id="species-panel" aria-labelledby="tab-species">
             <h3>Species Lineup</h3>
             <p class="info-panel-copy">Every species leans into a unique combat fantasy—mix and match to balance raw power, control, and narrative flair.</p>
             <div class="table-scroll" role="group" aria-labelledby="species-table-caption">
@@ -227,8 +232,8 @@
                 </tbody>
               </table>
             </div>
-          </article>
-          <article class="info-panel">
+          </section>
+          <section class="info-panel" role="tabpanel" id="effects-panel" aria-labelledby="tab-effects" hidden>
             <h3>Effect Types</h3>
             <p class="info-panel-copy">These keywords frame most card text—stack combos that layer damage, disruption, and protection.</p>
             <div class="table-scroll" role="group" aria-labelledby="effects-table-caption">
@@ -308,8 +313,8 @@
                 </tbody>
               </table>
             </div>
-          </article>
-          <article class="info-panel">
+          </section>
+          <section class="info-panel" role="tabpanel" id="dere-panel" aria-labelledby="tab-dere" hidden>
             <h3>Dere Archetypes</h3>
             <p class="info-panel-copy">Personality drives tactics—draft dere types that reinforce your win condition.</p>
             <div class="table-scroll" role="group" aria-labelledby="dere-table-caption">
@@ -461,7 +466,7 @@
                 </tbody>
               </table>
             </div>
-          </article>
+          </section>
         </div>
       </div>
     </section>
@@ -1014,6 +1019,106 @@
       resetTilt(false);
     }
 
+    // === TAB UI ===
+    function setupInfoTabs(root = document) {
+      if (!root) {
+        return;
+      }
+
+      const tabLists = Array.from(root.querySelectorAll('[data-tabs]'));
+      if (!tabLists.length) {
+        return;
+      }
+
+      tabLists.forEach((tabList) => {
+        const tabs = Array.from(tabList.querySelectorAll('[role="tab"]'));
+        if (!tabs.length) {
+          return;
+        }
+
+        const escapeSelector = (value = '') => {
+          if (typeof CSS !== 'undefined' && typeof CSS.escape === 'function') {
+            return CSS.escape(value);
+          }
+          return String(value).replace(/([ "!#$%&'()*+,./:;<=>?@[\\\]^`{|}~])/g, '\\$1');
+        };
+
+        const panels = tabs
+          .map((tab) => {
+            const panelId = tab.getAttribute('aria-controls');
+            return panelId ? root.getElementById(panelId) || root.querySelector(`#${escapeSelector(panelId)}`) : null;
+          })
+          .filter(Boolean);
+
+        if (!panels.length) {
+          return;
+        }
+
+        const activateTab = (tab, { setFocus = true } = {}) => {
+          if (!tab) {
+            return;
+          }
+
+          tabs.forEach((btn) => {
+            const isActive = btn === tab;
+            btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            btn.classList.toggle('is-active', isActive);
+            btn.setAttribute('tabindex', isActive ? '0' : '-1');
+          });
+
+          panels.forEach((panel) => {
+            const controlsId = tab.getAttribute('aria-controls');
+            if (!controlsId || panel.id !== controlsId) {
+              panel.hidden = true;
+              return;
+            }
+            panel.hidden = false;
+          });
+
+          if (setFocus && typeof tab.focus === 'function') {
+            tab.focus({ preventScroll: true });
+          }
+        };
+
+        const handleKeydown = (event) => {
+          const { key } = event;
+          const currentIndex = tabs.indexOf(event.currentTarget);
+          if (currentIndex === -1) {
+            return;
+          }
+
+          let nextIndex = null;
+          if (key === 'ArrowRight' || key === 'ArrowDown') {
+            event.preventDefault();
+            nextIndex = (currentIndex + 1) % tabs.length;
+          } else if (key === 'ArrowLeft' || key === 'ArrowUp') {
+            event.preventDefault();
+            nextIndex = (currentIndex + tabs.length - 1) % tabs.length;
+          } else if (key === 'Home') {
+            event.preventDefault();
+            nextIndex = 0;
+          } else if (key === 'End') {
+            event.preventDefault();
+            nextIndex = tabs.length - 1;
+          }
+
+          if (nextIndex !== null) {
+            activateTab(tabs[nextIndex]);
+          }
+        };
+
+        tabs.forEach((tab) => {
+          tab.addEventListener('click', () => {
+            activateTab(tab, { setFocus: false });
+          });
+          tab.addEventListener('keydown', handleKeydown);
+        });
+
+        const initiallySelected = tabs.find((tab) => tab.getAttribute('aria-selected') === 'true') || tabs[0];
+        activateTab(initiallySelected, { setFocus: false });
+      });
+    }
+
     // === DATA LOADING ===
     async function loadCards() {
       if (!cardsGrid || !cardsStatus) {
@@ -1245,6 +1350,7 @@
       }).catch(() => {});
     }
 
+    setupInfoTabs();
     loadCards();
   </script>
 </body>
