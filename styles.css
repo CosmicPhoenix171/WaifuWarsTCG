@@ -761,7 +761,12 @@
   position: relative;
   padding-left: 0;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: .25rem;
+}
+.card-abilities li[data-ability="cost"] {
+  flex-direction: row;
   align-items: baseline;
   gap: .35rem;
 }
@@ -772,12 +777,26 @@
   color: var(--textbox-keyword);
   flex-shrink: 0;
 }
+.card-ability-keyword--block {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+}
+.card-ability-keyword--cost {
+  display: inline-flex;
+  align-items: baseline;
+  gap: .2rem;
+}
 .card-ability-keyword span {
   font-weight: inherit;
 }
 .card-ability-body {
   flex: 1;
   min-width: 0;
+}
+.card-ability-body--stacked {
+  display: block;
+  width: 100%;
 }
 .card-abilities li::before {
   display: none;

@@ -617,13 +617,14 @@
     function formatAbilityLine(line = '', bondCosts = {}) {
       const trimmed = line.trim();
       if (!trimmed) {
-        return '';
+        return null;
       }
       const keywordMatch = trimmed.match(/^([^:\u2014\u2013\-]{1,48}?)[\s]*(?:[:\u2014\u2013\-])\s+(.+)$/u);
       if (keywordMatch) {
         const keywordRaw = keywordMatch[1].trim();
         const keywordId = keywordRaw.toLowerCase();
         let keywordLabel = keywordRaw;
+        let isCostKeyword = false;
         if (keywordId === 'dere' || keywordId === 'extreme') {
           const costs = (bondCosts && typeof bondCosts === 'object') ? bondCosts : {};
           const costValue = costs[keywordId];
@@ -632,12 +633,25 @@
           } else {
             keywordLabel = 'Bond Cost';
           }
+          isCostKeyword = true;
         }
         const keyword = decorateAbilityText(keywordLabel);
         const body = decorateAbilityText(keywordMatch[2]);
-        return `<span class="card-ability-keyword">${keyword}<span aria-hidden="true"> —</span></span><span class="card-ability-body">${body}</span>`;
+        if (isCostKeyword) {
+          return {
+            html: `<span class="card-ability-keyword card-ability-keyword--cost">${keyword}<span aria-hidden="true"> —</span></span><span class="card-ability-body">${body}</span>`,
+            modifier: 'cost'
+          };
+        }
+        return {
+          html: `<span class="card-ability-keyword card-ability-keyword--block">${keyword}</span><span class="card-ability-body card-ability-body--stacked">${body}</span>`,
+          modifier: 'stacked'
+        };
       }
-      return `<span class="card-ability-body">${decorateAbilityText(trimmed)}</span>`;
+      return {
+        html: `<span class="card-ability-body">${decorateAbilityText(trimmed)}</span>`,
+        modifier: 'plain'
+      };
     }
 
     // === LAYOUT HELPERS ===
@@ -1200,8 +1214,17 @@
             return `<div class="card-bond-overlay card-bond-overlay--condensed"><span class="card-bond-token" aria-hidden="true"></span><span class="card-bond-count">x${countEsc}</span><span class="sr-only">${labelEsc}</span></div>`;
           })();
 
-          const abilitiesHtml = abilityLines.length
-            ? abilityLines.map((line) => `<li>${formatAbilityLine(line, bondCostMap)}</li>`).join('')
+          const formattedAbilities = abilityLines
+            .map((line) => formatAbilityLine(line, bondCostMap))
+            .filter((entry) => entry && typeof entry.html === 'string' && entry.html.trim().length);
+
+          const abilitiesHtml = formattedAbilities.length
+            ? formattedAbilities
+                .map(({ html, modifier }) => {
+                  const attr = (modifier && modifier !== 'plain') ? ` data-ability="${escapeHtml(modifier)}"` : '';
+                  return `<li${attr}>${html}</li>`;
+                })
+                .join('')
             : '<li class="card-ability-empty">Ability text coming soon.</li>';
 
           const flavorHtml = flavor
