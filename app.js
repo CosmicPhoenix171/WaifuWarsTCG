@@ -234,21 +234,47 @@ function loadList(listType) {
 
 // Render list items
 function renderList(listType, data) {
+  listCaches[listType] = data;
   const container = document.getElementById(`${listType}-list`);
   container.innerHTML = '';
-  const keys = Object.keys(data || {}).sort((a,b)=>{
-    const ta = (data[a].title||'').toLowerCase();
-    const tb = (data[b].title||'').toLowerCase();
-    return ta < tb ? -1 : ta > tb ? 1 : 0;
-  });
-  if (keys.length === 0) {
-    container.innerHTML = '<div class="small">No items yet. Add something!</div>';
+
+  const entries = Object.entries(data || {});
+  const supportsActorFilter = Object.prototype.hasOwnProperty.call(actorFilters, listType);
+  const filterValue = supportsActorFilter ? (actorFilters[listType] || '').trim().toLowerCase() : '';
+
+  let filtered = entries;
+  if (filterValue && supportsActorFilter) {
+    filtered = entries.filter(([, item]) => {
+      if (!item) return false;
+      const actorField = Array.isArray(item.actors)
+        ? item.actors.join(' ').toLowerCase()
+        : String(item.actors || '').toLowerCase();
+      return actorField.includes(filterValue);
+    });
+  }
+
+  if (filtered.length === 0) {
+    const message = supportsActorFilter && filterValue
+      ? 'No items match this actor filter yet.'
+      : 'No items yet. Add something!';
+    container.innerHTML = `<div class="small">${message}</div>`;
     return;
   }
-  keys.forEach(id => {
-    const item = data[id];
+
+  filtered.sort(([, a], [, b]) => {
+    const ta = (a && a.title ? a.title : '').toLowerCase();
+    const tb = (b && b.title ? b.title : '').toLowerCase();
+    if (ta < tb) return -1;
+    if (ta > tb) return 1;
+    return 0;
+  });
+
+  filtered.forEach(([id, item]) => {
+    if (!item) return;
+
     const card = document.createElement('div');
     card.className = 'card';
+
     if (item.poster) {
       const artwork = document.createElement('div');
       artwork.className = 'artwork';
@@ -259,8 +285,10 @@ function renderList(listType, data) {
       artwork.appendChild(img);
       card.appendChild(artwork);
     }
+
     const left = document.createElement('div');
     left.className = 'card-body';
+
     const header = document.createElement('div');
     header.className = 'card-header';
     const title = document.createElement('div');
@@ -270,8 +298,9 @@ function renderList(listType, data) {
     if (item.status) {
       header.appendChild(buildStatusChip(item.status));
     }
-    const meta = document.createElement('div');
-    meta.className = 'meta';
+
+    left.appendChild(header);
+
     const metaParts = [];
     if (item.year) metaParts.push(item.year);
     if (listType === 'books') {
@@ -279,13 +308,29 @@ function renderList(listType, data) {
     } else {
       if (item.director) metaParts.push(item.director);
       if (item.imdbRating) metaParts.push(`IMDb ${item.imdbRating}`);
+      if (item.runtime) metaParts.push(item.runtime);
     }
-    left.appendChild(header);
+
     const metaText = metaParts.filter(Boolean).join(' • ');
     if (metaText) {
+      const meta = document.createElement('div');
+      meta.className = 'meta';
       meta.textContent = metaText;
       left.appendChild(meta);
     }
+
+    if (item.actors && Array.isArray(item.actors) && item.actors.length && listType !== 'books') {
+      const actorLine = document.createElement('div');
+      actorLine.className = 'actor-line';
+      actorLine.textContent = `Cast: ${item.actors.slice(0, 5).join(', ')}`;
+      left.appendChild(actorLine);
+    } else if (item.actors && typeof item.actors === 'string' && item.actors.trim() && listType !== 'books') {
+      const actorLine = document.createElement('div');
+      actorLine.className = 'actor-line';
+      actorLine.textContent = `Cast: ${item.actors}`;
+      left.appendChild(actorLine);
+    }
+
     if (item.imdbUrl) {
       const imdbLink = document.createElement('a');
       imdbLink.href = item.imdbUrl;
@@ -304,6 +349,7 @@ function renderList(listType, data) {
       trailerLink.textContent = 'Watch Trailer';
       left.appendChild(trailerLink);
     }
+
     if (item.plot) {
       const plot = document.createElement('div');
       plot.className = 'plot-summary';
@@ -326,14 +372,13 @@ function renderList(listType, data) {
     editBtn.addEventListener('click', () => openEditModal(listType, id, item));
 
     const delBtn = document.createElement('button');
-  delBtn.className = 'btn ghost';
+    delBtn.className = 'btn ghost';
     delBtn.textContent = 'Delete';
     delBtn.addEventListener('click', () => deleteItem(listType, id));
 
     actions.appendChild(editBtn);
     actions.appendChild(delBtn);
 
-    // For media lists, add 'Mark Completed'
     if (['movies','tvShows','anime'].includes(listType)) {
       const markBtn = document.createElement('button');
       markBtn.className = 'btn primary';
