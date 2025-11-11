@@ -30,8 +30,8 @@
   ],
   "flavor": "Bow properly and victory is yours to command.",
   "art": {
-    "default": "cards/waifus/himedere/crown-himedere-default.png",
-    "extreme": "cards/waifus/himedere/crown-himedere-extreme.png"
+    "default": "cards/waifus/himedere/human/inspire/crown-himedere/art/default.png",
+    "extreme": "cards/waifus/himedere/human/inspire/crown-himedere/art/extreme.png"
   },
   "version": 1
 }

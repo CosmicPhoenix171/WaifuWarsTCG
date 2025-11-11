@@ -3,6 +3,8 @@
   "type": "waifu",
   "name": "Example Waifu",
   "archetype": "Tsundere",
+  "species": "Human",
+  "strategy": "Burn",
   "set": "CORE-01",
   "rarity": "common",
   "affection": 8,
@@ -14,6 +16,8 @@
     { "when": "onSummon", "do": [ { "type": "damage", "target": "targetWaifu", "amount": 1 } ] }
   ],
   "flavor": "Optional flavor.",
-  "art": { "default": "cards/waifus/tsundere/example-waifu-id-default.png" },
+  "art": {
+    "default": "cards/waifus/tsundere/human/burn/example-waifu-id/art/default.png"
+  },
   "version": 1
 }

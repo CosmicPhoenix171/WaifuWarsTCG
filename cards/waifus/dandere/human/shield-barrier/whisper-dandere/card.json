@@ -27,8 +27,8 @@
   ],
   "flavor": "When she finally speaks up, the whole battlefield listens.",
   "art": {
-    "default": "cards/waifus/dandere/whisper-dandere-default.png",
-    "extreme": "cards/waifus/dandere/whisper-dandere-extreme.png"
+    "default": "cards/waifus/dandere/human/shield-barrier/whisper-dandere/art/default.png",
+    "extreme": "cards/waifus/dandere/human/shield-barrier/whisper-dandere/art/extreme.png"
   },
   "version": 1
 }

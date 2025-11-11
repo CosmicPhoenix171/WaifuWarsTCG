@@ -28,8 +28,8 @@
   ],
   "flavor": "Logic slices hotter than passion.",
   "art": {
-    "default": "cards/waifus/kuudere/icebound-kuudere-default.png",
-    "extreme": "cards/waifus/kuudere/icebound-kuudere-extreme.png"
+    "default": "cards/waifus/kuudere/human/freeze-immobilize/icebound-kuudere/art/default.png",
+    "extreme": "cards/waifus/kuudere/human/freeze-immobilize/icebound-kuudere/art/extreme.png"
   },
   "version": 1
 }

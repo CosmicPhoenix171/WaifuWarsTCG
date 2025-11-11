@@ -28,8 +28,8 @@
   ],
   "flavor": "Love can be a double-edged blade. Mostly edge.",
   "art": {
-    "default": "cards/waifus/yandere/crimson-yandere-default.png",
-    "extreme": "cards/waifus/yandere/crimson-yandere-extreme.png"
+    "default": "cards/waifus/yandere/human/bleed/crimson-yandere/art/default.png",
+    "extreme": "cards/waifus/yandere/human/bleed/crimson-yandere/art/extreme.png"
   },
   "version": 1
 }

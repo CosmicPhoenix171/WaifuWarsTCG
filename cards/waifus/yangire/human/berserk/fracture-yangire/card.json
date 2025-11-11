@@ -33,8 +33,8 @@
   ],
   "flavor": "Sanity is a courtesy, not a promise.",
   "art": {
-    "default": "cards/waifus/yangire/fracture-yangire-default.png",
-    "extreme": "cards/waifus/yangire/fracture-yangire-extreme.png"
+    "default": "cards/waifus/yangire/human/berserk/fracture-yangire/art/default.png",
+    "extreme": "cards/waifus/yangire/human/berserk/fracture-yangire/art/extreme.png"
   },
   "version": 1
 }

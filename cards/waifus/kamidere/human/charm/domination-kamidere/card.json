@@ -28,8 +28,8 @@
   ],
   "flavor": "Kneel now and the world might spare you.",
   "art": {
-    "default": "cards/waifus/kamidere/domination-kamidere-default.png",
-    "extreme": "cards/waifus/kamidere/domination-kamidere-extreme.png"
+    "default": "cards/waifus/kamidere/human/charm/domination-kamidere/art/default.png",
+    "extreme": "cards/waifus/kamidere/human/charm/domination-kamidere/art/extreme.png"
   },
   "version": 1
 }

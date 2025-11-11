@@ -28,8 +28,8 @@
   ],
   "flavor": "A beam of sunshine with emergency snacks for everyone.",
   "art": {
-    "default": "cards/waifus/deredere/sunbeam-deredere-default.png",
-    "extreme": "cards/waifus/deredere/sunbeam-deredere-extreme.png"
+    "default": "cards/waifus/deredere/human/heal-restore/sunbeam-deredere/art/default.png",
+    "extreme": "cards/waifus/deredere/human/heal-restore/sunbeam-deredere/art/extreme.png"
   },
   "version": 1
 }
