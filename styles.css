@@ -90,38 +90,9 @@
 
 .splash-eyebrow {
   margin: 0;
-.card-abilities li::before {
-  content: "◆";
-  position: absolute;
-  left: 0;
-  top: .45rem;
-  font-size: .58rem;
-  color: color-mix(in srgb, var(--textbox-keyword) 65%, rgba(250,250,255,0.65));
-  text-shadow: 0 1px 2px rgba(5,4,12,0.4);
-  letter-spacing: 1px;
-}
-.card-abilities li[data-ability="cost"] {
-  padding-left: 0;
-  flex-direction: row;
-  align-items: baseline;
-  gap: .35rem;
-}
-.card-abilities li[data-ability="cost"]::before {
-  content: "—";
-  position: static;
-  display: inline-block;
-  margin-right: .25rem;
-  font-size: .82rem;
-  color: color-mix(in srgb, var(--textbox-divider) 70%, rgba(255,255,255,0.6));
-  opacity: .85;
-  letter-spacing: .2em;
-  transform: translateY(-0.05rem);
-}
-.card-abilities li:not([data-ability])::before {
-  content: "•";
-  font-size: .6rem;
-  color: color-mix(in srgb, var(--textbox-body) 60%, rgba(250,250,255,0.45));
-}
+  font-size: .9rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
   color: rgba(255,255,255,0.78);
 }
 
@@ -387,7 +358,8 @@
   inset: 2px;
   border-radius: 18px;
   border: 1px solid rgba(121,41,255,0.35);
-  background: linear-gradient(180deg, rgba(255,255,255,0.25), rgba(255,255,255,0.04));
+  background: linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.05));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.22), inset 0 -1px 0 rgba(10,10,18,0.35);
   pointer-events: none;
   z-index: 1;
 }
@@ -399,23 +371,10 @@
   background-image:
     radial-gradient(circle at 50% 50%, rgba(80,41,125,0.05) 0%, rgba(18,13,38,0.35) 60%, rgba(10,7,24,0.6) 100%),
     url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
   pointer-events: none;
   z-index: 3;
   mix-blend-mode: overlay;
-}
-.card-frame::before {
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
-}
-.card-frame::after {
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.12);
-}
-.card-frame::after {
-  background-image:
-    linear-gradient(120deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.05) 45%, rgba(255,255,255,0.28) 50%, rgba(255,255,255,0.05) 55%, rgba(255,255,255,0.28) 100%),
-    radial-gradient(circle at 50% 50%, rgba(80,41,125,0.05) 0%, rgba(18,13,38,0.35) 60%, rgba(10,7,24,0.6) 100%),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
-  mix-blend-mode: screen;
-  opacity: .85;
 }
 .card-art--back {
   background: #05040f;
@@ -823,16 +782,11 @@
 }
 .card-abilities li {
   position: relative;
-  padding-left: 0;
+  padding-left: 1.3rem;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: .25rem;
-}
-.card-abilities li[data-ability="cost"] {
-  flex-direction: row;
-  align-items: baseline;
-  gap: .35rem;
+  gap: .3rem;
 }
 .card-ability-keyword {
   font-weight: 700;
@@ -865,7 +819,35 @@
   width: 100%;
 }
 .card-abilities li::before {
-  display: none;
+  content: "•";
+  position: absolute;
+  left: 0;
+  top: .48rem;
+  font-size: .58rem;
+  color: color-mix(in srgb, var(--textbox-body) 60%, rgba(245,245,255,0.45));
+  text-shadow: 0 1px 2px rgba(5,4,12,0.4);
+}
+.card-abilities li[data-ability="stacked"]::before {
+  content: "◆";
+  font-size: .62rem;
+  color: color-mix(in srgb, var(--textbox-keyword) 70%, rgba(250,250,255,0.68));
+}
+.card-abilities li[data-ability="cost"] {
+  padding-left: 0;
+  flex-direction: row;
+  align-items: baseline;
+  gap: .35rem;
+}
+.card-abilities li[data-ability="cost"]::before {
+  content: "—";
+  position: static;
+  display: inline-block;
+  margin-right: .3rem;
+  font-size: .82rem;
+  color: color-mix(in srgb, var(--textbox-divider) 70%, rgba(255,255,255,0.6));
+  opacity: .85;
+  letter-spacing: .18em;
+  transform: translateY(-0.05rem);
 }
 .card-ability-empty {
   opacity: .65;
