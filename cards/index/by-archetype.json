@@ -197,6 +197,32 @@
         "default": "cards/waifus/kamidere/domination-kamidere/art/default.png",
         "extreme": "cards/waifus/kamidere/domination-kamidere/art/extreme.png"
       }
+    },
+    {
+      "id": "kaia-gojin",
+      "type": "waifu",
+      "name": "Kaia Gojin",
+      "archetype": "Kamidere",
+      "rarity": "super-rare",
+      "tags": [],
+      "strategy": "Burn",
+      "species": "Dragonkin",
+      "set": "CORE-01",
+      "affection": 9,
+      "mood": {
+        "dere": 4,
+        "extreme": 10
+      },
+      "bonds": {
+        "start": 1,
+        "max": 13
+      },
+      "text": "Atomic Pulse — When you enter combat, deal 1 damage to all enemies. Burn (5): Ignite all enemies, dealing 2 damage per turn for two turns. Pierce (3): Ignore enemy Shields and deal +4 direct damage. Curse (2): Inflict meltdown on one enemy; their next attack deals half damage.",
+      "flavor": "Cities tremble, oceans boil, and still she stands—radiant, unstoppable, alive.",
+      "art": {
+        "default": "cards/waifus/kamidere/kaia-gojin/art/default.png",
+        "extreme": "cards/waifus/kamidere/kaia-gojin/art/extreme.png"
+      }
     }
   ],
   "Kuudere": [

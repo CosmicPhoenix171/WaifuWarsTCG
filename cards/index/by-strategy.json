@@ -205,6 +205,89 @@
       }
     }
   ],
+  "Burn": [
+    {
+      "id": "kaia-gojin",
+      "type": "waifu",
+      "name": "Kaia Gojin",
+      "archetype": "Kamidere",
+      "rarity": "super-rare",
+      "tags": [],
+      "strategy": "Burn",
+      "species": "Dragonkin",
+      "set": "CORE-01",
+      "affection": 9,
+      "mood": {
+        "dere": 4,
+        "extreme": 10
+      },
+      "bonds": {
+        "start": 1,
+        "max": 13
+      },
+      "text": "Atomic Pulse — When you enter combat, deal 1 damage to all enemies. Burn (5): Ignite all enemies, dealing 2 damage per turn for two turns. Pierce (3): Ignore enemy Shields and deal +4 direct damage. Curse (2): Inflict meltdown on one enemy; their next attack deals half damage.",
+      "flavor": "Cities tremble, oceans boil, and still she stands—radiant, unstoppable, alive.",
+      "art": {
+        "default": "cards/waifus/kamidere/kaia-gojin/art/default.png",
+        "extreme": "cards/waifus/kamidere/kaia-gojin/art/extreme.png"
+      }
+    },
+    {
+      "id": "aika-suzuhara",
+      "type": "waifu",
+      "name": "Aika Suzuhara",
+      "archetype": "Tsundere",
+      "rarity": "common",
+      "tags": [
+        "burn",
+        "boost"
+      ],
+      "strategy": "Burn",
+      "species": "Human",
+      "set": "CORE-01",
+      "affection": 10,
+      "mood": {
+        "dere": 5,
+        "extreme": 10
+      },
+      "bonds": {
+        "start": 0,
+        "max": 12
+      },
+      "text": "Hot-Headed Retort — When attacked, gain +1 Shield until end of turn. Burn 2 — Deal 3 damage over time to a target enemy. Boost 2 — Increase your attack by +2 this turn.",
+      "flavor": "Don’t get the wrong idea! I just happened to be nearby.",
+      "art": {
+        "default": "cards/waifus/tsundere/aika-suzuhara/art/default.png",
+        "extreme": "cards/waifus/tsundere/aika-suzuhara/art/extreme.png"
+      }
+    },
+    {
+      "id": "flame-tsundere",
+      "type": "waifu",
+      "name": "Flame Tsundere",
+      "archetype": "Tsundere",
+      "rarity": "common",
+      "tags": [],
+      "strategy": "Burn",
+      "species": "Human",
+      "set": "CORE-01",
+      "affection": 8,
+      "mood": {
+        "dere": 5,
+        "extreme": 10
+      },
+      "bonds": {
+        "start": 0,
+        "max": 12
+      },
+      "text": "On Summon: Deal 1 damage to a target waifu. Extreme: +2 damage on first attack each turn.",
+      "flavor": "It's NOT like she wanted to melt your defenses... idiot!",
+      "art": {
+        "default": "cards/waifus/tsundere/flame-tsundere/art/default.png",
+        "extreme": "cards/waifus/tsundere/flame-tsundere/art/extreme.png"
+      }
+    }
+  ],
   "Freeze / Immobilize": [
     {
       "id": "icebound-kuudere",
@@ -261,63 +344,6 @@
       "art": {
         "default": "cards/waifus/kuudere/sayo-yukinaga/art/default.png",
         "extreme": "cards/waifus/kuudere/sayo-yukinaga/art/extreme.png"
-      }
-    }
-  ],
-  "Burn": [
-    {
-      "id": "aika-suzuhara",
-      "type": "waifu",
-      "name": "Aika Suzuhara",
-      "archetype": "Tsundere",
-      "rarity": "common",
-      "tags": [
-        "burn",
-        "boost"
-      ],
-      "strategy": "Burn",
-      "species": "Human",
-      "set": "CORE-01",
-      "affection": 10,
-      "mood": {
-        "dere": 5,
-        "extreme": 10
-      },
-      "bonds": {
-        "start": 0,
-        "max": 12
-      },
-      "text": "Hot-Headed Retort — When attacked, gain +1 Shield until end of turn. Burn 2 — Deal 3 damage over time to a target enemy. Boost 2 — Increase your attack by +2 this turn.",
-      "flavor": "Don’t get the wrong idea! I just happened to be nearby.",
-      "art": {
-        "default": "cards/waifus/tsundere/aika-suzuhara/art/default.png",
-        "extreme": "cards/waifus/tsundere/aika-suzuhara/art/extreme.png"
-      }
-    },
-    {
-      "id": "flame-tsundere",
-      "type": "waifu",
-      "name": "Flame Tsundere",
-      "archetype": "Tsundere",
-      "rarity": "common",
-      "tags": [],
-      "strategy": "Burn",
-      "species": "Human",
-      "set": "CORE-01",
-      "affection": 8,
-      "mood": {
-        "dere": 5,
-        "extreme": 10
-      },
-      "bonds": {
-        "start": 0,
-        "max": 12
-      },
-      "text": "On Summon: Deal 1 damage to a target waifu. Extreme: +2 damage on first attack each turn.",
-      "flavor": "It's NOT like she wanted to melt your defenses... idiot!",
-      "art": {
-        "default": "cards/waifus/tsundere/flame-tsundere/art/default.png",
-        "extreme": "cards/waifus/tsundere/flame-tsundere/art/extreme.png"
       }
     }
   ],
