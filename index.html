@@ -594,6 +594,44 @@
       return '';
     }
 
+    function arrangeTopRowRarities(cards = []) {
+      if (!Array.isArray(cards) || cards.length === 0) {
+        return [];
+      }
+
+      const priorityOrder = [
+        'common',
+        'rare',
+        'super-rare',
+        'special-super-rare',
+        'ultra',
+        'event'
+      ];
+      const used = new Set();
+      const prioritized = [];
+      const lowerRarities = cards.map((card) => (card?.rarity || '').toLowerCase());
+
+      for (const rarity of priorityOrder) {
+        const index = lowerRarities.findIndex((value, idx) => value === rarity && !used.has(idx));
+        if (index >= 0) {
+          prioritized.push(cards[index]);
+          used.add(index);
+        }
+      }
+
+      if (!used.size) {
+        return cards.slice();
+      }
+
+      cards.forEach((card, idx) => {
+        if (!used.has(idx)) {
+          prioritized.push(card);
+        }
+      });
+
+      return prioritized;
+    }
+
     function decorateAbilityText(text = '') {
       let output = escapeHtml(text);
       const replacements = [
@@ -1169,8 +1207,9 @@
 
         const data = await response.json();
         const waifus = Array.isArray(data?.waifu) ? data.waifu : [];
+        const orderedWaifus = arrangeTopRowRarities(waifus);
 
-        if (!waifus.length) {
+        if (!orderedWaifus.length) {
           cardsStatus.textContent = 'Card previews are coming soon.';
           return;
         }
@@ -1184,7 +1223,7 @@
         const customCardBack = 'assets/images/card-back.png';
         const fallbackCardBack = 'assets/images/card-back-default.svg';
 
-        for (const card of waifus) {
+  for (const card of orderedWaifus) {
           const rarityKey = (card.rarity || 'common').toLowerCase();
           const rarityMeta = RARITY_META[rarityKey] || RARITY_META.common;
           const rarityDatasetKey = rarityMeta.datasetKey || rarityMeta.key;
