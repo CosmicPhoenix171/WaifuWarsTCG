@@ -2,6 +2,30 @@
 
 Waifu cards are the primary character units. They use ATK and Affection (HP) and are driven by archetype and emotional mechanics (Bonds, mood states).
 
+## Repository File Layout
+
+All waifu card assets now live together so each card can carry its own data, visuals, audio, and lore. Use the tag ordering `archetype / species / strategy / card-id` under `cards/waifus/`:
+
+```plaintext
+cards/
+	waifus/
+		dandere/
+			human/
+				shield-barrier/
+					whisper-dandere/
+						card.json        ← universal metadata + art references
+						art/             ← default/extreme renders (default.png, extreme.png, etc.)
+						audio/           ← voice lines, SFX
+						lore.md          ← optional written backstory
+```
+
+When creating or relocating a waifu:
+
+- Keep identifiers lowercased with dashes (e.g. `whisper-dandere`).
+- Update the `art` stanza inside `card.json` to point at files within the same folder tree.
+- Add supplementary material (profiles, scripts, alt art) next to the card under the same directory so other pages can load them by walking the hierarchy.
+- After editing any `card.json`, regenerate indexes with `node cards/tools/index-builder.js` so site loaders resolve the new paths.
+
 ## Waifu Card Rules (concise)
 
 - ATK / Affection (AFF) stats: ATK uses double-digit values (10–99) and Affection uses single-digit values (1–9). Affection is the waifu's health pool — when it reaches 0 the waifu is discarded.
