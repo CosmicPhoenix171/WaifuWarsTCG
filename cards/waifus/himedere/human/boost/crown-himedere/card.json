@@ -1,0 +1,37 @@
+{
+  "id": "crown-himedere",
+  "type": "waifu",
+  "name": "Crown Himedere",
+  "set": "CORE-01",
+  "rarity": "super-rare",
+  "affection": 9,
+  "bonds": { "start": 1, "max": 13 },
+  "mood": { "thresholds": { "dere": 5, "extreme": 10 } },
+  "strategy": "Inspire",
+  "archetype": "Himedere",
+  "species": "Human",
+  "text": "Leader Aura: Other allied waifus gain +1 ATK while you have the highest Affection. Dere: Your Support cards cost 1 less. Extreme: When you defeat a waifu, gain +2 {BOND} and heal 2 Affection.",
+  "effects": [
+    {
+      "when": "onSummon",
+      "do": [ { "type": "buff", "target": "allyWaifus", "amount": 1, "note": "Aura active while she has highest Affection" } ]
+    },
+    {
+      "when": "onSummon",
+      "do": [ { "type": "buff", "target": "yourSupports", "note": "Cost -1 while mood>=Dere" } ]
+    },
+    {
+      "when": "onDamage",
+      "do": [
+        { "type": "gainBonds", "target": "self", "amount": 2, "note": "If mood=Extreme and you KO a waifu" },
+        { "type": "heal", "target": "self", "amount": 2, "note": "Same trigger as above" }
+      ]
+    }
+  ],
+  "flavor": "Bow properly and victory is yours to command.",
+  "art": {
+    "default": "cards/waifus/himedere/human/boost/crown-himedere/art/default.png",
+    "extreme": "cards/waifus/himedere/human/boost/crown-himedere/art/extreme.png"
+  },
+  "version": 1
+}

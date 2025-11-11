@@ -22,8 +22,8 @@
       "text": "Passive: Cannot be targeted by opponent Support cards while Neutral. Dere: Gain +2 shield counters. Extreme: When you speak (play a Support), draw a card.",
       "flavor": "When she finally speaks up, the whole battlefield listens.",
       "art": {
-        "default": "cards/waifus/dandere/human/shield-barrier/whisper-dandere/art/default.png",
-        "extreme": "cards/waifus/dandere/human/shield-barrier/whisper-dandere/art/extreme.png"
+        "default": "cards/waifus/dandere/human/shield/whisper-dandere/art/default.png",
+        "extreme": "cards/waifus/dandere/human/shield/whisper-dandere/art/extreme.png"
       }
     },
     {
@@ -48,8 +48,8 @@
       "text": "Start of Turn: Give bonded allies +1 {BOND}. Activated: Spend 1 {BOND} to heal 2 Affection to another waifu. Extreme: Your bonded allies gain +1 Affection when they attack.",
       "flavor": "A beam of sunshine with emergency snacks for everyone.",
       "art": {
-        "default": "cards/waifus/deredere/human/heal-restore/sunbeam-deredere/art/default.png",
-        "extreme": "cards/waifus/deredere/human/heal-restore/sunbeam-deredere/art/extreme.png"
+        "default": "cards/waifus/deredere/human/heal/sunbeam-deredere/art/default.png",
+        "extreme": "cards/waifus/deredere/human/heal/sunbeam-deredere/art/extreme.png"
       }
     },
     {
@@ -74,8 +74,8 @@
       "text": "Leader Aura: Other allied waifus gain +1 ATK while you have the highest Affection. Dere: Your Support cards cost 1 less. Extreme: When you defeat a waifu, gain +2 {BOND} and heal 2 Affection.",
       "flavor": "Bow properly and victory is yours to command.",
       "art": {
-        "default": "cards/waifus/himedere/human/inspire/crown-himedere/art/default.png",
-        "extreme": "cards/waifus/himedere/human/inspire/crown-himedere/art/extreme.png"
+        "default": "cards/waifus/himedere/human/boost/crown-himedere/art/default.png",
+        "extreme": "cards/waifus/himedere/human/boost/crown-himedere/art/extreme.png"
       }
     },
     {
@@ -126,8 +126,8 @@
       "text": "Reaction: When an opponent plays a Support, spend 1 {BOND} to cancel it. Dere: Opponents cannot gain bonus bonds outside their turn. Extreme: First trap each turn resets to face-down after resolving.",
       "flavor": "Logic slices hotter than passion.",
       "art": {
-        "default": "cards/waifus/kuudere/human/freeze-immobilize/icebound-kuudere/art/default.png",
-        "extreme": "cards/waifus/kuudere/human/freeze-immobilize/icebound-kuudere/art/extreme.png"
+        "default": "cards/waifus/kuudere/human/freeze/icebound-kuudere/art/default.png",
+        "extreme": "cards/waifus/kuudere/human/freeze/icebound-kuudere/art/extreme.png"
       }
     },
     {
@@ -178,8 +178,8 @@
       "text": "On Summon: Mark a rival waifu. Activated: Spend 2 {BOND} to deal 3 damage to the marked target. Extreme: When the mark is cleared, gain +3 bonds.",
       "flavor": "Love can be a double-edged blade. Mostly edge.",
       "art": {
-        "default": "cards/waifus/yandere/human/bleed/crimson-yandere/art/default.png",
-        "extreme": "cards/waifus/yandere/human/bleed/crimson-yandere/art/extreme.png"
+        "default": "cards/waifus/yandere/human/drain/crimson-yandere/art/default.png",
+        "extreme": "cards/waifus/yandere/human/drain/crimson-yandere/art/extreme.png"
       }
     },
     {
@@ -207,8 +207,8 @@
       "text": "When you attack: Flip a coin. Heads — deal +4 damage. Tails — take 2 self-damage. Dere: Gain +1 {BOND} on heads. Extreme: You may flip twice and choose the result, but suffer both tails outcomes.",
       "flavor": "Sanity is a courtesy, not a promise.",
       "art": {
-        "default": "cards/waifus/yangire/human/berserk/fracture-yangire/art/default.png",
-        "extreme": "cards/waifus/yangire/human/berserk/fracture-yangire/art/extreme.png"
+        "default": "cards/waifus/yangire/human/needs-fixed/fracture-yangire/art/default.png",
+        "extreme": "cards/waifus/yangire/human/needs-fixed/fracture-yangire/art/extreme.png"
       }
     }
   ],

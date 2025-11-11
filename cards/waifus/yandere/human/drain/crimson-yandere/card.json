@@ -1,0 +1,35 @@
+{
+  "id": "crimson-yandere",
+  "type": "waifu",
+  "name": "Crimson Yandere",
+  "set": "CORE-01",
+  "rarity": "super-rare",
+  "affection": 7,
+  "bonds": { "start": 1, "max": 12 },
+  "mood": { "thresholds": { "dere": 4, "extreme": 9 } },
+  "strategy": "Bleed",
+  "archetype": "Yandere",
+  "species": "Human",
+  "text": "On Summon: Mark a rival waifu. Activated: Spend 2 {BOND} to deal 3 damage to the marked target. Extreme: When the mark is cleared, gain +3 bonds.",
+  "effects": [
+    {
+      "when": "onSummon",
+      "do": [ { "type": "debuff", "target": "choiceOpponentWaifu", "note": "Apply Crimson Mark" } ]
+    },
+    {
+      "when": "activated",
+      "cost": { "bonds": 2 },
+      "do": [ { "type": "damage", "target": "markedWaifu", "amount": 3 } ]
+    },
+    {
+      "when": "onDamage",
+      "do": [ { "type": "gainBonds", "target": "self", "amount": 3, "note": "Trigger only if mood=Extreme and mark was cleared" } ]
+    }
+  ],
+  "flavor": "Love can be a double-edged blade. Mostly edge.",
+  "art": {
+    "default": "cards/waifus/yandere/human/drain/crimson-yandere/art/default.png",
+    "extreme": "cards/waifus/yandere/human/drain/crimson-yandere/art/extreme.png"
+  },
+  "version": 1
+}
