@@ -73,6 +73,14 @@ let currentUser = null;
 const listeners = {};
 let omdbWarningShown = false;
 let spinTimeouts = [];
+const AUTOCOMPLETE_LISTS = new Set(['movies', 'tvShows', 'anime']);
+const OMDB_TYPE_MAP = {
+  movies: 'movie',
+  tvShows: 'series',
+  anime: 'series',
+};
+const suggestionForms = new Set();
+let globalSuggestionClickBound = false;
 
 // DOM references
 const loginScreen = document.getElementById('login-screen');
@@ -111,9 +119,10 @@ function initFirebase() {
 
   // Add form handlers
   document.querySelectorAll('.add-form').forEach(form => {
+    const listType = form.dataset.list;
+    setupFormAutocomplete(form, listType);
     form.addEventListener('submit', async (ev) => {
       ev.preventDefault();
-      const listType = form.dataset.list;
       await addItemFromForm(listType, form);
     });
   });
@@ -332,10 +341,11 @@ async function addItemFromForm(listType, form) {
   setButtonBusy(submitBtn, true);
 
   try {
-    let metadata = null;
-    if (OMDB_API_KEY && ['movies', 'tvShows', 'anime'].includes(listType)) {
-      metadata = await fetchOmdbMetadata(listType, { title, year });
-    } else if (!OMDB_API_KEY && ['movies', 'tvShows', 'anime'].includes(listType)) {
+    let metadata = form.__selectedMetadata || null;
+    const selectedImdbId = form.dataset.selectedImdbId || '';
+    if (!metadata && OMDB_API_KEY && ['movies', 'tvShows', 'anime'].includes(listType)) {
+      metadata = await fetchOmdbMetadata(listType, { title, year, imdbId: selectedImdbId });
+    } else if (!metadata && !OMDB_API_KEY && ['movies', 'tvShows', 'anime'].includes(listType)) {
       maybeWarnAboutOmdbKey();
     }
 
@@ -353,8 +363,8 @@ async function addItemFromForm(listType, form) {
       if (creatorValue) item.director = creatorValue;
       if (metadata) {
         // Merge metadata where available but keep user input when present.
-        const yearFromApi = metadata.Year && metadata.Year !== 'N/A' ? metadata.Year : null;
-        if (yearFromApi) item.year = yearFromApi;
+        const apiYear = metadata.Year && metadata.Year !== 'N/A' ? extractPrimaryYear(metadata.Year) : '';
+        if (apiYear) item.year = apiYear;
         const directorFromApi = metadata.Director && metadata.Director !== 'N/A' ? metadata.Director : null;
         if (!item.director && directorFromApi) item.director = directorFromApi;
         if (metadata.imdbID) {
@@ -377,6 +387,9 @@ async function addItemFromForm(listType, form) {
 
     await addItem(listType, item);
     form.reset();
+    form.__selectedMetadata = null;
+    delete form.dataset.selectedImdbId;
+    hideTitleSuggestions(form);
   } catch (err) {
     console.error('Unable to add item', err);
     const message = err && err.message === 'Not signed in'
@@ -393,6 +406,20 @@ function sanitizeYear(input) {
   const cleaned = input.replace(/[^0-9]/g, '').slice(0, 4);
   if (cleaned.length !== 4) return '';
   return cleaned;
+}
+
+function extractPrimaryYear(value) {
+  if (!value) return '';
+  const match = String(value).match(/\d{4}/);
+  return match ? match[0] : '';
+}
+
+function debounce(fn, wait = 250) {
+  let timeoutId;
+  return function debounced(...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn.apply(this, args), wait);
+  };
 }
 
 function setButtonBusy(button, isBusy) {
@@ -420,15 +447,180 @@ function maybeWarnAboutOmdbKey() {
   alert(message);
 }
 
-async function fetchOmdbMetadata(listType, { title, year }) {
+function hideTitleSuggestions(form) {
+  if (!form || !form.__suggestionsEl) return;
+  const el = form.__suggestionsEl;
+  el.classList.remove('visible');
+  el.innerHTML = '';
+}
+
+function renderTitleSuggestions(container, suggestions, onSelect) {
+  container.innerHTML = '';
+  if (!suggestions || suggestions.length === 0) {
+    const empty = document.createElement('div');
+    empty.className = 'empty';
+    empty.textContent = 'No matches found';
+    container.appendChild(empty);
+    return;
+  }
+
+  suggestions.forEach(suggestion => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    const label = document.createElement('span');
+    label.textContent = suggestion.title || '(no title)';
+    button.appendChild(label);
+    if (suggestion.year) {
+      const year = document.createElement('span');
+      year.className = 'year';
+      year.textContent = suggestion.year;
+      button.appendChild(year);
+    }
+    button.addEventListener('click', () => onSelect && onSelect(suggestion));
+    container.appendChild(button);
+  });
+}
+
+async function fetchOmdbSuggestions(listType, query) {
+  if (!OMDB_API_KEY) return [];
+  const type = OMDB_TYPE_MAP[listType];
+  const params = new URLSearchParams({ apikey: OMDB_API_KEY, s: query });
+  if (type) params.set('type', type);
+  try {
+    const resp = await fetch(`${OMDB_API_URL}?${params.toString()}`);
+    if (!resp.ok) return [];
+    const json = await resp.json();
+    if (!json || json.Response !== 'True' || !Array.isArray(json.Search)) return [];
+    return json.Search.slice(0, 8).map(entry => ({
+      title: entry.Title,
+      year: entry.Year,
+      imdbID: entry.imdbID,
+      type: entry.Type,
+    }));
+  } catch (err) {
+    console.warn('OMDb suggestion lookup failed', err);
+    return [];
+  }
+}
+
+function setupFormAutocomplete(form, listType) {
+  if (!form) return;
+  const wrapper = form.querySelector('.input-suggest');
+  const titleInput = wrapper ? wrapper.querySelector('input[name="title"]') : null;
+  const suggestionsEl = wrapper ? wrapper.querySelector('[data-role="title-suggestions"]') : null;
+  form.__suggestionsEl = suggestionsEl || null;
+  if (!titleInput || !suggestionsEl) return;
+
+  if (!AUTOCOMPLETE_LISTS.has(listType)) {
+    return;
+  }
+
+  if (!OMDB_API_KEY) {
+    maybeWarnAboutOmdbKey();
+    return;
+  }
+
+  suggestionForms.add(form);
+  if (!globalSuggestionClickBound) {
+    document.addEventListener('click', (event) => {
+      suggestionForms.forEach(f => {
+        if (!f.contains(event.target)) hideTitleSuggestions(f);
+      });
+    });
+    globalSuggestionClickBound = true;
+  }
+
+  const yearInput = form.querySelector('input[name="year"]');
+  const creatorInput = form.querySelector(listType === 'books' ? 'input[name="author"]' : 'input[name="director"]');
+  let lastFetchToken = 0;
+
+  const performSearch = debounce(async (query) => {
+    const currentToken = ++lastFetchToken;
+    const results = await fetchOmdbSuggestions(listType, query);
+    if (currentToken !== lastFetchToken) return;
+    renderTitleSuggestions(suggestionsEl, results, async (suggestion) => {
+      titleInput.value = suggestion.title || '';
+      const suggestionYear = extractPrimaryYear(suggestion.year);
+      if (yearInput && suggestionYear) {
+        yearInput.value = suggestionYear;
+      }
+      form.__selectedMetadata = null;
+      if (suggestion.imdbID) {
+        form.dataset.selectedImdbId = suggestion.imdbID;
+        try {
+          const detail = await fetchOmdbMetadata(listType, { title: suggestion.title, year: suggestionYear, imdbId: suggestion.imdbID });
+          if (detail) {
+            form.__selectedMetadata = detail;
+            if (yearInput) {
+              const detailYear = extractPrimaryYear(detail.Year);
+              if (detailYear) yearInput.value = detailYear;
+            }
+            if (creatorInput && (!creatorInput.value || creatorInput.value === '') && detail.Director && detail.Director !== 'N/A') {
+              creatorInput.value = detail.Director;
+            }
+          }
+        } catch (err) {
+          console.warn('Unable to prefill metadata from suggestion', err);
+        }
+      } else {
+        delete form.dataset.selectedImdbId;
+      }
+      hideTitleSuggestions(form);
+      titleInput.focus();
+    });
+    suggestionsEl.classList.add('visible');
+  }, 260);
+
+  titleInput.addEventListener('input', () => {
+    const query = titleInput.value.trim();
+    form.__selectedMetadata = null;
+    delete form.dataset.selectedImdbId;
+    if (query.length < 3) {
+      lastFetchToken++;
+      hideTitleSuggestions(form);
+      return;
+    }
+    performSearch(query);
+  });
+
+  titleInput.addEventListener('focus', () => {
+    if (suggestionsEl.children.length > 0) {
+      suggestionsEl.classList.add('visible');
+    }
+  });
+
+  titleInput.addEventListener('blur', () => {
+    setTimeout(() => hideTitleSuggestions(form), 150);
+  });
+
+  titleInput.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Escape') {
+      hideTitleSuggestions(form);
+    }
+  });
+}
+
+async function fetchOmdbMetadata(listType, { title, year, imdbId }) {
   if (!OMDB_API_KEY) return null;
-  const typeMap = {
-    movies: 'movie',
-    tvShows: 'series',
-    anime: 'series',
-  };
+  const type = OMDB_TYPE_MAP[listType];
+
+  if (imdbId) {
+    try {
+      const detailParams = new URLSearchParams({ apikey: OMDB_API_KEY, i: imdbId, plot: 'short' });
+      const detailResp = await fetch(`${OMDB_API_URL}?${detailParams.toString()}`);
+      if (detailResp.ok) {
+        const detailJson = await detailResp.json();
+        if (detailJson && detailJson.Response === 'True') {
+          return detailJson;
+        }
+      }
+    } catch (err) {
+      console.warn('OMDb lookup by ID failed', err);
+    }
+  }
+
+  if (!title) return null;
   const params = new URLSearchParams({ apikey: OMDB_API_KEY, t: title });
-  const type = typeMap[listType];
   if (type) params.set('type', type);
   if (year) params.set('y', year);
 
