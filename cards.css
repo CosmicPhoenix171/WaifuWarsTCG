@@ -700,8 +700,8 @@
 }
 
 .card-cost-heart {
-  width: 14px;
-  height: 14px;
+  width: 28px;
+  height: 28px;
   background: url("assets/images/Heart-energy.png") center/contain no-repeat;
   filter: drop-shadow(0 1px 2px rgba(15,23,42,0.45));
 }
