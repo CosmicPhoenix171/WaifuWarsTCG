@@ -674,16 +674,17 @@
 }
 .card-text-box {
   padding: .85rem .9rem 2.2rem; /* extra bottom padding keeps space before footer */
-  border-radius: 10px;
-  background: #ffffff;
-  border: 2px solid rgba(203,213,225,0.8);
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.04),
-              inset 0 0 0 1px rgba(255,255,255,0.8),
-              0 2px 4px rgba(0,0,0,0.08);
+  border-radius: 12px;
+  background: linear-gradient(155deg, rgba(23,18,37,0.96), rgba(10,7,20,0.94));
+  border: 1px solid rgba(121,41,255,0.35);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08),
+              inset 0 -1px 0 rgba(12,10,25,0.65),
+              0 16px 38px -24px rgba(6,4,14,0.9);
   display: flex;
   flex-direction: column;
   overflow: visible; /* allow natural flow */
   position: relative;
+  color: #ede9ff;
 }
 
 .card-bond-overlay {
@@ -729,8 +730,8 @@
   flex-direction: column;
   gap: .45rem;
   font-size: .9rem;
-  line-height: 1.45;
-  color: #111827;
+  line-height: 1.5;
+  color: #f1efff;
   overflow: visible;
 }
 .card-abilities li {
@@ -745,7 +746,7 @@
   font-weight: 700;
   letter-spacing: .55px;
   text-transform: uppercase;
-  color: #1f2937;
+  color: #f472b6;
   flex-shrink: 0;
 }
 .card-ability-keyword span {
@@ -764,21 +765,21 @@
 }
 .card-flavor {
   margin: auto 0 0;
-  padding-top: .5rem;
+  padding-top: .55rem;
   font-size: .76rem;
-  color: #94a3b8;
+  color: rgba(211,208,236,0.78);
   font-style: italic;
   text-align: left;
-  line-height: 1.35;
+  line-height: 1.4;
   flex-shrink: 0;
-  border-top: 1px solid rgba(203,213,225,0.4);
+  border-top: 1px solid rgba(121,41,255,0.28);
 }
 .card-footer {
-  margin-top: .3rem;
+  margin-top: .35rem;
   font-size: .68rem;
   letter-spacing: .6px;
   text-transform: uppercase;
-  color: #94a3b8;
+  color: rgba(211,208,236,0.75);
   height: 20px;
   flex-shrink: 0;
   display: flex;
@@ -793,7 +794,7 @@
   font-size: .78rem;
   font-weight: 700;
   letter-spacing: .45px;
-  opacity: 0.75;
+  opacity: 0.8;
 }
 /* Overflow indicator when content had to be force-fitted */
 .card-display[data-overflow="true"] .card-footer::after {
@@ -808,7 +809,7 @@
   opacity: 0.9;
 }
 .card-display[data-overflow="true"] .card-text-box {
-  outline: 2px dashed rgba(239,68,68,0.4);
+  outline: 2px dashed rgba(239,68,68,0.45);
   outline-offset: -2px;
 }
 /* === Rarity Themes === */
