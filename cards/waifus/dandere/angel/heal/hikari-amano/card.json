@@ -1,0 +1,43 @@
+{
+  "id": "hikari-amano",
+  "type": "waifu",
+  "name": "Hikari Amano",
+  "set": "CORE-01",
+  "rarity": "common",
+  "archetype": "Dandere",
+  "species": "Angel",
+  "strategy": "Heal",
+  "affection": 11,
+  "bonds": { "start": 0, "max": 12 },
+  "mood": { "thresholds": { "dere": 5, "extreme": 10 } },
+  "tags": ["heal", "cleanse"],
+  "text": "Quiet Encouragement — When an ally gains {BOND}, heal them 1 Affection. Heal 1 — Restore 3 Affection to any ally. Cleanse 1 — Remove one debuff or Curse from an ally.",
+  "effects": [
+    {
+      "when": "onAllyGainBonds",
+      "do": [
+        { "type": "heal", "target": "choiceAllyWaifu", "amount": 1, "note": "Quiet Encouragement passive" }
+      ]
+    },
+    {
+      "when": "activated",
+      "cost": { "bonds": 1 },
+      "do": [
+        { "type": "heal", "target": "choiceAllyWaifu", "amount": 3, "note": "Restore Affection" }
+      ]
+    },
+    {
+      "when": "activated",
+      "cost": { "bonds": 1 },
+      "do": [
+        { "type": "cleanse", "target": "choiceAllyWaifu", "note": "Remove one debuff or Curse" }
+      ]
+    }
+  ],
+  "flavor": "You don’t have to fight alone anymore…",
+  "art": {
+    "default": "cards/waifus/dandere/angel/heal/hikari-amano/art/default.png",
+    "extreme": "cards/waifus/dandere/angel/heal/hikari-amano/art/extreme.png"
+  },
+  "version": 1
+}
