@@ -1,0 +1,40 @@
+{
+  "id": "fracture-yangire",
+  "type": "waifu",
+  "name": "Fracture Yangire",
+  "set": "CORE-01",
+  "rarity": "event",
+  "rarityName": "Event Exclusive",
+  "rarityCode": "EX",
+  "rarityTheme": "cosmic",
+  "affection": 6,
+  "bonds": { "start": 0, "max": 12 },
+  "mood": { "thresholds": { "dere": 3, "extreme": 8 } },
+  "strategy": "Berserk",
+  "archetype": "Yangire",
+  "species": "Human",
+  "text": "When you attack: Flip a coin. Heads — deal +4 damage. Tails — take 2 self-damage. Dere: Gain +1 {BOND} on heads. Extreme: You may flip twice and choose the result, but suffer both tails outcomes.",
+  "effects": [
+    {
+      "when": "onAttack",
+      "do": [
+        { "type": "damage", "target": "defender", "amount": 4, "note": "Coin flip heads" },
+        { "type": "damage", "target": "self", "amount": 2, "note": "Coin flip tails" }
+      ]
+    },
+    {
+      "when": "onAttack",
+      "do": [ { "type": "gainBonds", "target": "self", "amount": 1, "note": "Additional gain when mood>=Dere and result=heads" } ]
+    },
+    {
+      "when": "onAttack",
+      "do": [ { "type": "buff", "target": "self", "note": "If mood=Extreme, flip twice pick result, but apply both tails penalties" } ]
+    }
+  ],
+  "flavor": "Sanity is a courtesy, not a promise.",
+  "art": {
+    "default": "cards/waifus/yangire/fracture-yangire/art/default.png",
+    "extreme": "cards/waifus/yangire/fracture-yangire/art/extreme.png"
+  },
+  "version": 1
+}

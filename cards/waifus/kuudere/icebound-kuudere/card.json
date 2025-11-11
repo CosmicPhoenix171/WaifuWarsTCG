@@ -1,0 +1,35 @@
+{
+  "id": "icebound-kuudere",
+  "type": "waifu",
+  "name": "Icebound Kuudere",
+  "set": "CORE-01",
+  "rarity": "super-rare",
+  "affection": 8,
+  "bonds": { "start": 1, "max": 12 },
+  "mood": { "thresholds": { "dere": 4, "extreme": 9 } },
+  "strategy": "Freeze / Immobilize",
+  "archetype": "Kuudere",
+  "species": "Human",
+  "text": "Reaction: When an opponent plays a Support, spend 1 {BOND} to cancel it. Dere: Opponents cannot gain bonus bonds outside their turn. Extreme: First trap each turn resets to face-down after resolving.",
+  "effects": [
+    {
+      "when": "activated",
+      "cost": { "bonds": 1 },
+      "do": [ { "type": "prevent", "target": "supportStack", "note": "Counter target opponent Support" } ]
+    },
+    {
+      "when": "onSummon",
+      "do": [ { "type": "debuff", "target": "opponent", "note": "Lock bonus bonds during opponent turns while mood>=Dere" } ]
+    },
+    {
+      "when": "trapTrigger",
+      "do": [ { "type": "buff", "target": "trap", "note": "If mood=Extreme, reset first trap you control" } ]
+    }
+  ],
+  "flavor": "Logic slices hotter than passion.",
+  "art": {
+    "default": "cards/waifus/kuudere/icebound-kuudere/art/default.png",
+    "extreme": "cards/waifus/kuudere/icebound-kuudere/art/extreme.png"
+  },
+  "version": 1
+}

@@ -1,0 +1,51 @@
+{
+  "id": "reina-kurogane",
+  "type": "waifu",
+  "name": "Reina Kurogane",
+  "set": "CORE-01",
+  "rarity": "rare",
+  "archetype": "Yandere",
+  "species": "Vampire",
+  "strategy": "Drain",
+  "affection": 8,
+  "bonds": { "start": 1, "max": 13 },
+  "mood": { "thresholds": { "dere": 4, "extreme": 9 } },
+  "tags": ["drain", "curse", "charm"],
+  "text": "Love or Death — When an ally falls, gain +1 {BOND} and heal 2 Affection. Drain 2 — Steal 2 Affection from an enemy waifu. Curse 3 — Inflict −2 BP for 2 turns. Charm 3 — Force one enemy waifu to skip their next attack.",
+  "effects": [
+    {
+      "when": "onAllyDefeated",
+      "do": [
+        { "type": "gainBonds", "target": "self", "amount": 1, "note": "Love or Death passive" },
+        { "type": "heal", "target": "self", "amount": 2, "note": "Regain Affection when an ally falls" }
+      ]
+    },
+    {
+      "when": "activated",
+      "cost": { "bonds": 2 },
+      "do": [
+        { "type": "drain", "target": "choiceEnemyWaifu", "amount": 2, "note": "Steal Affection" }
+      ]
+    },
+    {
+      "when": "activated",
+      "cost": { "bonds": 3 },
+      "do": [
+        { "type": "debuff", "target": "choiceEnemyWaifu", "amount": 2, "note": "Reduce BP for 2 turns" }
+      ]
+    },
+    {
+      "when": "activated",
+      "cost": { "bonds": 3 },
+      "do": [
+        { "type": "charm", "target": "choiceEnemyWaifu", "note": "Skip next attack" }
+      ]
+    }
+  ],
+  "flavor": "Your heartbeat belongs to me now.",
+  "art": {
+    "default": "cards/waifus/yandere/reina-kurogane/art/default.png",
+    "extreme": "cards/waifus/yandere/reina-kurogane/art/extreme.png"
+  },
+  "version": 1
+}

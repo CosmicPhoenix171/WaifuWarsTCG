@@ -1,0 +1,34 @@
+{
+  "id": "whisper-dandere",
+  "type": "waifu",
+  "name": "Whisper Dandere",
+  "set": "CORE-01",
+  "rarity": "common",
+  "affection": 10,
+  "bonds": { "start": 0, "max": 12 },
+  "mood": { "thresholds": { "dere": 6, "extreme": 10 } },
+  "strategy": "Shield / Barrier",
+  "archetype": "Dandere",
+  "species": "Human",
+  "text": "Passive: Cannot be targeted by opponent Support cards while Neutral. Dere: Gain +2 shield counters. Extreme: When you speak (play a Support), draw a card.",
+  "effects": [
+    {
+      "when": "onSummon",
+      "do": [ { "type": "prevent", "target": "self", "amount": 999, "note": "Treat as untargetable by opponent Supports while mood=Neutral" } ]
+    },
+    {
+      "when": "onSummon",
+      "do": [ { "type": "buff", "target": "self", "amount": 2, "note": "Add 2 shield counters when reaching Dere" } ]
+    },
+    {
+      "when": "activated",
+      "do": [ { "type": "draw", "target": "you", "amount": 1, "note": "Only if mood=Extreme and you played a Support this turn" } ]
+    }
+  ],
+  "flavor": "When she finally speaks up, the whole battlefield listens.",
+  "art": {
+    "default": "cards/waifus/dandere/whisper-dandere/art/default.png",
+    "extreme": "cards/waifus/dandere/whisper-dandere/art/extreme.png"
+  },
+  "version": 1
+}

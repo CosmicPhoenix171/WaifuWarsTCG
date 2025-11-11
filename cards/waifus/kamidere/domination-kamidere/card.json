@@ -1,0 +1,35 @@
+{
+  "id": "domination-kamidere",
+  "type": "waifu",
+  "name": "Domination Kamidere",
+  "set": "CORE-01",
+  "rarity": "special-super-rare",
+  "affection": 8,
+  "bonds": { "start": 2, "max": 14 },
+  "mood": { "thresholds": { "dere": 5, "extreme": 11 } },
+  "strategy": "Charm",
+  "archetype": "Kamidere",
+  "species": "Human",
+  "text": "Command Phase: Spend 2 {BOND} to choose an enemy waifu; it must attack a target you pick this turn. Dere: Opponents can't ready more than one waifu during End Phase. Extreme: When you issue a command, ready one of your waifus.",
+  "effects": [
+    {
+      "when": "activated",
+      "cost": { "bonds": 2 },
+      "do": [ { "type": "redirect", "target": "choiceOpponentWaifu", "note": "Force chosen attack target this turn" } ]
+    },
+    {
+      "when": "onSummon",
+      "do": [ { "type": "debuff", "target": "opponentField", "note": "Limit ready actions to 1 while mood>=Dere" } ]
+    },
+    {
+      "when": "activated",
+      "do": [ { "type": "buff", "target": "allyWaifu", "note": "If mood=Extreme, ready a waifu you control after issuing command" } ]
+    }
+  ],
+  "flavor": "Kneel now and the world might spare you.",
+  "art": {
+    "default": "cards/waifus/kamidere/domination-kamidere/art/default.png",
+    "extreme": "cards/waifus/kamidere/domination-kamidere/art/extreme.png"
+  },
+  "version": 1
+}
