@@ -1,4 +1,33 @@
 {
+  "hikari-amano": {
+    "id": "hikari-amano",
+    "type": "waifu",
+    "name": "Hikari Amano",
+    "archetype": "Dandere",
+    "rarity": "common",
+    "tags": [
+      "heal",
+      "cleanse"
+    ],
+    "strategy": "Heal",
+    "species": "Angel",
+    "set": "CORE-01",
+    "affection": 11,
+    "mood": {
+      "dere": 5,
+      "extreme": 10
+    },
+    "bonds": {
+      "start": 0,
+      "max": 12
+    },
+    "text": "Quiet Encouragement — When an ally gains {BOND}, heal them 1 Affection. Heal 1 — Restore 3 Affection to any ally. Cleanse 1 — Remove one debuff or Curse from an ally.",
+    "flavor": "You don’t have to fight alone anymore…",
+    "art": {
+      "default": "cards/waifus/dandere/angel/heal/hikari-amano/art/default.png",
+      "extreme": "cards/waifus/dandere/angel/heal/hikari-amano/art/extreme.png"
+    }
+  },
   "whisper-dandere": {
     "id": "whisper-dandere",
     "type": "waifu",
@@ -49,6 +78,65 @@
     "art": {
       "default": "cards/waifus/deredere/human/heal/sunbeam-deredere/art/default.png",
       "extreme": "cards/waifus/deredere/human/heal/sunbeam-deredere/art/extreme.png"
+    }
+  },
+  "mina-hanekawa": {
+    "id": "mina-hanekawa",
+    "type": "waifu",
+    "name": "Mina Hanekawa",
+    "archetype": "Deredere",
+    "rarity": "common",
+    "tags": [
+      "boost",
+      "heal"
+    ],
+    "strategy": "Boost",
+    "species": "Neko",
+    "set": "CORE-01",
+    "affection": 9,
+    "mood": {
+      "dere": 5,
+      "extreme": 10
+    },
+    "bonds": {
+      "start": 0,
+      "max": 12
+    },
+    "text": "Infectious Cheer — At the start of your turn, all allies gain +1 BP until end of turn. Boost 2 — Increase an ally’s attack by +3 this turn. Heal 2 — Restore 2 Affection to all allies.",
+    "flavor": "Nyaa~ Let’s give it our all together!",
+    "art": {
+      "default": "cards/waifus/deredere/neko-catgirl/boost/mina-hanekawa/art/default.png",
+      "extreme": "cards/waifus/deredere/neko-catgirl/boost/mina-hanekawa/art/extreme.png"
+    }
+  },
+  "celeste-draconis": {
+    "id": "celeste-draconis",
+    "type": "waifu",
+    "name": "Celeste Draconis",
+    "archetype": "Himedere",
+    "rarity": "super-rare",
+    "tags": [
+      "shield",
+      "charm",
+      "pierce"
+    ],
+    "strategy": "Shield",
+    "species": "Dragonkin",
+    "set": "CORE-01",
+    "affection": 10,
+    "mood": {
+      "dere": 5,
+      "extreme": 10
+    },
+    "bonds": {
+      "start": 1,
+      "max": 13
+    },
+    "text": "Royal Command — When played, give one ally +1 {BOND}. Shield 1 — Grant +2 Shield to an ally of your choice. Charm 2 — Command one enemy waifu to defend instead of attack this turn. Pierce 3 — Deal +4 damage that ignores Shield.",
+    "flavor": "Bow before my majesty, and I may let you stand beside me.",
+    "art": {
+      "default": "cards/waifus/himedere/dragonkin/shield/celeste-draconis/art/default.png",
+      "extreme": "cards/waifus/himedere/dragonkin/shield/celeste-draconis/art/extreme.png"
     }
   },
   "crown-himedere": {
@@ -103,6 +191,35 @@
       "extreme": "cards/waifus/kamidere/human/charm/domination-kamidere/art/extreme.png"
     }
   },
+  "sayo-yukinaga": {
+    "id": "sayo-yukinaga",
+    "type": "waifu",
+    "name": "Sayo Yukinaga",
+    "archetype": "Kuudere",
+    "rarity": "rare",
+    "tags": [
+      "freeze",
+      "pierce"
+    ],
+    "strategy": "Freeze",
+    "species": "Elf",
+    "set": "CORE-01",
+    "affection": 9,
+    "mood": {
+      "dere": 4,
+      "extreme": 9
+    },
+    "bonds": {
+      "start": 1,
+      "max": 12
+    },
+    "text": "Cold Precision — Your first attack each turn ignores 1 Shield. Freeze 2 — Prevent an enemy waifu from acting until your next turn. Pierce 2 — Deal +3 damage ignoring Shield.",
+    "flavor": "Calm your mind. Let the cold guide your strike.",
+    "art": {
+      "default": "cards/waifus/kuudere/elf/freeze/sayo-yukinaga/art/default.png",
+      "extreme": "cards/waifus/kuudere/elf/freeze/sayo-yukinaga/art/extreme.png"
+    }
+  },
   "icebound-kuudere": {
     "id": "icebound-kuudere",
     "type": "waifu",
@@ -127,6 +244,35 @@
     "art": {
       "default": "cards/waifus/kuudere/human/freeze/icebound-kuudere/art/default.png",
       "extreme": "cards/waifus/kuudere/human/freeze/icebound-kuudere/art/extreme.png"
+    }
+  },
+  "aika-suzuhara": {
+    "id": "aika-suzuhara",
+    "type": "waifu",
+    "name": "Aika Suzuhara",
+    "archetype": "Tsundere",
+    "rarity": "common",
+    "tags": [
+      "burn",
+      "boost"
+    ],
+    "strategy": "Burn",
+    "species": "Human",
+    "set": "CORE-01",
+    "affection": 10,
+    "mood": {
+      "dere": 5,
+      "extreme": 10
+    },
+    "bonds": {
+      "start": 0,
+      "max": 12
+    },
+    "text": "Hot-Headed Retort — When attacked, gain +1 Shield until end of turn. Burn 2 — Deal 3 damage over time to a target enemy. Boost 2 — Increase your attack by +2 this turn.",
+    "flavor": "Don’t get the wrong idea! I just happened to be nearby.",
+    "art": {
+      "default": "cards/waifus/tsundere/human/burn/aika-suzuhara/art/default.png",
+      "extreme": "cards/waifus/tsundere/human/burn/aika-suzuhara/art/extreme.png"
     }
   },
   "flame-tsundere": {
@@ -179,6 +325,36 @@
     "art": {
       "default": "cards/waifus/yandere/human/drain/crimson-yandere/art/default.png",
       "extreme": "cards/waifus/yandere/human/drain/crimson-yandere/art/extreme.png"
+    }
+  },
+  "reina-kurogane": {
+    "id": "reina-kurogane",
+    "type": "waifu",
+    "name": "Reina Kurogane",
+    "archetype": "Yandere",
+    "rarity": "rare",
+    "tags": [
+      "drain",
+      "curse",
+      "charm"
+    ],
+    "strategy": "Drain",
+    "species": "Vampire",
+    "set": "CORE-01",
+    "affection": 8,
+    "mood": {
+      "dere": 4,
+      "extreme": 9
+    },
+    "bonds": {
+      "start": 1,
+      "max": 13
+    },
+    "text": "Love or Death — When an ally falls, gain +1 {BOND} and heal 2 Affection. Drain 2 — Steal 2 Affection from an enemy waifu. Curse 3 — Inflict −2 BP for 2 turns. Charm 3 — Force one enemy waifu to skip their next attack.",
+    "flavor": "Your heartbeat belongs to me now.",
+    "art": {
+      "default": "cards/waifus/yandere/vampire/drain/reina-kurogane/art/default.png",
+      "extreme": "cards/waifus/yandere/vampire/drain/reina-kurogane/art/extreme.png"
     }
   },
   "fracture-yangire": {

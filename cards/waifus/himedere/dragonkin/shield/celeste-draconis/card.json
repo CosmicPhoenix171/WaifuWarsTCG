@@ -1,0 +1,50 @@
+{
+  "id": "celeste-draconis",
+  "type": "waifu",
+  "name": "Celeste Draconis",
+  "set": "CORE-01",
+  "rarity": "super-rare",
+  "archetype": "Himedere",
+  "species": "Dragonkin",
+  "strategy": "Shield",
+  "affection": 10,
+  "bonds": { "start": 1, "max": 13 },
+  "mood": { "thresholds": { "dere": 5, "extreme": 10 } },
+  "tags": ["shield", "charm", "pierce"],
+  "text": "Royal Command — When played, give one ally +1 {BOND}. Shield 1 — Grant +2 Shield to an ally of your choice. Charm 2 — Command one enemy waifu to defend instead of attack this turn. Pierce 3 — Deal +4 damage that ignores Shield.",
+  "effects": [
+    {
+      "when": "onSummon",
+      "do": [
+        { "type": "gainBonds", "target": "choiceAllyWaifu", "amount": 1, "note": "Royal Command" }
+      ]
+    },
+    {
+      "when": "activated",
+      "cost": { "bonds": 1 },
+      "do": [
+        { "type": "gainShield", "target": "choiceAllyWaifu", "amount": 2, "note": "Grant +2 Shield" }
+      ]
+    },
+    {
+      "when": "activated",
+      "cost": { "bonds": 2 },
+      "do": [
+        { "type": "charm", "target": "choiceEnemyWaifu", "note": "Force to defend instead of attack" }
+      ]
+    },
+    {
+      "when": "activated",
+      "cost": { "bonds": 3 },
+      "do": [
+        { "type": "damage", "target": "choiceEnemyWaifu", "amount": 4, "note": "Piercing damage ignoring Shield" }
+      ]
+    }
+  ],
+  "flavor": "Bow before my majesty, and I may let you stand beside me.",
+  "art": {
+    "default": "cards/waifus/himedere/dragonkin/shield/celeste-draconis/art/default.png",
+    "extreme": "cards/waifus/himedere/dragonkin/shield/celeste-draconis/art/extreme.png"
+  },
+  "version": 1
+}
