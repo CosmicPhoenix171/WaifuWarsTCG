@@ -649,7 +649,7 @@
         if (isCostKeyword) {
           const costMarkup = renderBondCostHearts(costValue);
           return {
-            html: `<span class="card-ability-keyword card-ability-keyword--cost">${costMarkup}<span aria-hidden="true"> —</span></span><span class="card-ability-body">${body}</span>`,
+            html: `<span class="card-ability-keyword card-ability-keyword--cost">${costMarkup}</span><span class="card-ability-body">${body}</span>`,
             modifier: 'cost'
           };
         }

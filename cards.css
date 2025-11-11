@@ -735,20 +735,12 @@
 .card-abilities li[data-ability="cost"] {
   padding-left: 0;
   flex-direction: row;
-  align-items: baseline;
-  gap: .35rem;
+  align-items: center;
+  gap: .45rem;
 }
 
 .card-abilities li[data-ability="cost"]::before {
-  content: "—";
-  position: static;
-  display: inline-block;
-  margin-right: .3rem;
-  font-size: .82rem;
-  color: color-mix(in srgb, var(--textbox-divider) 70%, rgba(255,255,255,0.6));
-  opacity: .85;
-  letter-spacing: .18em;
-  transform: translateY(-0.05rem);
+  content: none;
 }
 
 .card-ability-empty {
