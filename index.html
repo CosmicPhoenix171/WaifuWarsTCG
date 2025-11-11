@@ -610,12 +610,16 @@
       const used = new Set();
       const prioritized = [];
       const lowerRarities = cards.map((card) => (card?.rarity || '').toLowerCase());
+      const topRowSlots = Math.min(3, cards.length);
 
       for (const rarity of priorityOrder) {
         const index = lowerRarities.findIndex((value, idx) => value === rarity && !used.has(idx));
         if (index >= 0) {
           prioritized.push(cards[index]);
           used.add(index);
+          if (prioritized.length >= topRowSlots) {
+            break;
+          }
         }
       }
 
