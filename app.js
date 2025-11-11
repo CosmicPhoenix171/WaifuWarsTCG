@@ -224,7 +224,18 @@ function renderList(listType, data) {
     const item = data[id];
     const card = document.createElement('div');
     card.className = 'card';
+    if (item.poster) {
+      const artwork = document.createElement('div');
+      artwork.className = 'artwork';
+      const img = document.createElement('img');
+      img.src = item.poster;
+      img.alt = `${item.title || 'Poster'} artwork`;
+      img.loading = 'lazy';
+      artwork.appendChild(img);
+      card.appendChild(artwork);
+    }
     const left = document.createElement('div');
+    left.className = 'card-body';
     left.style.flex = '1';
     const title = document.createElement('div');
     title.className = 'title';
