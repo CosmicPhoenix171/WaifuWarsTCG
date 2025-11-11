@@ -15,6 +15,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="cards.css" />
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -424,14 +425,7 @@
       </div>
     </section>
 
-    <section id="cards" class="cards-gallery">
-      <div class="container">
-        <h2 class="section-title">Card Spotlight</h2>
-        <p class="cards-intro">Preview a sampling of Waifu archetypes—each colorful personality brings unique stats, moods, and tags to weave into your bond-driven strategy.</p>
-        <div id="cards-status" class="cards-status" role="status" aria-live="polite">Loading card previews…</div>
-        <div id="cards-grid" class="cards-grid" aria-live="polite"></div>
-      </div>
-    </section>
+    <div id="cards-section" data-partial="cards"></div>
 
     <section class="callouts">
       <div class="container">
@@ -476,9 +470,10 @@
 
   <script type="module">
     // === DOM REFERENCES ===
-    const yearEl = document.getElementById('year');
-    const cardsGrid = document.getElementById('cards-grid');
-    const cardsStatus = document.getElementById('cards-status');
+  const yearEl = document.getElementById('year');
+  const cardsSectionMount = document.getElementById('cards-section');
+  let cardsGrid = null;
+  let cardsStatus = null;
 
     if (yearEl) {
       yearEl.textContent = new Date().getFullYear();
@@ -1087,6 +1082,60 @@
       });
     }
 
+    // === PARTIAL MOUNTING ===
+    async function mountCardsSection() {
+      const placeholder = cardsSectionMount;
+      if (!placeholder) {
+        return false;
+      }
+
+      const partialName = placeholder.dataset.partial || 'cards';
+      const partialUrl = partialName.endsWith('.html') ? partialName : `${partialName}.html`;
+
+      try {
+        placeholder.textContent = 'Loading card spotlight…';
+        const response = await fetch(partialUrl, { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(`Failed to load ${partialUrl}: ${response.status}`);
+        }
+
+        const markup = (await response.text()).trim();
+        if (!markup.length) {
+          throw new Error(`Partial ${partialUrl} returned no content`);
+        }
+
+        const template = document.createElement('template');
+        template.innerHTML = markup;
+        const hasGrid = Boolean(template.content.querySelector('#cards-grid'));
+        const hasStatus = Boolean(template.content.querySelector('#cards-status'));
+
+        if (!hasGrid || !hasStatus) {
+          throw new Error(`Partial ${partialUrl} is missing required nodes`);
+        }
+
+        const fragment = template.content.cloneNode(true);
+        placeholder.replaceWith(fragment);
+
+        cardsGrid = document.getElementById('cards-grid');
+        cardsStatus = document.getElementById('cards-status');
+
+        return Boolean(cardsGrid && cardsStatus);
+      } catch (error) {
+        console.error('Failed to mount card section', error);
+        placeholder.innerHTML = `
+          <section class="cards-gallery">
+            <div class="container">
+              <h2 class="section-title">Card Spotlight</h2>
+              <p class="cards-intro">Card previews are unavailable right now.</p>
+            </div>
+          </section>
+        `;
+        cardsGrid = null;
+        cardsStatus = null;
+        return false;
+      }
+    }
+
     // === DATA LOADING ===
     async function loadCards() {
       if (!cardsGrid || !cardsStatus) {
@@ -1346,21 +1395,32 @@
 
     // === LIFECYCLE ===
     window.addEventListener('resize', () => {
-      balanceAbilityText(cardsGrid);
-      fitAllTitles(cardsGrid);
-      detectAllOverflow(cardsGrid);
+      const scope = cardsGrid || document;
+      balanceAbilityText(scope);
+      fitAllTitles(scope);
+      detectAllOverflow(scope);
     });
 
     if (document.fonts && typeof document.fonts.ready?.then === 'function') {
       document.fonts.ready.then(() => {
-        balanceAbilityText(cardsGrid);
-        fitAllTitles(cardsGrid);
-        detectAllOverflow(cardsGrid);
+        const scope = cardsGrid || document;
+        balanceAbilityText(scope);
+        fitAllTitles(scope);
+        detectAllOverflow(scope);
       }).catch(() => {});
     }
 
-    setupInfoTabs();
-    loadCards();
+    const initPage = async () => {
+      setupInfoTabs();
+      const mounted = await mountCardsSection();
+      if (mounted) {
+        await loadCards();
+      }
+    };
+
+    initPage().catch((error) => {
+      console.error('Waifu Wars init failed', error);
+    });
   </script>
 </body>
 </html>
