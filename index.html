@@ -41,6 +41,8 @@
           <h2>Movies</h2>
           <form class="add-form" data-list="movies">
             <input name="title" placeholder="Title" required />
+            <input name="year" placeholder="Year" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" />
+            <input name="director" placeholder="Director (optional)" />
             <select name="status">
               <option>Planned</option>
               <option>Watching/Reading</option>
@@ -58,6 +60,8 @@
           <h2>TV Shows</h2>
           <form class="add-form" data-list="tvShows">
             <input name="title" placeholder="Title" required />
+            <input name="year" placeholder="Year" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" />
+            <input name="director" placeholder="Director / Showrunner (optional)" />
             <select name="status">
               <option>Planned</option>
               <option>Watching/Reading</option>
@@ -75,6 +79,8 @@
           <h2>Anime</h2>
           <form class="add-form" data-list="anime">
             <input name="title" placeholder="Title" required />
+            <input name="year" placeholder="Year" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" />
+            <input name="director" placeholder="Director / Studio (optional)" />
             <select name="status">
               <option>Planned</option>
               <option>Watching/Reading</option>
@@ -92,6 +98,8 @@
           <h2>Books</h2>
           <form class="add-form" data-list="books">
             <input name="title" placeholder="Title" required />
+            <input name="year" placeholder="Year" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" />
+            <input name="author" placeholder="Author (optional)" />
             <select name="status">
               <option>Planned</option>
               <option>Watching/Reading</option>

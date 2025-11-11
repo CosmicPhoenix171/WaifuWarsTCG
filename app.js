@@ -62,11 +62,16 @@ const firebaseConfig = {
   measurementId: 'G-YXJ2E2XG42',
 };
 
+// Optional: OMDb API key for metadata lookups. Get one at https://www.omdbapi.com/apikey.aspx
+const OMDB_API_KEY = '37fad759';
+const OMDB_API_URL = 'https://www.omdbapi.com/';
+
 // -----------------------
 // App state
 let appInitialized = false;
 let currentUser = null;
 const listeners = {};
+let omdbWarningShown = false;
 
 // DOM references
 const loginScreen = document.getElementById('login-screen');
@@ -105,10 +110,10 @@ function initFirebase() {
 
   // Add form handlers
   document.querySelectorAll('.add-form').forEach(form => {
-    form.addEventListener('submit', (ev) => {
+    form.addEventListener('submit', async (ev) => {
       ev.preventDefault();
       const listType = form.dataset.list;
-      addItemFromForm(listType, form);
+      await addItemFromForm(listType, form);
     });
   });
 
@@ -226,9 +231,37 @@ function renderList(listType, data) {
     title.textContent = item.title || '(no title)';
     const meta = document.createElement('div');
     meta.className = 'meta';
-    meta.textContent = item.status || '';
+    const metaParts = [];
+    if (item.status) metaParts.push(item.status);
+    if (item.year) metaParts.push(item.year);
+    if (listType === 'books') {
+      if (item.author) metaParts.push(item.author);
+    } else {
+      if (item.director) metaParts.push(item.director);
+      if (item.imdbRating) metaParts.push(`IMDb ${item.imdbRating}`);
+    }
     left.appendChild(title);
-    left.appendChild(meta);
+    const metaText = metaParts.filter(Boolean).join(' • ');
+    if (metaText) {
+      meta.textContent = metaText;
+      left.appendChild(meta);
+    }
+    if (item.imdbUrl) {
+      const imdbLink = document.createElement('a');
+      imdbLink.href = item.imdbUrl;
+      imdbLink.target = '_blank';
+      imdbLink.rel = 'noopener noreferrer';
+      imdbLink.className = 'meta-link';
+      imdbLink.textContent = 'View on IMDb';
+      left.appendChild(imdbLink);
+    }
+    if (item.plot) {
+      const plot = document.createElement('div');
+      plot.className = 'plot-summary';
+      const cleanPlot = item.plot.trim();
+      plot.textContent = cleanPlot.length > 220 ? `${cleanPlot.slice(0, 217)}…` : cleanPlot;
+      left.appendChild(plot);
+    }
     if (item.notes) {
       const notes = document.createElement('div');
       notes.className = 'notes';
@@ -269,36 +302,192 @@ function renderList(listType, data) {
 }
 
 // Add item from form
-function addItemFromForm(listType, form) {
+async function addItemFromForm(listType, form) {
   const title = (form.title.value || '').trim();
   const status = form.status.value;
   const notes = (form.notes.value || '').trim();
+  const yearRaw = (form.year && form.year.value ? form.year.value.trim() : '');
+  const year = sanitizeYear(yearRaw);
+  const creatorField = listType === 'books' ? 'author' : 'director';
+  const creatorValue = (form[creatorField] && form[creatorField].value ? form[creatorField].value.trim() : '');
+
   if (!title) {
     alert('Title is required');
     return;
   }
-  addItem(listType, { title, status, notes, createdAt: Date.now() });
-  form.reset();
+
+  const submitBtn = form.querySelector('button[type="submit"]');
+  setButtonBusy(submitBtn, true);
+
+  try {
+    let metadata = null;
+    if (OMDB_API_KEY && ['movies', 'tvShows', 'anime'].includes(listType)) {
+      metadata = await fetchOmdbMetadata(listType, { title, year });
+    } else if (!OMDB_API_KEY && ['movies', 'tvShows', 'anime'].includes(listType)) {
+      maybeWarnAboutOmdbKey();
+    }
+
+    const item = {
+      title,
+      status,
+      createdAt: Date.now(),
+    };
+    if (notes) item.notes = notes;
+    if (year) item.year = year;
+
+    if (listType === 'books') {
+      if (creatorValue) item.author = creatorValue;
+    } else {
+      if (creatorValue) item.director = creatorValue;
+      if (metadata) {
+        // Merge metadata where available but keep user input when present.
+        const yearFromApi = metadata.Year && metadata.Year !== 'N/A' ? metadata.Year : null;
+        if (yearFromApi) item.year = yearFromApi;
+        const directorFromApi = metadata.Director && metadata.Director !== 'N/A' ? metadata.Director : null;
+        if (!item.director && directorFromApi) item.director = directorFromApi;
+        if (metadata.imdbID) {
+          item.imdbId = metadata.imdbID;
+          item.imdbUrl = `https://www.imdb.com/title/${metadata.imdbID}/`;
+        }
+        const rating = metadata.imdbRating && metadata.imdbRating !== 'N/A' ? metadata.imdbRating : null;
+        if (rating) item.imdbRating = rating;
+        const runtime = metadata.Runtime && metadata.Runtime !== 'N/A' ? metadata.Runtime : null;
+        if (runtime) item.runtime = runtime;
+        const poster = metadata.Poster && metadata.Poster !== 'N/A' ? metadata.Poster : null;
+        if (poster) item.poster = poster;
+        const plot = metadata.Plot && metadata.Plot !== 'N/A' ? metadata.Plot : null;
+        if (plot) item.plot = plot;
+        if (metadata.Type && metadata.Type !== 'N/A') item.imdbType = metadata.Type;
+        const metascore = metadata.Metascore && metadata.Metascore !== 'N/A' ? metadata.Metascore : null;
+        if (metascore) item.metascore = metascore;
+      }
+    }
+
+    await addItem(listType, item);
+    form.reset();
+  } catch (err) {
+    console.error('Unable to add item', err);
+    const message = err && err.message === 'Not signed in'
+      ? 'Please sign in to add items.'
+      : 'Unable to add item right now. Please try again.';
+    alert(message);
+  } finally {
+    setButtonBusy(submitBtn, false);
+  }
+}
+
+function sanitizeYear(input) {
+  if (!input) return '';
+  const cleaned = input.replace(/[^0-9]/g, '').slice(0, 4);
+  if (cleaned.length !== 4) return '';
+  return cleaned;
+}
+
+function setButtonBusy(button, isBusy) {
+  if (!button) return;
+  if (isBusy) {
+    if (!button.dataset.originalText) {
+      button.dataset.originalText = button.textContent;
+    }
+    button.disabled = true;
+    button.textContent = 'Adding...';
+  } else {
+    button.disabled = false;
+    if (button.dataset.originalText) {
+      button.textContent = button.dataset.originalText;
+      delete button.dataset.originalText;
+    }
+  }
+}
+
+function maybeWarnAboutOmdbKey() {
+  if (omdbWarningShown) return;
+  omdbWarningShown = true;
+  const message = 'OMDb API key missing. Metadata lookups are disabled. Set OMDB_API_KEY in app.js to enable them.';
+  console.warn(message);
+  alert(message);
+}
+
+async function fetchOmdbMetadata(listType, { title, year }) {
+  if (!OMDB_API_KEY) return null;
+  const typeMap = {
+    movies: 'movie',
+    tvShows: 'series',
+    anime: 'series',
+  };
+  const params = new URLSearchParams({ apikey: OMDB_API_KEY, t: title });
+  const type = typeMap[listType];
+  if (type) params.set('type', type);
+  if (year) params.set('y', year);
+
+  try {
+    const directResp = await fetch(`${OMDB_API_URL}?${params.toString()}`);
+    if (directResp.ok) {
+      const directJson = await directResp.json();
+      if (directJson && directJson.Response === 'True') {
+        return directJson;
+      }
+    }
+  } catch (err) {
+    console.warn('OMDb direct lookup failed', err);
+  }
+
+  // Fallback to search endpoint
+  try {
+    const searchParams = new URLSearchParams({ apikey: OMDB_API_KEY, s: title });
+    if (type) searchParams.set('type', type);
+    const searchResp = await fetch(`${OMDB_API_URL}?${searchParams.toString()}`);
+    if (!searchResp.ok) return null;
+    const searchJson = await searchResp.json();
+    if (!searchJson || searchJson.Response !== 'True' || !Array.isArray(searchJson.Search)) return null;
+
+    const normalizedYear = year;
+    const match = searchJson.Search.find(entry => {
+      if (!normalizedYear) return true;
+      return entry.Year && entry.Year.includes(normalizedYear);
+    }) || searchJson.Search[0];
+    if (!match || !match.imdbID) return null;
+
+    const detailParams = new URLSearchParams({ apikey: OMDB_API_KEY, i: match.imdbID, plot: 'short' });
+    const detailResp = await fetch(`${OMDB_API_URL}?${detailParams.toString()}`);
+    if (!detailResp.ok) return null;
+    const detailJson = await detailResp.json();
+    if (detailJson && detailJson.Response === 'True') {
+      return detailJson;
+    }
+  } catch (err) {
+    console.warn('OMDb search lookup failed', err);
+  }
+
+  return null;
 }
 
 // Create a new item
 function addItem(listType, item) {
-  if (!currentUser) return alert('Not signed in');
+  if (!currentUser) {
+    throw new Error('Not signed in');
+  }
   const listRef = ref(db, `users/${currentUser.uid}/${listType}`);
   const newRef = push(listRef);
-  set(newRef, item).catch(err => console.error('Add failed', err));
+  return set(newRef, item);
 }
 
 // Update an existing item
 function updateItem(listType, itemId, changes) {
-  if (!currentUser) return alert('Not signed in');
+  if (!currentUser) {
+    alert('Not signed in');
+    return Promise.reject(new Error('Not signed in'));
+  }
   const itemRef = ref(db, `users/${currentUser.uid}/${listType}/${itemId}`);
-  update(itemRef, changes).catch(err => console.error('Update failed', err));
+  return update(itemRef, changes);
 }
 
 // Delete an item
 function deleteItem(listType, itemId) {
-  if (!currentUser) return alert('Not signed in');
+  if (!currentUser) {
+    alert('Not signed in');
+    return Promise.reject(new Error('Not signed in'));
+  }
   if (!confirm('Delete this item?')) return;
   const itemRef = ref(db, `users/${currentUser.uid}/${listType}/${itemId}`);
   remove(itemRef).catch(err => console.error('Delete failed', err));
@@ -316,6 +505,25 @@ function openEditModal(listType, itemId, item) {
   const titleInput = document.createElement('input');
   titleInput.name = 'title';
   titleInput.value = item.title || '';
+  titleInput.placeholder = 'Title';
+  const yearInput = document.createElement('input');
+  yearInput.name = 'year';
+  yearInput.placeholder = 'Year';
+  yearInput.inputMode = 'numeric';
+  yearInput.pattern = '[0-9]{4}';
+  yearInput.maxLength = 4;
+  yearInput.value = item.year || '';
+  const creatorInput = document.createElement('input');
+  const creatorFieldName = listType === 'books' ? 'author' : 'director';
+  creatorInput.name = creatorFieldName;
+  const creatorPlaceholderMap = {
+    movies: 'Director',
+    tvShows: 'Director / Showrunner',
+    anime: 'Director / Studio',
+    books: 'Author',
+  };
+  creatorInput.placeholder = creatorPlaceholderMap[listType] || 'Creator';
+  creatorInput.value = listType === 'books' ? (item.author || '') : (item.director || '');
   const statusSelect = document.createElement('select');
   ['Planned','Watching/Reading','Completed','Dropped'].forEach(s => {
     const o = document.createElement('option'); o.value = s; o.text = s; if (s === item.status) o.selected = true; statusSelect.appendChild(o);
@@ -331,6 +539,8 @@ function openEditModal(listType, itemId, item) {
   cancelBtn.textContent = 'Cancel';
 
   form.appendChild(titleInput);
+  form.appendChild(yearInput);
+  form.appendChild(creatorInput);
   form.appendChild(statusSelect);
   form.appendChild(notesInput);
   const controls = document.createElement('div');
@@ -342,7 +552,20 @@ function openEditModal(listType, itemId, item) {
     ev.preventDefault();
     const newTitle = (titleInput.value || '').trim();
     if (!newTitle) return alert('Title is required');
-    updateItem(listType, itemId, { title: newTitle, status: statusSelect.value, notes: notesInput.value });
+    const updatedYear = sanitizeYear((yearInput.value || '').trim());
+    const creatorVal = (creatorInput.value || '').trim();
+    const payload = {
+      title: newTitle,
+      status: statusSelect.value,
+      notes: (notesInput.value || '').trim() || null,
+      year: updatedYear || null,
+    };
+    if (listType === 'books') {
+      payload.author = creatorVal || null;
+    } else {
+      payload.director = creatorVal || null;
+    }
+    updateItem(listType, itemId, payload);
     closeModal();
   });
 
@@ -418,5 +641,6 @@ if (auth) {
   - The `firebaseConfig` object must include `databaseURL` (Realtime DB URL).
   - Security rules must be applied in the Firebase Console to enforce per-user access.
   - This app uses Firebase v9 modular SDK via CDN imports.
+  - Set `OMDB_API_KEY` near the top of this file with your OMDb API key to enable automatic metadata lookups for movies, TV, and anime.
 
 */
