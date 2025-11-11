@@ -609,6 +609,24 @@
       return output;
     }
 
+    function renderBondCostHearts(count) {
+      if (!Number.isFinite(count)) {
+        return '<span class="card-cost-hearts card-cost-hearts--empty" aria-hidden="true"><span class="card-cost-heart" aria-hidden="true"></span></span><span class="sr-only">Bond cost unavailable</span>';
+      }
+
+      const rounded = Math.round(count);
+      if (rounded <= 0) {
+        return '<span class="card-cost-hearts card-cost-hearts--empty" aria-hidden="true"><span class="card-cost-heart" aria-hidden="true"></span></span><span class="sr-only">Bond cost 0 hearts</span>';
+      }
+
+      const total = clamp(rounded, 1, 5);
+      const icons = Array.from({ length: total })
+        .map(() => '<span class="card-cost-heart" aria-hidden="true"></span>')
+        .join('');
+      const srLabel = `Bond cost ${total} heart${total === 1 ? '' : 's'}`;
+      return `<span class="card-cost-hearts" aria-hidden="true">${icons}</span><span class="sr-only">${srLabel}</span>`;
+    }
+
     function formatAbilityLine(line = '', bondCosts = {}) {
       const trimmed = line.trim();
       if (!trimmed) {
@@ -620,24 +638,22 @@
         const keywordId = keywordRaw.toLowerCase();
         let keywordLabel = keywordRaw;
         let isCostKeyword = false;
+        let costValue = null;
         if (keywordId === 'dere' || keywordId === 'extreme') {
           const costs = (bondCosts && typeof bondCosts === 'object') ? bondCosts : {};
-          const costValue = costs[keywordId];
-          if (Number.isFinite(costValue)) {
-            keywordLabel = `Bond Cost ${costValue}`;
-          } else {
-            keywordLabel = 'Bond Cost';
-          }
+          costValue = costs[keywordId];
+          keywordLabel = 'Bond Cost';
           isCostKeyword = true;
         }
-        const keyword = decorateAbilityText(keywordLabel);
         const body = decorateAbilityText(keywordMatch[2]);
         if (isCostKeyword) {
+          const costMarkup = renderBondCostHearts(costValue);
           return {
-            html: `<span class="card-ability-keyword card-ability-keyword--cost">${keyword}<span aria-hidden="true"> —</span></span><span class="card-ability-body">${body}</span>`,
+            html: `<span class="card-ability-keyword card-ability-keyword--cost">${costMarkup}<span aria-hidden="true"> —</span></span><span class="card-ability-body">${body}</span>`,
             modifier: 'cost'
           };
         }
+        const keyword = decorateAbilityText(keywordLabel);
         return {
           html: `<span class="card-ability-keyword card-ability-keyword--block">${keyword}</span><span class="card-ability-body card-ability-body--stacked">${body}</span>`,
           modifier: 'stacked'
