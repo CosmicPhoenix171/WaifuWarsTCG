@@ -271,6 +271,17 @@
   --set-text: #1f2937;
   --set-icon-border: rgba(148,163,184,0.55);
   --set-icon-glow: rgba(148,163,184,0.35);
+  --textbox-primary: rgba(23,18,37,0.96);
+  --textbox-secondary: rgba(10,7,20,0.94);
+  --textbox-border: rgba(121,41,255,0.35);
+  --textbox-highlight: rgba(255,255,255,0.08);
+  --textbox-shadow: rgba(6,4,14,0.9);
+  --textbox-foreground: #ede9ff;
+  --textbox-body: #f1efff;
+  --textbox-keyword: #f472b6;
+  --textbox-flavor: rgba(211,208,236,0.78);
+  --textbox-divider: rgba(121,41,255,0.28);
+  --textbox-footer: rgba(211,208,236,0.75);
 }
 .card-display:focus-visible {
   outline: 3px solid rgba(109,93,252,0.7);
@@ -675,16 +686,19 @@
 .card-text-box {
   padding: .85rem .9rem 2.2rem; /* extra bottom padding keeps space before footer */
   border-radius: 12px;
-  background: linear-gradient(155deg, rgba(23,18,37,0.96), rgba(10,7,20,0.94));
-  border: 1px solid rgba(121,41,255,0.35);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.08),
-              inset 0 -1px 0 rgba(12,10,25,0.65),
-              0 16px 38px -24px rgba(6,4,14,0.9);
+  background:
+    radial-gradient(circle at 18% 20%, color-mix(in srgb, var(--textbox-primary) 70%, transparent) 0%, transparent 62%),
+    radial-gradient(circle at 82% 28%, color-mix(in srgb, var(--textbox-secondary) 65%, transparent) 0%, transparent 60%),
+    linear-gradient(155deg, var(--textbox-primary), var(--textbox-secondary));
+  border: 1px solid var(--textbox-border);
+  box-shadow: inset 0 1px 0 var(--textbox-highlight),
+              inset 0 -1px 0 color-mix(in srgb, var(--textbox-secondary) 75%, transparent),
+              0 16px 38px -24px var(--textbox-shadow);
   display: flex;
   flex-direction: column;
   overflow: visible; /* allow natural flow */
   position: relative;
-  color: #ede9ff;
+  color: var(--textbox-foreground);
 }
 
 .card-bond-overlay {
@@ -731,7 +745,7 @@
   gap: .45rem;
   font-size: .9rem;
   line-height: 1.5;
-  color: #f1efff;
+  color: var(--textbox-body);
   overflow: visible;
 }
 .card-abilities li {
@@ -746,7 +760,7 @@
   font-weight: 700;
   letter-spacing: .55px;
   text-transform: uppercase;
-  color: #f472b6;
+  color: var(--textbox-keyword);
   flex-shrink: 0;
 }
 .card-ability-keyword span {
@@ -767,19 +781,19 @@
   margin: auto 0 0;
   padding-top: .55rem;
   font-size: .76rem;
-  color: rgba(211,208,236,0.78);
+  color: var(--textbox-flavor);
   font-style: italic;
   text-align: left;
   line-height: 1.4;
   flex-shrink: 0;
-  border-top: 1px solid rgba(121,41,255,0.28);
+  border-top: 1px solid var(--textbox-divider);
 }
 .card-footer {
   margin-top: .35rem;
   font-size: .68rem;
   letter-spacing: .6px;
   text-transform: uppercase;
-  color: rgba(211,208,236,0.75);
+  color: var(--textbox-footer);
   height: 20px;
   flex-shrink: 0;
   display: flex;
@@ -1089,6 +1103,17 @@
                    radial-gradient(circle at 75% 70%, rgba(248,150,30,0.7), transparent 60%),
                    linear-gradient(180deg, rgba(248,113,113,0.4), rgba(30,27,75,0.75));
   --art-border-gradient: linear-gradient(135deg, rgba(248,113,113,0.8), rgba(249,115,22,0.7));
+  --textbox-primary: rgba(127,29,29,0.95);
+  --textbox-secondary: rgba(154,52,18,0.92);
+  --textbox-border: rgba(248,113,113,0.6);
+  --textbox-highlight: rgba(254,226,226,0.25);
+  --textbox-shadow: rgba(127,29,29,0.55);
+  --textbox-foreground: rgba(255,241,242,0.98);
+  --textbox-body: rgba(254,226,226,0.93);
+  --textbox-keyword: #fecaca;
+  --textbox-flavor: rgba(254,205,211,0.78);
+  --textbox-divider: rgba(248,113,113,0.45);
+  --textbox-footer: rgba(252,211,77,0.78);
 }
 .card-display[data-archetype="tsundere"] .card-frame {
   border: 2px solid #ef4444;
@@ -1105,6 +1130,17 @@
                    radial-gradient(circle at 80% 70%, rgba(239,68,68,0.65), transparent 65%),
                    linear-gradient(200deg, rgba(88,28,135,0.65), rgba(15,23,42,0.9));
   --art-border-gradient: linear-gradient(140deg, rgba(190,24,93,0.8), rgba(190,24,93,0.5), rgba(244,63,94,0.55));
+  --textbox-primary: rgba(76,29,149,0.92);
+  --textbox-secondary: rgba(153,27,27,0.92);
+  --textbox-border: rgba(190,24,93,0.55);
+  --textbox-highlight: rgba(253,224,236,0.24);
+  --textbox-shadow: rgba(76,29,149,0.55);
+  --textbox-foreground: rgba(255,236,251,0.97);
+  --textbox-body: rgba(253,222,248,0.93);
+  --textbox-keyword: #f9a8d4;
+  --textbox-flavor: rgba(244,192,222,0.8);
+  --textbox-divider: rgba(190,24,93,0.42);
+  --textbox-footer: rgba(244,192,222,0.82);
 }
 .card-display[data-archetype="yandere"] .card-frame {
   border: 2px solid #be185d;
@@ -1121,6 +1157,17 @@
                    radial-gradient(circle at 80% 70%, rgba(253,186,116,0.55), transparent 60%),
                    linear-gradient(200deg, rgba(251,207,232,0.7), rgba(252,231,243,0.85));
   --art-border-gradient: linear-gradient(135deg, rgba(249,168,212,0.7), rgba(251,191,36,0.55));
+  --textbox-primary: rgba(157,23,77,0.9);
+  --textbox-secondary: rgba(146,64,14,0.9);
+  --textbox-border: rgba(249,168,212,0.6);
+  --textbox-highlight: rgba(252,231,243,0.24);
+  --textbox-shadow: rgba(120,53,15,0.55);
+  --textbox-foreground: rgba(255,240,246,0.98);
+  --textbox-body: rgba(253,226,240,0.93);
+  --textbox-keyword: #f9a8d4;
+  --textbox-flavor: rgba(253,213,181,0.82);
+  --textbox-divider: rgba(249,168,212,0.44);
+  --textbox-footer: rgba(252,211,77,0.8);
 }
 .card-display[data-archetype="deredere"] .card-frame {
   border: 2px solid #f472b6;
@@ -1137,6 +1184,17 @@
                    radial-gradient(circle at 30% 75%, rgba(96,165,250,0.6), transparent 60%),
                    linear-gradient(200deg, rgba(31,41,55,0.85), rgba(17,24,39,0.92));
   --art-border-gradient: linear-gradient(135deg, rgba(129,140,248,0.75), rgba(96,165,250,0.65));
+  --textbox-primary: rgba(55,48,163,0.92);
+  --textbox-secondary: rgba(30,64,175,0.92);
+  --textbox-border: rgba(129,140,248,0.55);
+  --textbox-highlight: rgba(224,231,255,0.24);
+  --textbox-shadow: rgba(30,41,59,0.6);
+  --textbox-foreground: rgba(239,246,255,0.97);
+  --textbox-body: rgba(224,231,255,0.94);
+  --textbox-keyword: #c7d2fe;
+  --textbox-flavor: rgba(191,219,254,0.82);
+  --textbox-divider: rgba(129,140,248,0.35);
+  --textbox-footer: rgba(191,219,254,0.82);
 }
 .card-display[data-archetype="dandere"] .card-frame {
   border: 2px solid #8b5cf6;
@@ -1153,6 +1211,17 @@
                    radial-gradient(circle at 75% 75%, rgba(59,130,246,0.65), transparent 65%),
                    linear-gradient(200deg, rgba(15,118,110,0.55), rgba(13,42,70,0.9));
   --art-border-gradient: linear-gradient(135deg, rgba(45,212,191,0.7), rgba(14,165,233,0.65));
+  --textbox-primary: rgba(15,118,110,0.9);
+  --textbox-secondary: rgba(30,64,175,0.9);
+  --textbox-border: rgba(45,212,191,0.55);
+  --textbox-highlight: rgba(207,250,254,0.22);
+  --textbox-shadow: rgba(13,42,70,0.6);
+  --textbox-foreground: rgba(236,254,255,0.97);
+  --textbox-body: rgba(207,250,254,0.92);
+  --textbox-keyword: #a5f3fc;
+  --textbox-flavor: rgba(165,243,252,0.8);
+  --textbox-divider: rgba(45,212,191,0.4);
+  --textbox-footer: rgba(165,243,252,0.8);
 }
 .card-display[data-archetype="kuudere"] .card-frame {
   border: 2px solid #06b6d4;
@@ -1169,6 +1238,17 @@
                    radial-gradient(circle at 80% 70%, rgba(249,115,22,0.55), transparent 60%),
                    linear-gradient(200deg, rgba(250,204,21,0.65), rgba(124,45,18,0.85));
   --art-border-gradient: linear-gradient(135deg, rgba(253,224,71,0.75), rgba(249,115,22,0.6));
+  --textbox-primary: rgba(133,77,14,0.9);
+  --textbox-secondary: rgba(202,138,4,0.9);
+  --textbox-border: rgba(234,179,8,0.55);
+  --textbox-highlight: rgba(254,240,138,0.26);
+  --textbox-shadow: rgba(120,53,15,0.55);
+  --textbox-foreground: rgba(255,251,235,0.95);
+  --textbox-body: rgba(254,243,199,0.9);
+  --textbox-keyword: #fde68a;
+  --textbox-flavor: rgba(253,224,171,0.82);
+  --textbox-divider: rgba(234,179,8,0.42);
+  --textbox-footer: rgba(253,224,171,0.82);
 }
 .card-display[data-archetype="himedere"] .card-frame {
   border: 2px solid #eab308;
@@ -1185,6 +1265,17 @@
                    radial-gradient(circle at 75% 80%, rgba(236,72,153,0.6), transparent 65%),
                    linear-gradient(210deg, rgba(88,28,135,0.75), rgba(17,24,39,0.9));
   --art-border-gradient: linear-gradient(135deg, rgba(129,140,248,0.75), rgba(236,72,153,0.6));
+  --textbox-primary: rgba(76,29,149,0.92);
+  --textbox-secondary: rgba(190,24,93,0.92);
+  --textbox-border: rgba(129,140,248,0.5);
+  --textbox-highlight: rgba(233,213,255,0.24);
+  --textbox-shadow: rgba(55,31,134,0.58);
+  --textbox-foreground: rgba(243,232,255,0.97);
+  --textbox-body: rgba(233,213,255,0.93);
+  --textbox-keyword: #c4b5fd;
+  --textbox-flavor: rgba(249,213,255,0.82);
+  --textbox-divider: rgba(129,140,248,0.45);
+  --textbox-footer: rgba(233,213,255,0.82);
 }
 .card-display[data-archetype="yangire"] .card-frame {
   border: 2px solid #7c3aed;
@@ -1201,6 +1292,17 @@
                    radial-gradient(circle at 80% 75%, rgba(59,130,246,0.6), transparent 65%),
                    linear-gradient(210deg, rgba(59,7,100,0.75), rgba(49,46,129,0.85));
   --art-border-gradient: linear-gradient(135deg, rgba(168,85,247,0.7), rgba(59,130,246,0.6));
+  --textbox-primary: rgba(59,7,100,0.92);
+  --textbox-secondary: rgba(30,64,175,0.92);
+  --textbox-border: rgba(168,85,247,0.55);
+  --textbox-highlight: rgba(238,232,255,0.24);
+  --textbox-shadow: rgba(42,16,86,0.58);
+  --textbox-foreground: rgba(240,240,255,0.97);
+  --textbox-body: rgba(218,222,255,0.93);
+  --textbox-keyword: #c4b5fd;
+  --textbox-flavor: rgba(210,214,255,0.82);
+  --textbox-divider: rgba(168,85,247,0.42);
+  --textbox-footer: rgba(210,214,255,0.82);
 }
 .card-display[data-archetype="kamidere"] .card-frame {
   border: 2px solid #a855f7;
