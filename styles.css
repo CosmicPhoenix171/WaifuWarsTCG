@@ -282,6 +282,12 @@
   --textbox-flavor: rgba(211,208,236,0.78);
   --textbox-divider: rgba(121,41,255,0.28);
   --textbox-footer: rgba(211,208,236,0.75);
+  --title-font: "Inter", "Segoe UI", sans-serif;
+  --title-weight: 700;
+  --title-letter-spacing: .35px;
+  --title-color: #1f2937;
+  --title-shadow: none;
+  --title-animation: none;
 }
 .card-display:focus-visible {
   outline: 3px solid rgba(109,93,252,0.7);
@@ -471,9 +477,12 @@
 .card-title {
   margin: 0;
   font-size: clamp(.95rem, 2.6vw, 1.15rem);
-  font-weight: 700;
-  letter-spacing: .35px;
-  color: var(--header-title-color, #f8f7ff);
+  font-family: var(--title-font, "Inter", "Segoe UI", sans-serif);
+  font-weight: var(--title-weight, 700);
+  letter-spacing: var(--title-letter-spacing, .35px);
+  color: var(--title-color, var(--header-title-color, #1f2937));
+  text-shadow: var(--title-shadow, none);
+  animation: var(--title-animation, none);
   line-height: 1.3;
   display: -webkit-box;
   line-clamp: 2;
@@ -839,6 +848,12 @@
   --set-text: #1f2937;
   --set-icon-border: rgba(148,163,184,0.5);
   --set-icon-glow: rgba(148,163,184,0.35);
+  --title-font: "Inter", "Segoe UI", sans-serif;
+  --title-weight: 700;
+  --title-letter-spacing: .35px;
+  --title-color: #1f2937;
+  --title-shadow: 0 1px 1px rgba(255,255,255,0.5), 0 2px 4px rgba(15,23,42,0.3);
+  --title-animation: none;
 }
 .card-display[data-rarity="common"] .card-rarity-stars {
   color: #818cf8;
@@ -864,6 +879,12 @@
   --set-text: #7f1d1d;
   --set-icon-border: rgba(236,72,153,0.6);
   --set-icon-glow: rgba(236,72,153,0.4);
+  --title-font: "Inter", "Segoe UI", sans-serif;
+  --title-weight: 700;
+  --title-letter-spacing: .45px;
+  --title-color: #fbbf24;
+  --title-shadow: 0 0 6px rgba(236,72,153,0.35), 0 0 12px rgba(251,191,36,0.4);
+  --title-animation: rareTitleGlow 4.5s ease-in-out infinite;
 }
 .card-display[data-rarity="rare"] .card-rarity-stars,
 .card-display[data-rarity="rare"] .card-rarity-code {
@@ -906,6 +927,12 @@
   --set-text: #78350f;
   --set-icon-border: rgba(245,158,11,0.65);
   --set-icon-glow: rgba(245,158,11,0.45);
+  --title-font: "Bangers", "Inter", sans-serif;
+  --title-weight: 400;
+  --title-letter-spacing: .95px;
+  --title-color: #facc15;
+  --title-shadow: 0 0 10px rgba(245,158,11,0.5), 0 0 20px rgba(253,224,71,0.45);
+  --title-animation: srTitlePulse 4s ease-in-out infinite;
 }
 .card-display[data-rarity="super-rare"] .card-rarity-stars {
   color: #fbbf24;
@@ -952,6 +979,12 @@
   --set-text: #111827;
   --set-icon-border: rgba(129,140,248,0.65);
   --set-icon-glow: rgba(129,140,248,0.55);
+  --title-font: "Bangers", "Inter", sans-serif;
+  --title-weight: 400;
+  --title-letter-spacing: 1.05px;
+  --title-color: #38bdf8;
+  --title-shadow: 0 0 12px rgba(56,189,248,0.55), 0 0 24px rgba(148,163,255,0.45);
+  --title-animation: ssrTitleFlare 3.6s linear infinite;
 }
 .card-display[data-rarity="special-super-rare"] .card-rarity-stars {
   background: linear-gradient(120deg,#f472b6,#38bdf8,#facc15,#a855f7);
@@ -1011,6 +1044,12 @@
   --set-text: #f8fafc;
   --set-icon-border: color-mix(in srgb, var(--ultra-secondary) 65%, rgba(255,255,255,0.2));
   --set-icon-glow: color-mix(in srgb, var(--ultra-secondary) 55%, rgba(15,23,42,0.35));
+  --title-font: "Bangers", "Inter", sans-serif;
+  --title-weight: 400;
+  --title-letter-spacing: 1.1px;
+  --title-color: #22d3ee;
+  --title-shadow: 0 0 14px rgba(34,211,238,0.6), 0 0 28px rgba(139,92,246,0.5);
+  --title-animation: ultraTitleAurora 3.8s ease-in-out infinite;
 }
 .card-display[data-rarity="ultra"] .card-rarity-badge {
   background: linear-gradient(120deg,
@@ -1076,6 +1115,15 @@
   --ultra-primary: #8b5cf6;
   --ultra-secondary: #22d3ee;
   --ultra-accent: #f97316;
+}
+
+.card-display[data-rarity-tier="event"] {
+  --title-font: "Bangers", "Inter", sans-serif;
+  --title-weight: 400;
+  --title-letter-spacing: 1.2px;
+  --title-color: #f97316;
+  --title-shadow: 0 0 18px rgba(249,115,22,0.65), 0 0 34px rgba(34,211,238,0.55);
+  --title-animation: eventTitleEclipse 3.2s linear infinite;
 }
 
 .card-display[data-rarity-tier="event"] .card-rarity-badge {
@@ -1601,6 +1649,73 @@
   50% {
     opacity: 0.85;
     transform: scale(1.08);
+  }
+}
+
+@keyframes rareTitleGlow {
+  0%, 100% {
+    color: #fbbf24;
+    text-shadow: 0 0 6px rgba(236,72,153,0.35), 0 0 12px rgba(251,191,36,0.4);
+  }
+  50% {
+    color: #fde68a;
+    text-shadow: 0 0 14px rgba(236,72,153,0.5), 0 0 26px rgba(251,191,36,0.55);
+  }
+}
+
+@keyframes srTitlePulse {
+  0%, 100% {
+    color: #facc15;
+    text-shadow: 0 0 10px rgba(245,158,11,0.5), 0 0 20px rgba(253,224,71,0.45);
+  }
+  50% {
+    color: #fde68a;
+    text-shadow: 0 0 22px rgba(245,158,11,0.65), 0 0 36px rgba(253,224,71,0.6);
+  }
+}
+
+@keyframes ssrTitleFlare {
+  0% {
+    color: #38bdf8;
+    text-shadow: 0 0 12px rgba(56,189,248,0.55), 0 0 24px rgba(148,163,255,0.45);
+  }
+  33% {
+    color: #f472b6;
+    text-shadow: 0 0 18px rgba(244,114,182,0.55), 0 0 32px rgba(129,140,248,0.45);
+  }
+  66% {
+    color: #facc15;
+    text-shadow: 0 0 18px rgba(250,204,21,0.5), 0 0 34px rgba(56,189,248,0.45);
+  }
+  100% {
+    color: #38bdf8;
+    text-shadow: 0 0 12px rgba(56,189,248,0.55), 0 0 24px rgba(148,163,255,0.45);
+  }
+}
+
+@keyframes ultraTitleAurora {
+  0%, 100% {
+    color: #22d3ee;
+    text-shadow: 0 0 14px rgba(34,211,238,0.6), 0 0 28px rgba(139,92,246,0.5);
+  }
+  50% {
+    color: #8b5cf6;
+    text-shadow: 0 0 20px rgba(139,92,246,0.65), 0 0 38px rgba(249,115,22,0.5);
+  }
+}
+
+@keyframes eventTitleEclipse {
+  0% {
+    color: #f97316;
+    text-shadow: 0 0 18px rgba(249,115,22,0.65), 0 0 34px rgba(34,211,238,0.55);
+  }
+  45% {
+    color: #fde047;
+    text-shadow: 0 0 24px rgba(253,224,71,0.7), 0 0 40px rgba(34,211,238,0.5);
+  }
+  100% {
+    color: #f97316;
+    text-shadow: 0 0 18px rgba(249,115,22,0.65), 0 0 34px rgba(238,46,139,0.5);
   }
 }
 
