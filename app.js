@@ -75,6 +75,7 @@ let omdbWarningShown = false;
 let spinTimeouts = [];
 const actorFilters = { movies: '', tvShows: '', anime: '' };
 const listCaches = {};
+const metadataRefreshInflight = new Set();
 const AUTOCOMPLETE_LISTS = new Set(['movies', 'tvShows', 'anime']);
 const OMDB_TYPE_MAP = {
   movies: 'movie',
@@ -223,6 +224,7 @@ function loadList(listType) {
   const off = onValue(listRef, (snap) => {
     const data = snap.val() || {};
     renderList(listType, data);
+    maybeRefreshMetadata(listType, data);
   }, (err) => {
     console.error('DB read error', err);
     listContainer.innerHTML = '<div class="small">Unable to load items.</div>';
@@ -446,32 +448,13 @@ async function addItemFromForm(listType, form) {
     } else {
       if (creatorValue) item.director = creatorValue;
       if (metadata) {
-        // Merge metadata where available but keep user input when present.
-        const apiYear = metadata.Year && metadata.Year !== 'N/A' ? extractPrimaryYear(metadata.Year) : '';
-        if (apiYear) item.year = apiYear;
-        const directorFromApi = metadata.Director && metadata.Director !== 'N/A' ? metadata.Director : null;
-        if (!item.director && directorFromApi) item.director = directorFromApi;
-        if (metadata.imdbID) {
-          item.imdbId = metadata.imdbID;
-          item.imdbUrl = `https://www.imdb.com/title/${metadata.imdbID}/`;
-        }
-        const rating = metadata.imdbRating && metadata.imdbRating !== 'N/A' ? metadata.imdbRating : null;
-        if (rating) item.imdbRating = rating;
-        const runtime = metadata.Runtime && metadata.Runtime !== 'N/A' ? metadata.Runtime : null;
-        if (runtime) item.runtime = runtime;
-        const poster = metadata.Poster && metadata.Poster !== 'N/A' ? metadata.Poster : null;
-        if (poster) item.poster = poster;
-        const plot = metadata.Plot && metadata.Plot !== 'N/A' ? metadata.Plot : null;
-        if (plot) item.plot = plot;
-        if (metadata.Type && metadata.Type !== 'N/A') item.imdbType = metadata.Type;
-        const metascore = metadata.Metascore && metadata.Metascore !== 'N/A' ? metadata.Metascore : null;
-        if (metascore) item.metascore = metascore;
-        const castList = parseActorsList(metadata.Actors);
-        if (castList.length) item.actors = castList;
-        if (!item.trailerUrl) {
-          const trailerFromMeta = buildTrailerUrl(metadata.Title || title, extractPrimaryYear(metadata.Year));
-          if (trailerFromMeta) item.trailerUrl = trailerFromMeta;
-        }
+        const metadataUpdates = deriveMetadataAssignments(metadata, item, {
+          overwrite: false,
+          fallbackTitle: title,
+          fallbackYear: year,
+          alwaysAssign: ['year', 'imdbId', 'imdbUrl', 'imdbType'],
+        });
+        Object.assign(item, metadataUpdates);
       }
     }
 
@@ -496,6 +479,17 @@ function sanitizeYear(input) {
   const cleaned = input.replace(/[^0-9]/g, '').slice(0, 4);
   if (cleaned.length !== 4) return '';
   return cleaned;
+}
+
+function sanitizeSeriesOrder(input) {
+  if (!input) return null;
+  const trimmed = String(input).trim();
+  if (!trimmed) return null;
+  const numeric = Number(trimmed);
+  if (Number.isFinite(numeric)) return numeric;
+  const fallback = parseFloat(trimmed.replace(/[^0-9.\-]/g, ''));
+  if (Number.isFinite(fallback)) return fallback;
+  return trimmed;
 }
 
 function extractPrimaryYear(value) {
@@ -526,6 +520,77 @@ function buildActorPreview(value, limit = 5) {
   const preview = list.slice(0, limit);
   const truncated = list.length > limit;
   return `${preview.join(', ')}${truncated ? '…' : ''}`;
+}
+
+function hasMeaningfulValue(value) {
+  if (value === null || value === undefined) return false;
+  if (typeof value === 'string') return value.trim().length > 0;
+  if (Array.isArray(value)) return value.length > 0;
+  return true;
+}
+
+function deriveMetadataAssignments(metadata, existing = {}, options = {}) {
+  if (!metadata) return {};
+  const {
+    overwrite = false,
+    fallbackTitle = existing.title || '',
+    fallbackYear = existing.year || '',
+    alwaysAssign = [],
+  } = options;
+  const updates = {};
+  const forceKeys = new Set(Array.isArray(alwaysAssign) ? alwaysAssign : []);
+
+  const setField = (key, value) => {
+    if (value === undefined || value === null) return;
+    if (typeof value === 'string' && value.trim() === '') return;
+    if (Array.isArray(value) && value.length === 0) return;
+    if (!overwrite && !forceKeys.has(key) && hasMeaningfulValue(existing[key])) return;
+    updates[key] = value;
+  };
+
+  const apiYear = metadata.Year && metadata.Year !== 'N/A' ? extractPrimaryYear(metadata.Year) : '';
+  setField('year', apiYear);
+
+  const directorFromApi = metadata.Director && metadata.Director !== 'N/A' ? metadata.Director : '';
+  setField('director', directorFromApi);
+
+  const imdbIdValue = metadata.imdbID && metadata.imdbID !== 'N/A' ? metadata.imdbID : '';
+  setField('imdbId', imdbIdValue);
+  if (imdbIdValue) {
+    setField('imdbUrl', `https://www.imdb.com/title/${imdbIdValue}/`);
+  }
+
+  const rating = metadata.imdbRating && metadata.imdbRating !== 'N/A' ? metadata.imdbRating : '';
+  setField('imdbRating', rating);
+
+  const runtime = metadata.Runtime && metadata.Runtime !== 'N/A' ? metadata.Runtime : '';
+  setField('runtime', runtime);
+
+  const poster = metadata.Poster && metadata.Poster !== 'N/A' ? metadata.Poster : '';
+  setField('poster', poster);
+
+  const plot = metadata.Plot && metadata.Plot !== 'N/A' ? metadata.Plot : '';
+  setField('plot', plot);
+
+  const typeValue = metadata.Type && metadata.Type !== 'N/A' ? metadata.Type : '';
+  setField('imdbType', typeValue);
+
+  const metascore = metadata.Metascore && metadata.Metascore !== 'N/A' ? metadata.Metascore : '';
+  setField('metascore', metascore);
+
+  const actors = parseActorsList(metadata.Actors);
+  if (actors.length) {
+    setField('actors', actors);
+  }
+
+  const effectiveTitle = (metadata.Title && metadata.Title !== 'N/A') ? metadata.Title : fallbackTitle;
+  const effectiveYear = apiYear || fallbackYear;
+  if (effectiveTitle) {
+    const trailerUrl = buildTrailerUrl(effectiveTitle, effectiveYear);
+    setField('trailerUrl', trailerUrl);
+  }
+
+  return updates;
 }
 
 function normalizeStatusValue(status) {
@@ -620,6 +685,52 @@ function buildSpinnerCandidates(listType, rawData) {
   });
 }
 
+function needsMetadataRefresh(listType, item) {
+  if (!item || !item.title) return false;
+  if (!['movies', 'tvShows', 'anime'].includes(listType)) return false;
+  const criticalFields = ['imdbId', 'imdbUrl', 'poster', 'plot', 'actors'];
+  return criticalFields.some(field => !hasMeaningfulValue(item[field]));
+}
+
+function refreshMetadataForItem(listType, itemId, item) {
+  if (!OMDB_API_KEY) return;
+  const key = `${listType}:${itemId}`;
+  if (metadataRefreshInflight.has(key)) return;
+  metadataRefreshInflight.add(key);
+
+  const lookup = {
+    title: item.title || '',
+    year: item.year || '',
+    imdbId: item.imdbId || item.imdbID || '',
+  };
+
+  fetchOmdbMetadata(listType, lookup).then(metadata => {
+    if (!metadata) return;
+    const updates = deriveMetadataAssignments(metadata, item, {
+      overwrite: false,
+      fallbackTitle: item.title || '',
+      fallbackYear: item.year || '',
+    });
+    if (Object.keys(updates).length === 0) return;
+    return updateItem(listType, itemId, updates);
+  }).catch(err => {
+    console.warn('Metadata refresh failed', err);
+  }).finally(() => {
+    metadataRefreshInflight.delete(key);
+  });
+}
+
+function maybeRefreshMetadata(listType, data) {
+  if (!OMDB_API_KEY) return;
+  if (!currentUser) return;
+  if (!['movies', 'tvShows', 'anime'].includes(listType)) return;
+
+  Object.entries(data || {}).forEach(([id, item]) => {
+    if (!needsMetadataRefresh(listType, item)) return;
+    refreshMetadataForItem(listType, id, item);
+  });
+}
+
 function buildTrailerUrl(title, year) {
   if (!title) return '';
   const query = `${title} ${year ? year + ' ' : ''}trailer`.trim();
@@ -637,7 +748,7 @@ function buildStatusChip(status) {
     label = 'Watching/Reading';
     modifier = 'status-watching';
   } else if (normalized.startsWith('complete')) {
-    label = 'Completed';
+    if (value === undefined || value === null) return;
     modifier = 'status-completed';
   } else if (normalized.startsWith('drop')) {
     label = 'Dropped';

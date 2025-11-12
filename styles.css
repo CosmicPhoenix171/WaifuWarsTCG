@@ -90,6 +90,8 @@ h1{margin:0 0 .35rem 0;font-size:1.8rem;letter-spacing:.4px}
 .add-form textarea{grid-column:1 / -1;min-height:90px}
 .add-form select{grid-column:4}
 .add-form button{grid-column:1 / -1;justify-self:flex-end;min-width:180px}
+.add-form input[name="seriesName"]{grid-column:1 / 3}
+.add-form input[name="seriesOrder"]{grid-column:3}
 
 .input-suggest{position:relative}
 .input-suggest input{width:100%}
@@ -162,6 +164,8 @@ h1{margin:0 0 .35rem 0;font-size:1.8rem;letter-spacing:.4px}
   .filter-bar{flex-direction:column;align-items:stretch}
   .add-form{grid-template-columns:1fr;}
   .add-form button{width:100%;justify-self:stretch}
+  .add-form input[name="seriesName"],
+  .add-form input[name="seriesOrder"]{grid-column:1 / -1}
   .card{grid-template-columns:60px 1fr;}
   .actions{grid-column:1 / -1;flex-direction:row;justify-content:flex-end}
   .actions .btn{min-width:unset}
