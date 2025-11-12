@@ -651,22 +651,42 @@
       return output;
     }
 
-    function renderBondCostHearts(count) {
+    function renderBondCostHearts(count, labelText = null) {
+      const srBase = labelText ? String(labelText) : 'Bond cost';
       if (!Number.isFinite(count)) {
-        return '<span class="card-cost-hearts card-cost-hearts--empty" aria-hidden="true"><span class="card-cost-heart" aria-hidden="true"></span></span><span class="sr-only">Bond cost unavailable</span>';
+        return `<span class="card-cost-hearts card-cost-hearts--empty" aria-hidden="true"><span class="card-cost-heart" aria-hidden="true"></span></span><span class="sr-only">${srBase} unavailable</span>`;
       }
 
       const rounded = Math.round(count);
       if (rounded <= 0) {
-        return '<span class="card-cost-hearts card-cost-hearts--empty" aria-hidden="true"><span class="card-cost-heart" aria-hidden="true"></span></span><span class="sr-only">Bond cost 0 hearts</span>';
+        return `<span class="card-cost-hearts card-cost-hearts--empty" aria-hidden="true"><span class="card-cost-heart" aria-hidden="true"></span></span><span class="sr-only">${srBase} 0 hearts</span>`;
       }
 
       const total = clamp(rounded, 1, 5);
       const icons = Array.from({ length: total })
         .map(() => '<span class="card-cost-heart" aria-hidden="true"></span>')
         .join('');
-      const srLabel = `Bond cost ${total} heart${total === 1 ? '' : 's'}`;
+      const srLabel = `${srBase} ${total} heart${total === 1 ? '' : 's'}`;
       return `<span class="card-cost-hearts" aria-hidden="true">${icons}</span><span class="sr-only">${srLabel}</span>`;
+    }
+
+    function parseKeywordCost(keyword = '') {
+      if (!keyword) {
+        return { label: '', cost: null };
+      }
+
+      const trimmed = keyword.trim();
+      const parenMatch = trimmed.match(/^(.*?)[\s]*\((\d+)\)\s*$/);
+      if (parenMatch) {
+        return { label: parenMatch[1].trim(), cost: Number(parenMatch[2]) };
+      }
+
+      const trailingMatch = trimmed.match(/^(.*?)[\s]+(\d+)$/);
+      if (trailingMatch) {
+        return { label: trailingMatch[1].trim(), cost: Number(trailingMatch[2]) };
+      }
+
+      return { label: trimmed, cost: null };
     }
 
     function formatAbilityLine(line = '', bondCosts = {}) {
@@ -677,10 +697,11 @@
       const keywordMatch = trimmed.match(/^([^:\u2014\u2013\-]{1,48}?)[\s]*(?:[:\u2014\u2013\-])\s+(.+)$/u);
       if (keywordMatch) {
         const keywordRaw = keywordMatch[1].trim();
-        const keywordId = keywordRaw.toLowerCase();
-        let keywordLabel = keywordRaw;
+        const { label: parsedLabel, cost: parsedCost } = parseKeywordCost(keywordRaw);
+        let keywordLabel = parsedLabel;
+        const keywordId = keywordLabel.toLowerCase();
         let isCostKeyword = false;
-        let costValue = null;
+        let costValue = parsedCost;
         if (keywordId === 'dere' || keywordId === 'extreme') {
           const costs = (bondCosts && typeof bondCosts === 'object') ? bondCosts : {};
           costValue = costs[keywordId];
@@ -692,6 +713,14 @@
           const costMarkup = renderBondCostHearts(costValue);
           return {
             html: `<span class="card-ability-keyword card-ability-keyword--cost">${costMarkup}</span><span class="card-ability-body">${body}</span>`,
+            modifier: 'cost'
+          };
+        }
+        if (costValue !== null) {
+          const keywordText = decorateAbilityText(keywordLabel);
+          const costMarkup = renderBondCostHearts(costValue, `${keywordLabel} cost`);
+          return {
+            html: `<span class="card-ability-keyword card-ability-keyword--cost"><span class="card-ability-cost-label">${keywordText}</span>${costMarkup}</span><span class="card-ability-body">${body}</span>`,
             modifier: 'cost'
           };
         }

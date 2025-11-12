@@ -683,6 +683,12 @@
   gap: .25rem;
 }
 
+.card-ability-cost-label {
+  display: inline-flex;
+  align-items: center;
+  gap: .18rem;
+}
+
 .card-ability-keyword span {
   font-weight: inherit;
 }
@@ -709,6 +715,16 @@
 .card-cost-hearts--empty .card-cost-heart {
   opacity: .4;
   filter: grayscale(0.7) drop-shadow(0 0 0 rgba(0,0,0,0));
+}
+
+.card-ability-keyword--cost .card-cost-hearts {
+  padding-right: 0;
+  gap: .2rem;
+}
+
+.card-ability-keyword--cost .card-cost-heart {
+  width: 20px;
+  height: 20px;
 }
 
 .card-ability-body--stacked {
