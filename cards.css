@@ -625,11 +625,10 @@
   min-height: 0;
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: stretch;
-  gap: .65em;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-content: stretch;
+  row-gap: 0;
   font-size: clamp(1.1rem, 1vw + 0.6rem, 1.35rem);
   line-height: 1.42;
 }
@@ -699,6 +698,8 @@
   line-height: 1.45;
   color: var(--textbox-body);
   overflow: visible;
+  grid-row: 1;
+  align-self: stretch;
 }
 
 .card-abilities li {
@@ -821,8 +822,10 @@
 }
 
 .card-flavor {
-  margin: auto 0 0;
-  padding-top: .55em;
+  grid-row: 2;
+  align-self: end;
+  margin: 0;
+  padding-top: 8px;
   font-size: .85em;
   color: var(--textbox-flavor);
   font-style: italic;

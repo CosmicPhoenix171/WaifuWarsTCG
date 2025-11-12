@@ -769,9 +769,9 @@
       const computed = getComputedStyle(content);
       const baseFont = parseFloat(computed.fontSize) || 18;
       const maxAutoByHeight = Math.max((availableHeight || 0) * 0.24, baseFont + 6);
-      const maxFont = Math.min(28, baseFont * 1.75, maxAutoByHeight);
-      const hardMin = 11.5;
-      const minFont = Math.max(hardMin, baseFont * 0.62);
+    const maxFont = Math.min(28, baseFont * 1.75, maxAutoByHeight);
+    const hardMin = 8.5;
+    const minFont = Math.max(hardMin, baseFont * 0.55);
 
       const fits = (size) => {
         content.style.fontSize = `${size}px`;
