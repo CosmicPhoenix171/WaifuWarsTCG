@@ -10,7 +10,7 @@
   "strategy": "Shield / Barrier",
   "archetype": "Dandere",
   "species": "Human",
-  "text": "Passive: Cannot be targeted by opponent Support cards while Neutral. Dere: Gain +2 shield counters. Extreme: When you speak (play a Support), draw a card.",
+  "text": "Passive: Cannot be targeted by opponent Support cards while Neutral. Dere: Gain +2 shield counters. Extreme: When you play a Support, draw a card.",
   "effects": [
     {
       "when": "onSummon",
