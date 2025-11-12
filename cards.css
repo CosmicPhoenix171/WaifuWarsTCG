@@ -1619,28 +1619,7 @@
     gap: 1.5rem;
   }
 
-  .card-display {
-    max-width: 320px;
-  }
-
   .card-text-box {
     padding: .85rem 1rem 1.6rem;
   }
-
-  .card-display {
-    --card-current-width: min(var(--card-width), 100%);
-    --card-height: calc(var(--card-current-width) * 88 / 63);
-    --card-art-height: calc(var(--card-current-width) * 0.5);
-    --card-text-box-height: calc(var(--card-current-width) * 0.48);
-    width: var(--card-current-width);
-    max-width: 100%;
-    aspect-ratio: 63 / 88;
-    display: flex;
-    justify-content: center;
-    align-items: stretch;
-    perspective: 1600px;
-    perspective-origin: center 40%;
-    touch-action: pan-y;
-    position: relative;
-    will-change: transform;
-  }
+}
