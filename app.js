@@ -463,6 +463,11 @@ async function addItemFromForm(listType, form) {
       }
     }
 
+    if (isDuplicateCandidate(listType, item)) {
+      alert("Hey dumbass! It's already in the damn list!");
+      return;
+    }
+
     await addItem(listType, item);
     form.reset();
     form.__selectedMetadata = null;
@@ -495,6 +500,49 @@ function sanitizeSeriesOrder(input) {
   const fallback = parseFloat(trimmed.replace(/[^0-9.\-]/g, ''));
   if (Number.isFinite(fallback)) return fallback;
   return trimmed;
+}
+
+function normalizeTitleKey(title) {
+  if (!title) return '';
+  return String(title).trim().toLowerCase().replace(/\s+/g, ' ');
+}
+
+function buildComparisonSignature(item) {
+  if (!item) return null;
+  const imdbId = item.imdbId || item.imdbID || '';
+  const title = normalizeTitleKey(item.title || item.Title || '');
+  const year = sanitizeYear(item.year || item.Year || '');
+  const series = normalizeTitleKey(item.seriesName || '');
+  const order = item.seriesOrder !== undefined && item.seriesOrder !== null ? item.seriesOrder : null;
+  return { imdbId, title, year, series, order };
+}
+
+function signaturesMatch(candidate, existing) {
+  if (!candidate || !existing) return false;
+  if (candidate.imdbId && existing.imdbId && candidate.imdbId === existing.imdbId) {
+    return true;
+  }
+  if (candidate.title && existing.title) {
+    if (candidate.title === existing.title) {
+      if (!candidate.year || !existing.year || candidate.year === existing.year) {
+        return true;
+      }
+    }
+  }
+  if (candidate.series && existing.series && candidate.series === existing.series) {
+    if (candidate.order !== null && existing.order !== null && candidate.order === existing.order) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isDuplicateCandidate(listType, candidateItem) {
+  const cache = listCaches[listType];
+  if (!cache) return false;
+  const candidateSig = buildComparisonSignature(candidateItem);
+  if (!candidateSig) return false;
+  return Object.values(cache).some(existing => signaturesMatch(candidateSig, buildComparisonSignature(existing)));
 }
 
 function extractPrimaryYear(value) {
