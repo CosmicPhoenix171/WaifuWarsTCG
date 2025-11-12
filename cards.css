@@ -707,8 +707,8 @@
   display: grid;
   grid-template-columns: minmax(0, max-content) 1fr;
   align-items: start;
-  row-gap: .2em;
-  column-gap: .4em;
+  row-gap: .16em;
+  column-gap: .35em;
 }
 
 .card-ability-keyword {

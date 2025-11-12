@@ -770,7 +770,8 @@
       const baseFont = parseFloat(computed.fontSize) || 18;
       const maxAutoByHeight = Math.max((availableHeight || 0) * 0.24, baseFont + 6);
       const maxFont = Math.min(28, baseFont * 1.75, maxAutoByHeight);
-      const minFont = Math.max(7, baseFont * 0.58);
+      const hardMin = 11.5;
+      const minFont = Math.max(hardMin, baseFont * 0.62);
 
       const fits = (size) => {
         content.style.fontSize = `${size}px`;
@@ -778,12 +779,18 @@
         return Math.ceil(content.scrollHeight) <= Math.floor(heightThreshold);
       };
 
+      delete textBox.dataset.autofit;
+
       if (!fits(minFont)) {
         let size = minFont;
-        while (size > 6 && !fits(size)) {
+        while (size > hardMin && !fits(size)) {
           size -= 0.5;
         }
-        content.style.fontSize = `${Math.max(size, 6)}px`;
+        const finalSize = Math.max(size, hardMin);
+        content.style.fontSize = `${finalSize}px`;
+        if (!fits(finalSize)) {
+          textBox.dataset.autofit = 'overflow';
+        }
         return;
       }
 
