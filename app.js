@@ -1355,11 +1355,38 @@ function renderWheelResult(item, listType) {
   wheelResultEl.appendChild(card);
 }
 
-function animateWheelSequence(candidates, chosenIndex, listType) {
+function resolveSeriesRedirect(listType, item, rawData) {
+  if (!item || !rawData) return item;
+  if (!['movies', 'tvShows', 'anime'].includes(listType)) return item;
+  const rawSeries = typeof item.seriesName === 'string' ? item.seriesName.trim() : '';
+  if (!rawSeries) return item;
+  const targetKey = rawSeries.toLowerCase();
+  const siblings = Object.values(rawData || {}).filter(entry => {
+    if (!entry) return false;
+    const entrySeries = typeof entry.seriesName === 'string' ? entry.seriesName.trim() : '';
+    return entrySeries && entrySeries.toLowerCase() === targetKey;
+  });
+  if (!siblings.length) return item;
+  siblings.sort((a, b) => {
+    const orderA = parseSeriesOrder(a.seriesOrder);
+    const orderB = parseSeriesOrder(b.seriesOrder);
+    if (orderA !== orderB) return orderA - orderB;
+    const titleA = (a && a.title ? a.title : '').toLowerCase();
+    const titleB = (b && b.title ? b.title : '').toLowerCase();
+    if (titleA < titleB) return -1;
+    if (titleA > titleB) return 1;
+    return 0;
+  });
+  const firstUnwatched = siblings.find(entry => entry && !isItemWatched(entry));
+  return firstUnwatched || item;
+}
+
+function animateWheelSequence(candidates, chosenIndex, listType, finalItemOverride) {
   const len = candidates.length;
   if (len === 0) return;
 
   const chosenItem = candidates[chosenIndex];
+  const finalDisplayItem = finalItemOverride || chosenItem;
   const iterations = Math.max(28, len * 5);
   let pointer = Math.floor(Math.random() * len);
   const sequence = [];
@@ -1367,7 +1394,7 @@ function animateWheelSequence(candidates, chosenIndex, listType) {
     sequence.push(candidates[pointer % len]);
     pointer++;
   }
-  sequence.push(chosenItem);
+  sequence.push(finalDisplayItem);
 
   const totalDuration = 7000; // keep spin length consistent regardless of candidate count
   const stepCount = sequence.length;
@@ -1430,7 +1457,14 @@ function spinWheel(listType) {
       return;
     }
     const chosenIndex = Math.floor(Math.random() * candidates.length);
-    animateWheelSequence(candidates, chosenIndex, listType);
+    const chosenCandidate = candidates[chosenIndex];
+    const resolvedCandidate = resolveSeriesRedirect(listType, chosenCandidate, data);
+    const resolvedIndex = resolvedCandidate ? candidates.indexOf(resolvedCandidate) : -1;
+    if (resolvedIndex >= 0) {
+      animateWheelSequence(candidates, resolvedIndex, listType);
+    } else {
+      animateWheelSequence(candidates, chosenIndex, listType, resolvedCandidate || chosenCandidate);
+    }
   }).catch(err => {
     console.error('Wheel load failed', err);
     clearWheelAnimation();
