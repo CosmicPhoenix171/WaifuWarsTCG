@@ -690,7 +690,7 @@ function buildSpinnerCandidates(listType, rawData) {
   const eligibleItems = items.filter((item) => item && isSpinnerStatusEligible(item.status));
   if (!eligibleItems.length) return [];
 
-  const shouldApplySeriesLogic = listType === 'movies';
+  const shouldApplySeriesLogic = ['movies', 'tvShows', 'anime'].includes(listType);
   if (!shouldApplySeriesLogic) {
     return eligibleItems.filter(item => !isItemWatched(item));
   }
