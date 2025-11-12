@@ -415,6 +415,9 @@ async function addItemFromForm(listType, form) {
   const year = sanitizeYear(yearRaw);
   const creatorField = listType === 'books' ? 'author' : 'director';
   const creatorValue = (form[creatorField] && form[creatorField].value ? form[creatorField].value.trim() : '');
+  const seriesNameValue = listType === 'books' ? '' : (form.seriesName && form.seriesName.value ? form.seriesName.value.trim() : '');
+  const seriesOrderRaw = listType === 'books' ? '' : (form.seriesOrder && form.seriesOrder.value ? form.seriesOrder.value.trim() : '');
+  const seriesOrder = listType === 'books' ? null : sanitizeSeriesOrder(seriesOrderRaw);
 
   if (!title) {
     alert('Title is required');
@@ -447,6 +450,8 @@ async function addItemFromForm(listType, form) {
       if (creatorValue) item.author = creatorValue;
     } else {
       if (creatorValue) item.director = creatorValue;
+      if (seriesNameValue) item.seriesName = seriesNameValue;
+      if (seriesOrder !== null) item.seriesOrder = seriesOrder;
       if (metadata) {
         const metadataUpdates = deriveMetadataAssignments(metadata, item, {
           overwrite: false,
