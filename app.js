@@ -321,6 +321,17 @@ function renderList(listType, data) {
       left.appendChild(meta);
     }
 
+    if (listType === 'movies' && item.seriesName) {
+      const seriesLine = document.createElement('div');
+      seriesLine.className = 'series-line';
+      const parts = [`Series: ${item.seriesName}`];
+      if (item.seriesOrder !== undefined && item.seriesOrder !== null && item.seriesOrder !== '') {
+        parts.push(`Entry ${item.seriesOrder}`);
+      }
+      seriesLine.textContent = parts.join(' • ');
+      left.appendChild(seriesLine);
+    }
+
     if (listType !== 'books') {
       const actorPreview = buildActorPreview(item.actors, 5);
       if (actorPreview) {
@@ -515,6 +526,98 @@ function buildActorPreview(value, limit = 5) {
   const preview = list.slice(0, limit);
   const truncated = list.length > limit;
   return `${preview.join(', ')}${truncated ? '…' : ''}`;
+}
+
+function normalizeStatusValue(status) {
+  return String(status || '').trim().toLowerCase();
+}
+
+function isSpinnerStatusEligible(status) {
+  const normalized = normalizeStatusValue(status);
+  if (!normalized) return true;
+  if (normalized.startsWith('plan')) return true;
+  if (normalized.startsWith('watch') && !normalized.startsWith('watched')) return true;
+  if (normalized.startsWith('read')) return true;
+  return false;
+}
+
+function isItemWatched(item) {
+  if (!item) return false;
+  if (typeof item.watched === 'boolean') {
+    return item.watched;
+  }
+  const normalized = normalizeStatusValue(item.status);
+  if (!normalized) return false;
+  if (normalized.startsWith('complete')) return true;
+  if (normalized.startsWith('watched')) return true;
+  return false;
+}
+
+function parseSeriesOrder(value) {
+  if (value === null || value === undefined || value === '') {
+    return Number.POSITIVE_INFINITY;
+  }
+  const num = Number(value);
+  if (Number.isFinite(num)) {
+    return num;
+  }
+  const parsed = parseFloat(String(value).replace(/[^0-9.\-]/g, ''));
+  return Number.isFinite(parsed) ? parsed : Number.POSITIVE_INFINITY;
+}
+
+function buildSpinnerCandidates(listType, rawData) {
+  const items = Object.values(rawData || {});
+  if (!items.length) return [];
+
+  const eligibleItems = items.filter((item) => item && isSpinnerStatusEligible(item.status));
+  if (!eligibleItems.length) return [];
+
+  const shouldApplySeriesLogic = listType === 'movies';
+  if (!shouldApplySeriesLogic) {
+    return eligibleItems.filter(item => !isItemWatched(item));
+  }
+
+  const standalone = [];
+  const seriesMap = new Map();
+
+  eligibleItems.forEach(item => {
+    const seriesNameRaw = typeof item.seriesName === 'string' ? item.seriesName.trim() : '';
+    if (seriesNameRaw) {
+      const key = seriesNameRaw.toLowerCase();
+      if (!seriesMap.has(key)) {
+        seriesMap.set(key, []);
+      }
+      seriesMap.get(key).push({ order: parseSeriesOrder(item.seriesOrder), item });
+    } else {
+      if (!isItemWatched(item)) {
+        standalone.push(item);
+      }
+    }
+  });
+
+  seriesMap.forEach(entries => {
+    if (!entries || !entries.length) return;
+    entries.sort((a, b) => {
+      if (a.order !== b.order) return a.order - b.order;
+      const titleA = (a.item && a.item.title ? a.item.title : '').toLowerCase();
+      const titleB = (b.item && b.item.title ? b.item.title : '').toLowerCase();
+      if (titleA < titleB) return -1;
+      if (titleA > titleB) return 1;
+      return 0;
+    });
+    const firstUnwatched = entries.find(entry => entry && entry.item && !isItemWatched(entry.item));
+    if (firstUnwatched && firstUnwatched.item) {
+      standalone.push(firstUnwatched.item);
+    }
+  });
+
+  return standalone.sort((a, b) => {
+    const titleA = (a && a.title ? a.title : '').toLowerCase();
+    const titleB = (b && b.title ? b.title : '').toLowerCase();
+    if (titleA < titleB) return -1;
+    if (titleA > titleB) return 1;
+    return 0;
+  });
 }
 
 function buildTrailerUrl(title, year) {
@@ -992,6 +1095,17 @@ function renderWheelResult(item, listType) {
     details.appendChild(meta);
   }
 
+  if (listType === 'movies' && item.seriesName) {
+    const seriesLine = document.createElement('div');
+    seriesLine.className = 'wheel-result-series';
+    const parts = [`Series: ${item.seriesName}`];
+    if (item.seriesOrder !== undefined && item.seriesOrder !== null && item.seriesOrder !== '') {
+      parts.push(`Entry ${item.seriesOrder}`);
+    }
+    seriesLine.textContent = parts.join(' • ');
+    details.appendChild(seriesLine);
+  }
+
   if (listType !== 'books') {
     const castText = buildActorPreview(item.actors, 6);
     if (castText) {
@@ -1099,14 +1213,14 @@ function spinWheel(listType) {
   const listRef = ref(db, `users/${currentUser.uid}/${listType}`);
   get(listRef).then(snap => {
     const data = snap.val() || {};
-    const candidates = Object.values(data).filter(it => ['Planned','Watching/Reading'].includes(it.status));
+    const candidates = buildSpinnerCandidates(listType, data);
     if (candidates.length === 0) {
       clearWheelAnimation();
       const emptyState = document.createElement('span');
       emptyState.className = 'spin-text';
-      emptyState.textContent = 'Add items to spin!';
+      emptyState.textContent = 'No eligible items to spin.';
       wheelSpinnerEl.appendChild(emptyState);
-      wheelResultEl.textContent = 'No items available to spin. Add some first!';
+      wheelResultEl.textContent = 'No eligible items right now. Add something new or reset some items back to Planned/Watching.';
       return;
     }
     const chosenIndex = Math.floor(Math.random() * candidates.length);
