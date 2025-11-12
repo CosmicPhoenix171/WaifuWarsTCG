@@ -1383,6 +1383,15 @@ function resolveSeriesRedirect(listType, item, rawData) {
   const chosenOrder = parseSeriesOrder(item.seriesOrder);
   const earliestOrder = parseSeriesOrder(earliestUnwatched.seriesOrder);
   const needsRedirect = chosenOrder > earliestOrder || isItemWatched(item);
+  try {
+    console.debug('[Wheel] resolveSeriesRedirect', {
+      listType,
+      series: rawSeries,
+      chosen: { title: item.title, order: chosenOrder, status: item.status },
+      earliest: { title: earliestUnwatched.title, order: earliestOrder, status: earliestUnwatched.status },
+      needsRedirect
+    });
+  } catch (_) {}
   return needsRedirect ? earliestUnwatched : item;
 }
 
@@ -1415,6 +1424,17 @@ function animateWheelSequence(candidates, chosenIndex, listType, finalItemOverri
     }
   }
 
+  try {
+    console.debug('[Wheel] animate start', {
+      listType,
+      chosenIndex,
+      chosenTitle: chosenItem?.title,
+      finalTitle: finalDisplayItem?.title,
+      candidates: candidates.map(c => c && c.title).filter(Boolean),
+      steps: stepCount
+    });
+  } catch (_) {}
+
   sequence.forEach((item, idx) => {
     const timeout = setTimeout(() => {
       const isFinal = idx === sequence.length - 1;
@@ -1423,6 +1443,7 @@ function animateWheelSequence(candidates, chosenIndex, listType, finalItemOverri
       span.className = `spin-text${isFinal ? ' final' : ''}`;
       span.textContent = item.title || '(no title)';
       wheelSpinnerEl.appendChild(span);
+      try { console.debug(`[Wheel] step ${idx + 1}/${sequence.length}: ${item.title || '(no title)'}${isFinal ? ' [FINAL]' : ''}`); } catch (_) {}
       if (isFinal) {
         wheelSpinnerEl.classList.remove('spinning');
         renderWheelResult(item, listType);
@@ -1452,6 +1473,13 @@ function spinWheel(listType) {
   get(listRef).then(snap => {
     const data = snap.val() || {};
     const candidates = buildSpinnerCandidates(listType, data);
+    try {
+      console.debug('[Wheel] spin start', {
+        listType,
+        candidateCount: candidates.length,
+        titles: candidates.map(c => c && c.title).filter(Boolean)
+      });
+    } catch (_) {}
     if (candidates.length === 0) {
       clearWheelAnimation();
       const emptyState = document.createElement('span');
@@ -1464,8 +1492,7 @@ function spinWheel(listType) {
     const chosenIndex = Math.floor(Math.random() * candidates.length);
     const chosenCandidate = candidates[chosenIndex];
     const resolvedCandidate = resolveSeriesRedirect(listType, chosenCandidate, data) || chosenCandidate;
-    // Debug: log redirection decisions
-    try { console.debug('[Wheel] chosen=', chosenCandidate?.title, 'resolved=', resolvedCandidate?.title); } catch (_) {}
+    try { console.debug('[Wheel] pick', { chosenIndex, chosen: chosenCandidate?.title, resolved: resolvedCandidate?.title }); } catch (_) {}
     animateWheelSequence(candidates, chosenIndex, listType, resolvedCandidate);
   }).catch(err => {
     console.error('Wheel load failed', err);
