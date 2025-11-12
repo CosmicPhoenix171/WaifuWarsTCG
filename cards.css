@@ -2,7 +2,7 @@
 :root {
   --card-width: clamp(300px, 32vw, 360px);
   --card-padding: clamp(0.75rem, 0.6vw + 0.6rem, 0.95rem);
-  --card-section-gap: clamp(0.5rem, 0.8vw, 0.6rem);
+  --card-section-gap: clamp(0.45rem, 0.7vw, 0.6rem);
 }
 
 *, *::before, *::after {
@@ -89,7 +89,7 @@
   --card-current-width: min(var(--card-width), 100%);
   --card-height: calc(var(--card-current-width) * 88 / 63);
   --card-art-height: calc(var(--card-current-width) * 0.5);
-  --card-text-box-height: calc(var(--card-current-width) * 0.48);
+  --card-text-box-height: calc(var(--card-current-width) * 0.5);
   width: var(--card-current-width);
   max-width: 100%;
   aspect-ratio: 63 / 88;
