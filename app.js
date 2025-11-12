@@ -323,7 +323,7 @@ function renderList(listType, data) {
       left.appendChild(meta);
     }
 
-    if (listType === 'movies' && item.seriesName) {
+    if (listType !== 'books' && item.seriesName) {
       const seriesLine = document.createElement('div');
       seriesLine.className = 'series-line';
       const parts = [`Series: ${item.seriesName}`];
@@ -753,7 +753,6 @@ function buildStatusChip(status) {
     label = 'Watching/Reading';
     modifier = 'status-watching';
   } else if (normalized.startsWith('complete')) {
-    if (value === undefined || value === null) return;
     modifier = 'status-completed';
   } else if (normalized.startsWith('drop')) {
     label = 'Dropped';
@@ -1233,7 +1232,7 @@ function renderWheelResult(item, listType) {
     details.appendChild(meta);
   }
 
-  if (listType === 'movies' && item.seriesName) {
+  if (listType !== 'books' && item.seriesName) {
     const seriesLine = document.createElement('div');
     seriesLine.className = 'wheel-result-series';
     const parts = [`Series: ${item.seriesName}`];
