@@ -1,4 +1,8 @@
 /* Waifu Wars Card Gallery Styles */
+:root {
+  --card-text-box-height: 240px;
+}
+
 .card-chip {
   position: absolute;
   display: inline-flex;
@@ -568,6 +572,10 @@
 }
 
 .card-text-box {
+  width: 100%;
+  height: var(--card-text-box-height);
+  min-height: var(--card-text-box-height);
+  max-height: var(--card-text-box-height);
   padding: .85rem .9rem 2.2rem;
   border-radius: 12px;
   background:
@@ -583,9 +591,24 @@
               0 16px 38px -24px var(--textbox-shadow);
   display: flex;
   flex-direction: column;
-  overflow: visible;
+  align-items: stretch;
+  justify-content: flex-start;
+  overflow: hidden;
   position: relative;
   color: var(--textbox-foreground);
+}
+
+.card-text-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: stretch;
+  gap: .65em;
+  font-size: 1rem;
+  line-height: 1.45;
 }
 
 .card-text-box::before {
@@ -646,25 +669,26 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: .45rem;
-  font-size: .9rem;
-  line-height: 1.5;
+  flex: 1 1 auto;
+  gap: .5em;
+  font-size: 1em;
+  line-height: 1.45;
   color: var(--textbox-body);
   overflow: visible;
 }
 
 .card-abilities li {
   position: relative;
-  padding-left: 1.3rem;
+  padding-left: 1.3em;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: .3rem;
+  gap: .3em;
 }
 
 .card-ability-keyword {
   font-weight: 700;
-  letter-spacing: .55px;
+  letter-spacing: .06em;
   text-transform: uppercase;
   color: var(--textbox-keyword);
   flex-shrink: 0;
@@ -674,19 +698,19 @@
 .card-ability-keyword--block {
   display: inline-flex;
   align-items: center;
-  gap: .25rem;
+  gap: .25em;
 }
 
 .card-ability-keyword--cost {
   display: inline-flex;
   align-items: center;
-  gap: .25rem;
+  gap: .25em;
 }
 
 .card-ability-cost-label {
   display: inline-flex;
   align-items: center;
-  gap: .18rem;
+  gap: .18em;
 }
 
 .card-ability-keyword span {
@@ -701,13 +725,13 @@
 .card-cost-hearts {
   display: inline-flex;
   align-items: center;
-  gap: .18rem;
-  padding-right: .25rem;
+  gap: .18em;
+  padding-right: .25em;
 }
 
 .card-cost-heart {
-  width: 28px;
-  height: 28px;
+  width: 1.15em;
+  height: 1.15em;
   background: url("assets/images/Heart-energy.png") center/contain no-repeat;
   filter: drop-shadow(0 1px 2px rgba(15,23,42,0.45));
 }
@@ -719,12 +743,12 @@
 
 .card-ability-keyword--cost .card-cost-hearts {
   padding-right: 0;
-  gap: .2rem;
+  gap: .2em;
 }
 
 .card-ability-keyword--cost .card-cost-heart {
-  width: 20px;
-  height: 20px;
+  width: 1.05em;
+  height: 1.05em;
 }
 
 .card-ability-body--stacked {
@@ -736,15 +760,15 @@
   content: "•";
   position: absolute;
   left: 0;
-  top: .48rem;
-  font-size: .58rem;
+  top: .5em;
+  font-size: .58em;
   color: color-mix(in srgb, var(--textbox-body) 60%, rgba(245,245,255,0.45));
   text-shadow: 0 1px 2px rgba(5,4,12,0.4);
 }
 
 .card-abilities li[data-ability="stacked"]::before {
   content: "◆";
-  font-size: .62rem;
+  font-size: .62em;
   color: color-mix(in srgb, var(--textbox-keyword) 70%, rgba(250,250,255,0.68));
 }
 
@@ -752,7 +776,7 @@
   padding-left: 0;
   flex-direction: row;
   align-items: center;
-  gap: .45rem;
+  gap: .45em;
 }
 
 .card-abilities li[data-ability="cost"]::before {
@@ -766,12 +790,12 @@
 
 .card-flavor {
   margin: auto 0 0;
-  padding-top: .55rem;
-  font-size: .76rem;
+  padding-top: .55em;
+  font-size: .85em;
   color: var(--textbox-flavor);
   font-style: italic;
   text-align: left;
-  line-height: 1.4;
+  line-height: 1.35;
   flex-shrink: 0;
   border-top: 1px solid var(--textbox-divider);
 }
@@ -1579,15 +1603,15 @@
   }
 
   .card-text-box {
-    padding: .8rem .85rem 1rem;
+    padding: .75rem .8rem 1.9rem;
   }
 
   .card-abilities {
-    gap: .4rem;
+    gap: .45em;
     line-height: 1.4;
   }
 
   .card-flavor {
-    font-size: .74rem;
+    font-size: .9em;
   }
 }

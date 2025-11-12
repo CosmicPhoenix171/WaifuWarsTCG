@@ -737,65 +737,78 @@
     }
 
     // === LAYOUT HELPERS ===
-    function balanceAbilityText(root = document) {
-      if (!root || typeof root.querySelectorAll !== 'function') return;
-      root.querySelectorAll('.card-text-box').forEach((textBox) => {
-        if (textBox.dataset.fluid === 'true') return; // skip auto-fit for fluid boxes
-        const abilities = textBox.querySelector('.card-abilities');
-        if (!abilities) return;
+    function getTextBoxAvailableHeight(textBox) {
+      const boxStyle = getComputedStyle(textBox);
+      const paddingTop = parseFloat(boxStyle.paddingTop) || 0;
+      const paddingBottom = parseFloat(boxStyle.paddingBottom) || 0;
+      return textBox.clientHeight - paddingTop - paddingBottom;
+    }
 
-        // Reset any previous inline tweaks
+    function autoFitTextBox(textBox) {
+      if (!textBox || textBox.dataset.fluid === 'true') return;
+      const content = textBox.querySelector('.card-text-content');
+      if (!content) return;
+
+      const abilities = content.querySelector('.card-abilities');
+      if (abilities) {
         abilities.style.fontSize = '';
         abilities.style.lineHeight = '';
         abilities.style.gap = '';
-        const flavorEl = textBox.querySelector('.card-flavor');
-        if (flavorEl) flavorEl.style.display = '';
+      }
+      const flavorEl = content.querySelector('.card-flavor');
+      if (flavorEl) {
+        flavorEl.style.display = '';
+      }
+      content.style.fontSize = '';
 
-        const cs = getComputedStyle(abilities);
-        let fontSize = parseFloat(cs.fontSize) || 14;
-        let lineHeight = parseFloat(cs.lineHeight) || Math.max(1.2, (fontSize * 1.35));
-        let gap = parseFloat((cs.gap || '0').toString()) || 7.2; // approx .45rem
+      const availableHeight = getTextBoxAvailableHeight(textBox);
+      if (availableHeight <= 0) {
+        return;
+      }
 
-  const minFont = 8.5;
-  const minLine = Math.max(1.02, fontSize * 1.12);
-  const minGap = 1; // px
+      const computed = getComputedStyle(content);
+      const baseFont = parseFloat(computed.fontSize) || 16;
+      const maxFont = baseFont * 1.35;
+      const minFont = Math.max(8.5, baseFont * 0.6);
 
-        // Helper to check overflow
-        const overflows = () => textBox.scrollHeight > textBox.clientHeight + 1;
+      const fits = (size) => {
+        content.style.fontSize = `${size}px`;
+        return Math.ceil(content.scrollHeight) <= Math.floor(availableHeight);
+      };
 
-        // Step 1: shrink font size
-        while (overflows() && fontSize > minFont) {
-          fontSize -= 0.5;
-          abilities.style.fontSize = `${fontSize}px`;
+      if (!fits(minFont)) {
+        let size = minFont;
+        while (size > 6 && !fits(size)) {
+          size -= 0.5;
         }
+        content.style.fontSize = `${Math.max(size, 6)}px`;
+        return;
+      }
 
-        // Step 2: tighten line-height
-        // Re-read lineHeight in px for consistency
-        lineHeight = parseFloat(getComputedStyle(abilities).lineHeight) || lineHeight;
-        while (overflows() && lineHeight > minLine) {
-          lineHeight -= 0.5;
-          abilities.style.lineHeight = `${lineHeight}px`;
-        }
+      if (fits(maxFont)) {
+        return;
+      }
 
-        // Step 3: reduce gap between ability items
-        gap = parseFloat(getComputedStyle(abilities).gap) || gap;
-        while (overflows() && gap > minGap) {
-          gap -= 1;
-          abilities.style.gap = `${gap}px`;
-        }
+      let low = minFont;
+      let high = maxFont;
+      let best = minFont;
 
-        // Step 4: hide flavor text as last resort
-        if (overflows() && flavorEl) {
-          flavorEl.style.display = 'none';
+      while (high - low > 0.05) {
+        const mid = (low + high) / 2;
+        if (fits(mid)) {
+          best = mid;
+          low = mid + 0.05;
+        } else {
+          high = mid - 0.05;
         }
+      }
 
-        // Final pass: tiny font bump down if still overflowing
-        let guard = 10;
-        while (overflows() && guard--) {
-          fontSize -= 0.25;
-          abilities.style.fontSize = `${Math.max(minFont - 1.5, fontSize)}px`;
-        }
-      });
+      content.style.fontSize = `${best}px`;
+    }
+
+    function balanceAbilityText(root = document) {
+      if (!root || typeof root.querySelectorAll !== 'function') return;
+      root.querySelectorAll('.card-text-box').forEach(autoFitTextBox);
     }
 
     function fitCardTitle(titleEl) {
@@ -890,7 +903,13 @@
       const title = article.querySelector('.card-title');
       let overflow = false;
       if (textBox) {
-        overflow = overflow || (textBox.scrollHeight > textBox.clientHeight + 1);
+        const content = textBox.querySelector('.card-text-content');
+        if (content) {
+          const available = getTextBoxAvailableHeight(textBox);
+          overflow = overflow || (Math.ceil(content.scrollHeight) > Math.floor(available) + 1);
+        } else {
+          overflow = overflow || (textBox.scrollHeight > textBox.clientHeight + 1);
+        }
       }
       if (title) {
         overflow = overflow || titleWouldOverflow(title);
@@ -1398,10 +1417,12 @@
               </div>
               <div class="card-text-box">
                 ${bondOverlayMarkup}
-                <ul class="card-abilities">
-                  ${abilitiesHtml}
-                </ul>
-                ${flavorHtml}
+                <div class="card-text-content">
+                  <ul class="card-abilities">
+                    ${abilitiesHtml}
+                  </ul>
+                  ${flavorHtml}
+                </div>
               </div>
               <footer class="card-footer" data-rating-symbol="${ratingEmblem}" title="${rarityName} rating">Set ${setLabel} • ${idLabel}</footer>
             </div>
