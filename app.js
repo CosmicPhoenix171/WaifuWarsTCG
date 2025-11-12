@@ -79,6 +79,7 @@ const listeners = {};
 let omdbWarningShown = false;
 let spinTimeouts = [];
 const actorFilters = { movies: '', tvShows: '', anime: '' };
+const sortModes = { movies: 'title', tvShows: 'title', anime: 'title', books: 'title' };
 const listCaches = {};
 const metadataRefreshInflight = new Set();
 const AUTOCOMPLETE_LISTS = new Set(['movies', 'tvShows', 'anime']);
@@ -144,6 +145,17 @@ function initFirebase() {
       if (cached) {
         renderList(listType, cached);
       }
+    });
+  });
+
+  // Sort controls
+  document.querySelectorAll('[data-role="sort"]').forEach(sel => {
+    const listType = sel.dataset.list;
+    sel.addEventListener('change', () => {
+      if (!listType) return;
+      sortModes[listType] = sel.value;
+      const cached = listCaches[listType];
+      if (cached) renderList(listType, cached);
     });
   });
 
@@ -355,12 +367,36 @@ function renderList(listType, data) {
     return;
   }
 
+  const mode = sortModes[listType] || 'title';
   filtered.sort(([, a], [, b]) => {
     const ta = (a && a.title ? a.title : '').toLowerCase();
     const tb = (b && b.title ? b.title : '').toLowerCase();
-    if (ta < tb) return -1;
-    if (ta > tb) return 1;
-    return 0;
+    if (mode === 'title') {
+      if (ta < tb) return -1; if (ta > tb) return 1; return 0;
+    }
+    if (mode === 'yearAsc' || mode === 'yearDesc') {
+      const ya = a && a.year ? parseInt(a.year, 10) : 9999;
+      const yb = b && b.year ? parseInt(b.year, 10) : 9999;
+      if (ya !== yb) return mode === 'yearAsc' ? ya - yb : yb - ya;
+      if (ta < tb) return -1; if (ta > tb) return 1; return 0;
+    }
+    if (mode === 'director') {
+      const da = (a && (a.director || a.author || '')).toLowerCase();
+      const db = (b && (b.director || b.author || '')).toLowerCase();
+      if (da && db && da !== db) return da < db ? -1 : 1;
+      if (ta < tb) return -1; if (ta > tb) return 1; return 0;
+    }
+    if (mode === 'series') {
+      const sa = (a && a.seriesName ? a.seriesName : '').toLowerCase();
+      const sb = (b && b.seriesName ? b.seriesName : '').toLowerCase();
+      if (sa && sb && sa !== sb) return sa < sb ? -1 : 1;
+      const oa = parseSeriesOrder(a && a.seriesOrder);
+      const ob = parseSeriesOrder(b && b.seriesOrder);
+      if (oa !== ob) return oa - ob;
+      if (ta < tb) return -1; if (ta > tb) return 1; return 0;
+    }
+    // fallback title
+    if (ta < tb) return -1; if (ta > tb) return 1; return 0;
   });
 
   filtered.forEach(([id, item]) => {
