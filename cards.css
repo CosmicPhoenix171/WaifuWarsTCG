@@ -1,11 +1,8 @@
 /* Waifu Wars Card Gallery Styles */
 :root {
-  --card-width: clamp(280px, 32vw, 340px);
-  --card-height: calc(var(--card-width) * 88 / 63);
+  --card-width: clamp(300px, 32vw, 360px);
   --card-padding: clamp(0.75rem, 0.6vw + 0.6rem, 0.95rem);
-  --card-section-gap: clamp(0.45rem, 0.8vw, 0.65rem);
-  --card-art-height: calc(var(--card-height) * 0.42);
-  --card-text-box-height: calc(var(--card-height) * 0.28);
+  --card-section-gap: clamp(0.5rem, 0.8vw, 0.6rem);
 }
 
 *, *::before, *::after {
@@ -89,7 +86,11 @@
 
 /* === Card Components === */
 .card-display {
-  width: var(--card-width);
+  --card-current-width: min(var(--card-width), 100%);
+  --card-height: calc(var(--card-current-width) * 88 / 63);
+  --card-art-height: calc(var(--card-current-width) * 0.5);
+  --card-text-box-height: calc(var(--card-current-width) * 0.48);
+  width: var(--card-current-width);
   max-width: 100%;
   aspect-ratio: 63 / 88;
   display: flex;
@@ -1459,14 +1460,11 @@
   }
 }
 
-@keyframes holo-wave {
-  0% {
-    background-position: 0% 50%, 50% 50%;
+  :root {
+    --card-width: clamp(300px, 32vw, 360px);
+    --card-padding: clamp(0.75rem, 0.6vw + 0.6rem, 0.95rem);
+    --card-section-gap: clamp(0.5rem, 0.8vw, 0.6rem);
   }
-  50% {
-    background-position: 100% 60%, 55% 45%;
-  }
-  100% {
     background-position: 200% 50%, 50% 50%;
   }
 }
@@ -1629,12 +1627,20 @@
     padding: .85rem 1rem 1.6rem;
   }
 
-  .card-abilities {
-    gap: .45em;
-    line-height: 1.4;
+  .card-display {
+    --card-current-width: min(var(--card-width), 100%);
+    --card-height: calc(var(--card-current-width) * 88 / 63);
+    --card-art-height: calc(var(--card-current-width) * 0.5);
+    --card-text-box-height: calc(var(--card-current-width) * 0.48);
+    width: var(--card-current-width);
+    max-width: 100%;
+    aspect-ratio: 63 / 88;
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+    perspective: 1600px;
+    perspective-origin: center 40%;
+    touch-action: pan-y;
+    position: relative;
+    will-change: transform;
   }
-
-  .card-flavor {
-    font-size: .9em;
-  }
-}
