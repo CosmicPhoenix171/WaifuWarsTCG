@@ -767,13 +767,15 @@
       }
 
       const computed = getComputedStyle(content);
-      const baseFont = parseFloat(computed.fontSize) || 16;
-      const maxFont = baseFont * 1.35;
-      const minFont = Math.max(8.5, baseFont * 0.6);
+      const baseFont = parseFloat(computed.fontSize) || 18;
+      const maxAutoByHeight = Math.max((availableHeight || 0) * 0.24, baseFont + 6);
+      const maxFont = Math.min(28, baseFont * 1.75, maxAutoByHeight);
+      const minFont = Math.max(7, baseFont * 0.58);
 
       const fits = (size) => {
         content.style.fontSize = `${size}px`;
-        return Math.ceil(content.scrollHeight) <= Math.floor(availableHeight);
+        const heightThreshold = availableHeight > 2 ? availableHeight - 1 : availableHeight;
+        return Math.ceil(content.scrollHeight) <= Math.floor(heightThreshold);
       };
 
       if (!fits(minFont)) {

@@ -630,8 +630,8 @@
   justify-content: flex-start;
   align-items: stretch;
   gap: .65em;
-  font-size: 1rem;
-  line-height: 1.45;
+  font-size: clamp(1.1rem, 1vw + 0.6rem, 1.35rem);
+  line-height: 1.42;
 }
 
 .card-text-box::before {
