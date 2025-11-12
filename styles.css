@@ -5,6 +5,10 @@
   --font-display: "Bangers", "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 .splash-highlights {
   margin: 0;
   padding: 0;
