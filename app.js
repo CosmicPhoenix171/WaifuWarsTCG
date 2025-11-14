@@ -623,6 +623,12 @@ function buildCollapsibleMovieCard(id, item) {
   }
   info.appendChild(header);
 
+  summary.appendChild(info);
+  card.appendChild(summary);
+
+  const details = document.createElement('div');
+  details.className = 'collapsible-details movie-card-details';
+
   const metaParts = [];
   if (item.year) metaParts.push(item.year);
   if (item.director) metaParts.push(item.director);
@@ -632,22 +638,8 @@ function buildCollapsibleMovieCard(id, item) {
     const meta = document.createElement('div');
     meta.className = 'meta';
     meta.textContent = metaParts.join(' • ');
-    info.appendChild(meta);
+    details.appendChild(meta);
   }
-
-  const shortCast = buildActorPreview(item.actors, 4);
-  if (shortCast) {
-    const actorLine = document.createElement('div');
-    actorLine.className = 'actor-line';
-    actorLine.textContent = `Cast: ${shortCast}`;
-    info.appendChild(actorLine);
-  }
-
-  summary.appendChild(info);
-  card.appendChild(summary);
-
-  const details = document.createElement('div');
-  details.className = 'collapsible-details movie-card-details';
 
   if (item.seriesName) {
     const seriesLine = document.createElement('div');
