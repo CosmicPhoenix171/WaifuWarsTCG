@@ -79,7 +79,7 @@ const listeners = {};
 let omdbWarningShown = false;
 let spinTimeouts = [];
 const actorFilters = { movies: '', tvShows: '', anime: '' };
-const expandedCards = { movies: null };
+const expandedCards = { movies: new Set() };
 const sortModes = { movies: 'title', tvShows: 'title', anime: 'title', books: 'title' };
 const listCaches = {};
 const metadataRefreshInflight = new Set();
@@ -421,9 +421,12 @@ function renderList(listType, data) {
     });
     container.appendChild(grid);
 
-    if (expandedCards.movies && !visibleIds.has(expandedCards.movies)) {
-      expandedCards.movies = null;
-    }
+    const expandedSet = ensureExpandedSet('movies');
+    expandedSet.forEach(cardId => {
+      if (!visibleIds.has(cardId)) {
+        expandedSet.delete(cardId);
+      }
+    });
 
     updateCollapsibleCardStates('movies');
     return;
@@ -576,7 +579,7 @@ function renderList(listType, data) {
 }
 
 function buildCollapsibleMovieCard(id, item) {
-  const isExpanded = expandedCards.movies === id;
+  const isExpanded = ensureExpandedSet('movies').has(id);
   const card = document.createElement('div');
   card.className = `card collapsible movie-card${isExpanded ? ' expanded' : ''}`;
   card.dataset.id = id;
@@ -727,19 +730,34 @@ function buildCollapsibleMovieCard(id, item) {
 
 function toggleCardExpansion(listType, cardId) {
   if (!(listType in expandedCards)) return;
-  const current = expandedCards[listType];
-  expandedCards[listType] = current === cardId ? null : cardId;
+  const expandedSet = ensureExpandedSet(listType);
+  if (expandedSet.has(cardId)) {
+    expandedSet.delete(cardId);
+  } else {
+    expandedSet.add(cardId);
+  }
   updateCollapsibleCardStates(listType);
 }
 
 function updateCollapsibleCardStates(listType) {
   const listEl = document.getElementById(`${listType}-list`);
   if (!listEl) return;
-  const targetId = expandedCards[listType];
+  const expandedSet = expandedCards[listType];
   listEl.querySelectorAll('.card.collapsible').forEach(card => {
-    const isMatch = card.dataset.id === targetId;
+    const isMatch = expandedSet instanceof Set
+      ? expandedSet.has(card.dataset.id)
+      : expandedSet === card.dataset.id;
     card.classList.toggle('expanded', isMatch);
   });
+}
+
+function ensureExpandedSet(listType) {
+  let store = expandedCards[listType];
+  if (!(store instanceof Set)) {
+    store = new Set(store ? [store] : []);
+    expandedCards[listType] = store;
+  }
+  return store;
 }
 
 
@@ -1310,7 +1328,7 @@ function resetFilterState() {
     actorFilters[key] = '';
   });
   Object.keys(expandedCards).forEach(key => {
-    expandedCards[key] = null;
+    expandedCards[key] = new Set();
   });
   Object.keys(listCaches).forEach(key => delete listCaches[key]);
   document.querySelectorAll('[data-role="actor-filter"]').forEach(input => {
