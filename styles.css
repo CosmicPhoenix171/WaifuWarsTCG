@@ -106,7 +106,7 @@ h1{margin:0 0 .35rem 0;font-size:1.8rem;letter-spacing:.4px}
 .suggestions .empty{padding:.6rem .7rem;color:var(--text-500);font-size:.85rem}
 
 .list{display:grid;gap:.8rem}
-.movies-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem;align-items:start}
+.movies-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;align-items:start;justify-items:center}
 .card{background:linear-gradient(180deg,rgba(30,43,54,0.88),rgba(24,35,45,0.88));padding:.95rem;border-radius:14px;border:1px solid var(--border);display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:stretch;box-shadow:0 12px 26px rgba(0,0,0,0.2);transition:transform .12s ease,box-shadow .24s ease,border-color .2s ease}
 .card:hover{transform:translateY(-2px);box-shadow:0 18px 36px rgba(0,0,0,0.28);border-color:#233546}
 .card .artwork{width:72px;height:110px;flex-shrink:0;border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.02);box-shadow:0 8px 20px rgba(0,0,0,0.35);border:1px solid rgba(36,54,68,0.8)}
@@ -130,7 +130,7 @@ h1{margin:0 0 .35rem 0;font-size:1.8rem;letter-spacing:.4px}
 .actions .btn{min-width:130px}
 
 .card.collapsible{cursor:pointer;transition:border-color .2s ease,box-shadow .24s ease}
-.card.collapsible.movie-card{display:flex;gap:0;padding:1rem;text-align:left;align-items:stretch;justify-content:center}
+.card.collapsible.movie-card{display:flex;gap:0;padding:1rem;text-align:left;align-items:flex-start;justify-content:flex-start;width:auto}
 .card.collapsible.movie-card:hover{border-color:#2a4055}
 .movie-card-summary{display:flex;flex-direction:column;align-items:center;gap:.6rem;text-align:center;flex:0 0 150px}
 .artwork-wrapper{display:flex;flex-direction:column;gap:.4rem;align-items:center}
