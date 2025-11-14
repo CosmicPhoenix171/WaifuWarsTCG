@@ -276,11 +276,14 @@ function signOut() {
   fbSignOut(auth).catch(err => console.error('Sign-out error', err));
 }
 
-function shouldUseRedirectSignIn() {
-  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
-  if (window.innerWidth && window.innerWidth <= 768) return true;
-  const ua = navigator.userAgent || '';
-  return /Android|iPhone|iPad|iPod|Mobile/i.test(ua);
+function shouldFallbackToRedirect(err) {
+  if (!err || !err.code) return false;
+  return [
+    'auth/operation-not-supported-in-this-environment',
+    'auth/popup-blocked',
+    'auth/popup-blocked-by-browser',
+    'auth/cancelled-popup-request'
+  ].includes(err.code);
 }
 
 async function signInWithGoogle() {
@@ -290,13 +293,19 @@ async function signInWithGoogle() {
     return;
   }
   try {
-    if (shouldUseRedirectSignIn()) {
-      await signInWithRedirect(auth, googleProvider);
-      return;
-    }
     await signInWithPopup(auth, googleProvider);
   } catch (err) {
     if (err && err.code === 'auth/popup-closed-by-user') return;
+    if (shouldFallbackToRedirect(err)) {
+      try {
+        await signInWithRedirect(auth, googleProvider);
+        return;
+      } catch (redirectErr) {
+        console.error('Redirect fallback failed', redirectErr);
+        alert('Google sign-in redirect failed. Please try again.');
+        return;
+      }
+    }
     console.error('Google sign-in failed', err);
     alert('Google sign-in failed. Please try again.');
   }
