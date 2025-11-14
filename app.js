@@ -179,10 +179,9 @@ function promptAddMissingCollectionParts(listType, collInfo, currentItem) {
   if (!collInfo || !Array.isArray(collInfo.parts)) return;
   const existing = listCaches[listType] ? Object.values(listCaches[listType]) : [];
   const existingKeys = new Set(existing.map(e => normalizeTitleKey(e.title)));
-  // Include the just-added item
   existingKeys.add(normalizeTitleKey(currentItem.title));
   const missing = collInfo.parts.filter(p => !existingKeys.has(normalizeTitleKey(p.title)));
-  if (!missing.length) return; // nothing to add
+  if (!missing.length) return;
 
   const modalRoot = document.getElementById('modal-root');
   modalRoot.innerHTML = '';
@@ -196,6 +195,7 @@ function promptAddMissingCollectionParts(listType, collInfo, currentItem) {
   const sub = document.createElement('p');
   sub.textContent = `Detected ${missing.length} not yet in your list.`;
   modal.appendChild(sub);
+
   const list = document.createElement('div');
   list.style.display = 'flex';
   list.style.flexDirection = 'column';
@@ -220,6 +220,7 @@ function promptAddMissingCollectionParts(listType, collInfo, currentItem) {
     checkboxes.push(cb);
   });
   modal.appendChild(list);
+
   const actions = document.createElement('div');
   actions.style.display = 'flex';
   actions.style.gap = '.5rem';
@@ -227,37 +228,39 @@ function promptAddMissingCollectionParts(listType, collInfo, currentItem) {
   const addBtn = document.createElement('button');
   addBtn.className = 'btn primary';
   addBtn.textContent = 'Add Selected';
-  const summaryTitle = document.createElement('div');
-  summaryTitle.className = 'movie-card-title';
-  summaryTitle.textContent = item.title || '(no title)';
-  summary.appendChild(summaryTitle);
+  addBtn.addEventListener('click', async () => {
+    const toAdd = checkboxes.filter(cb => cb.checked).map(cb => ({
+      title: cb.dataset.title,
+      year: sanitizeYear(cb.dataset.year),
+      seriesName: collInfo.collectionName,
+      seriesOrder: cb.dataset.order ? Number(cb.dataset.order) : null,
+      status: 'Planned'
+    }));
+    for (const part of toAdd) {
+      try {
+        if (isDuplicateCandidate(listType, part)) continue;
+        const baseTrailerUrl = buildTrailerUrl(part.title, part.year);
+        if (baseTrailerUrl) part.trailerUrl = baseTrailerUrl;
+        await addItem(listType, part);
+      } catch (e) {
+        console.warn('Failed to auto-add part', part.title, e);
+      }
+    }
+    modalRoot.innerHTML = '';
+  });
 
-  const artwork = document.createElement('div');
-  artwork.className = 'artwork-wrapper';
-  if (item.poster) {
-    const poster = document.createElement('div');
-    poster.className = 'artwork';
-    const img = document.createElement('img');
-    img.src = item.poster;
-    img.alt = `${item.title || 'Poster'} artwork`;
-    img.loading = 'lazy';
-    poster.appendChild(img);
-    artwork.appendChild(poster);
-  } else {
-    const placeholder = document.createElement('div');
-    placeholder.className = 'artwork placeholder';
-    placeholder.textContent = 'No Poster';
-    artwork.appendChild(placeholder);
-  }
-  summary.appendChild(artwork);
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'btn secondary';
+  cancelBtn.textContent = 'Skip';
+  cancelBtn.addEventListener('click', () => {
+    modalRoot.innerHTML = '';
+  });
 
-  if (item.status) {
-    const statusChip = buildStatusChip(item.status);
-    statusChip.classList.add('movie-card-status');
-    summary.appendChild(statusChip);
-  }
-  const provider = new GoogleAuthProvider();
-  signInWithPopup(auth, provider).catch(err => alert('Sign in failed: ' + err.message));
+  actions.appendChild(addBtn);
+  actions.appendChild(cancelBtn);
+  modal.appendChild(actions);
+  backdrop.appendChild(modal);
+  modalRoot.appendChild(backdrop);
 }
 
 function signOut() {
