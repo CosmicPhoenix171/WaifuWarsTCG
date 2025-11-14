@@ -380,10 +380,6 @@ function renderList(listType, data) {
       ? 'No items match this actor filter yet.'
       : 'No items yet. Add something!';
     container.innerHTML = '<div class="small">' + message + '</div>';
-    if (listType === 'movies') {
-      expandedCards.movies = null;
-      renderMovieDetailPanel(null);
-    }
     return;
   }
 
@@ -420,9 +416,6 @@ function renderList(listType, data) {
   });
 
   if (listType === 'movies') {
-    const layout = document.createElement('div');
-    layout.className = 'movies-layout';
-
     const grid = document.createElement('div');
     grid.className = 'movies-grid';
     const visibleIds = new Set();
@@ -431,21 +424,13 @@ function renderList(listType, data) {
       visibleIds.add(id);
       grid.appendChild(buildCollapsibleMovieCard(id, item));
     });
-    layout.appendChild(grid);
-
-    const detailPanel = document.createElement('div');
-    detailPanel.id = 'movie-detail-panel';
-    detailPanel.className = 'movie-detail-panel empty';
-    layout.appendChild(detailPanel);
-
-    container.appendChild(layout);
+    container.appendChild(grid);
 
     if (expandedCards.movies && !visibleIds.has(expandedCards.movies)) {
       expandedCards.movies = null;
     }
 
     updateCollapsibleCardStates('movies');
-    renderMovieDetailPanel(expandedCards.movies);
     return;
   }
 
@@ -602,9 +587,11 @@ function buildCollapsibleMovieCard(id, item) {
   card.dataset.id = id;
   card.addEventListener('click', () => toggleCardExpansion('movies', id));
 
-  const content = document.createElement('div');
-  content.className = 'movie-card-content';
+  const summary = document.createElement('div');
+  summary.className = 'movie-card-summary';
 
+  const artwork = document.createElement('div');
+  artwork.className = 'artwork-wrapper';
   if (item.poster) {
     const poster = document.createElement('div');
     poster.className = 'artwork';
@@ -613,13 +600,14 @@ function buildCollapsibleMovieCard(id, item) {
     img.alt = `${item.title || 'Poster'} artwork`;
     img.loading = 'lazy';
     poster.appendChild(img);
-    content.appendChild(poster);
+    artwork.appendChild(poster);
   } else {
     const placeholder = document.createElement('div');
     placeholder.className = 'artwork placeholder';
     placeholder.textContent = 'No Poster';
-    content.appendChild(placeholder);
+    artwork.appendChild(placeholder);
   }
+  summary.appendChild(artwork);
 
   const info = document.createElement('div');
   info.className = 'movie-card-info';
@@ -647,104 +635,19 @@ function buildCollapsibleMovieCard(id, item) {
     info.appendChild(meta);
   }
 
-  if (item.seriesName) {
-    const seriesLine = document.createElement('div');
-    seriesLine.className = 'series-line';
-    const parts = [`Series: ${item.seriesName}`];
-    if (item.seriesOrder !== undefined && item.seriesOrder !== null && item.seriesOrder !== '') {
-      parts.push(`Entry ${item.seriesOrder}`);
-    }
-    seriesLine.textContent = parts.join(' • ');
-    info.appendChild(seriesLine);
-  }
-
-  const actorPreview = buildActorPreview(item.actors, 6);
-  if (actorPreview) {
+  const shortCast = buildActorPreview(item.actors, 4);
+  if (shortCast) {
     const actorLine = document.createElement('div');
     actorLine.className = 'actor-line';
-    actorLine.textContent = `Cast: ${actorPreview}`;
+    actorLine.textContent = `Cast: ${shortCast}`;
     info.appendChild(actorLine);
   }
 
-  content.appendChild(info);
-  card.appendChild(content);
-  return card;
-}
+  summary.appendChild(info);
+  card.appendChild(summary);
 
-function toggleCardExpansion(listType, cardId) {
-  if (!(listType in expandedCards)) return;
-  const current = expandedCards[listType];
-  expandedCards[listType] = current === cardId ? null : cardId;
-  updateCollapsibleCardStates(listType);
-  if (listType === 'movies') {
-    renderMovieDetailPanel(expandedCards[listType]);
-  }
-}
-
-function updateCollapsibleCardStates(listType) {
-  const listEl = document.getElementById(`${listType}-list`);
-  if (!listEl) return;
-  const targetId = expandedCards[listType];
-  listEl.querySelectorAll('.card.collapsible').forEach(card => {
-    const isMatch = card.dataset.id === targetId;
-    card.classList.toggle('expanded', isMatch);
-  });
-}
-
-function renderMovieDetailPanel(selectedId) {
-  const panel = document.getElementById('movie-detail-panel');
-  if (!panel) return;
-  panel.innerHTML = '';
-  const cache = listCaches.movies || {};
-  if (!selectedId || !cache[selectedId]) {
-    panel.classList.add('empty');
-    const placeholder = document.createElement('div');
-    placeholder.className = 'detail-placeholder';
-    placeholder.textContent = 'Select a movie to see its details.';
-    panel.appendChild(placeholder);
-    return;
-  }
-
-  panel.classList.remove('empty');
-  const item = cache[selectedId];
-
-  if (item.poster) {
-    const poster = document.createElement('div');
-    poster.className = 'detail-poster';
-    const img = document.createElement('img');
-    img.src = item.poster;
-    img.alt = `${item.title || 'Poster'} artwork`;
-    img.loading = 'lazy';
-    poster.appendChild(img);
-    panel.appendChild(poster);
-  } else {
-    const placeholder = document.createElement('div');
-    placeholder.className = 'detail-poster placeholder';
-    placeholder.textContent = 'No Poster Available';
-    panel.appendChild(placeholder);
-  }
-
-  const header = document.createElement('div');
-  header.className = 'detail-header';
-  const title = document.createElement('h3');
-  title.textContent = item.title || '(no title)';
-  header.appendChild(title);
-  if (item.status) {
-    header.appendChild(buildStatusChip(item.status));
-  }
-  panel.appendChild(header);
-
-  const metaParts = [];
-  if (item.year) metaParts.push(item.year);
-  if (item.director) metaParts.push(item.director);
-  if (item.runtime) metaParts.push(item.runtime);
-  if (item.imdbRating) metaParts.push(`IMDb ${item.imdbRating}`);
-  if (metaParts.length) {
-    const meta = document.createElement('div');
-    meta.className = 'meta';
-    meta.textContent = metaParts.join(' • ');
-    panel.appendChild(meta);
-  }
+  const details = document.createElement('div');
+  details.className = 'collapsible-details movie-card-details';
 
   if (item.seriesName) {
     const seriesLine = document.createElement('div');
@@ -763,15 +666,15 @@ function renderMovieDetailPanel(selectedId) {
       parts.push(`Prev: ${item.previousPrequel}`);
     }
     seriesLine.textContent = parts.join(' • ');
-    panel.appendChild(seriesLine);
+    details.appendChild(seriesLine);
   }
 
-  const actorPreview = buildActorPreview(item.actors);
+  const actorPreview = buildActorPreview(item.actors, 12);
   if (actorPreview) {
     const actorLine = document.createElement('div');
     actorLine.className = 'actor-line';
     actorLine.textContent = `Cast: ${actorPreview}`;
-    panel.appendChild(actorLine);
+    details.appendChild(actorLine);
   }
 
   const links = document.createElement('div');
@@ -795,42 +698,63 @@ function renderMovieDetailPanel(selectedId) {
     links.appendChild(trailer);
   }
   if (links.children.length) {
-    panel.appendChild(links);
+    details.appendChild(links);
   }
 
   if (item.plot) {
     const plot = document.createElement('div');
     plot.className = 'plot-summary';
     plot.textContent = item.plot.trim();
-    panel.appendChild(plot);
+    details.appendChild(plot);
   }
 
   if (item.notes) {
     const notes = document.createElement('div');
     notes.className = 'notes';
     notes.textContent = item.notes;
-    panel.appendChild(notes);
+    details.appendChild(notes);
   }
 
   const actions = document.createElement('div');
-  actions.className = 'movie-detail-actions';
+  actions.className = 'actions collapsible-actions';
   const editBtn = document.createElement('button');
   editBtn.className = 'btn secondary';
   editBtn.textContent = 'Edit';
-  editBtn.addEventListener('click', () => openEditModal('movies', selectedId, item));
+  editBtn.addEventListener('click', (ev) => { ev.stopPropagation(); openEditModal('movies', id, item); });
   const delBtn = document.createElement('button');
   delBtn.className = 'btn ghost';
   delBtn.textContent = 'Delete';
-  delBtn.addEventListener('click', () => deleteItem('movies', selectedId));
+  delBtn.addEventListener('click', (ev) => { ev.stopPropagation(); deleteItem('movies', id); });
   const markBtn = document.createElement('button');
   markBtn.className = 'btn primary';
   markBtn.textContent = 'Mark Completed';
-  markBtn.addEventListener('click', () => updateItem('movies', selectedId, { status: 'Completed' }));
+  markBtn.addEventListener('click', (ev) => { ev.stopPropagation(); updateItem('movies', id, { status: 'Completed' }); });
   actions.appendChild(editBtn);
   actions.appendChild(delBtn);
   actions.appendChild(markBtn);
-  panel.appendChild(actions);
+  details.appendChild(actions);
+
+  card.appendChild(details);
+  return card;
 }
+
+function toggleCardExpansion(listType, cardId) {
+  if (!(listType in expandedCards)) return;
+  const current = expandedCards[listType];
+  expandedCards[listType] = current === cardId ? null : cardId;
+  updateCollapsibleCardStates(listType);
+}
+
+function updateCollapsibleCardStates(listType) {
+  const listEl = document.getElementById(`${listType}-list`);
+  if (!listEl) return;
+  const targetId = expandedCards[listType];
+  listEl.querySelectorAll('.card.collapsible').forEach(card => {
+    const isMatch = card.dataset.id === targetId;
+    card.classList.toggle('expanded', isMatch);
+  });
+}
+
 
 // Add item from form
 async function addItemFromForm(listType, form) {
@@ -1411,7 +1335,6 @@ function resetFilterState() {
     sel.value = mode;
   });
   updateCollapsibleCardStates('movies');
-  renderMovieDetailPanel(null);
 }
 
 function renderTitleSuggestions(container, suggestions, onSelect) {
