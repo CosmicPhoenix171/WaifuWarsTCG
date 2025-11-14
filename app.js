@@ -560,6 +560,10 @@ function renderList(listType, data) {
     card.appendChild(actions);
     container.appendChild(card);
   });
+
+  if (listType in expandedCards) {
+    updateCollapsibleCardStates(listType);
+  }
 }
 
 function buildCollapsibleMovieCard(id, item) {
@@ -690,10 +694,17 @@ function toggleCardExpansion(listType, cardId) {
   if (!(listType in expandedCards)) return;
   const current = expandedCards[listType];
   expandedCards[listType] = current === cardId ? null : cardId;
-  const cache = listCaches[listType];
-  if (cache) {
-    renderList(listType, cache);
-  }
+  updateCollapsibleCardStates(listType);
+}
+
+function updateCollapsibleCardStates(listType) {
+  const listEl = document.getElementById(`${listType}-list`);
+  if (!listEl) return;
+  const targetId = expandedCards[listType];
+  listEl.querySelectorAll('.card.collapsible').forEach(card => {
+    const isMatch = card.dataset.id === targetId;
+    card.classList.toggle('expanded', isMatch);
+  });
 }
 
 // Add item from form
@@ -1274,6 +1285,7 @@ function resetFilterState() {
     const mode = sortModes[listType] || 'title';
     sel.value = mode;
   });
+  updateCollapsibleCardStates('movies');
 }
 
 function renderTitleSuggestions(container, suggestions, onSelect) {
@@ -2160,32 +2172,3 @@ if (auth) {
   // If config was not added, attempt to still listen after a small delay
   try { handleAuthState(); } catch(e) { /* silent */ }
 }
-
-/*
-  README-style notes:
-
-  How to set up Firebase
-  1. Create a Firebase project at https://console.firebase.google.com
-  2. Enable Authentication -> Sign-in method -> Google
-  3. Create a Realtime Database and set its rules to the block at the top of this file.
-  4. In Project Settings -> Your apps, register a new Web App and copy the config.
-  5. Paste the config object into the `firebaseConfig` constant near the top of this file.
-
-  Where to paste Database Rules
-  - Copy the rules at the top of this file (inside the comment) into the Realtime Database Rules editor.
-
-  How to run locally
-  - This is a static site. You can open `index.html` directly, but some browsers block module imports when opened via file://.
-  - Recommended: run a simple static server. Example using Python 3:
-
-      python3 -m http.server 8000
-
-    Then open http://localhost:8000 in your browser.
-
-  Notes
-  - The `firebaseConfig` object must include `databaseURL` (Realtime DB URL).
-  - Security rules must be applied in the Firebase Console to enforce per-user access.
-  - This app uses Firebase v9 modular SDK via CDN imports.
-  - Set `OMDB_API_KEY` near the top of this file with your OMDb API key to enable automatic metadata lookups for movies, TV, and anime.
-
-*/
