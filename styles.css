@@ -106,7 +106,7 @@ h1{margin:0 0 .35rem 0;font-size:1.8rem;letter-spacing:.4px}
 .suggestions .empty{padding:.6rem .7rem;color:var(--text-500);font-size:.85rem}
 
 .list{display:grid;gap:.8rem}
-.movies-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem;align-items:start;justify-items:center;grid-auto-flow:dense}
+.movies-grid{display:flex;flex-wrap:wrap;gap:1rem;align-items:flex-start;justify-content:flex-start}
 .card{background:linear-gradient(180deg,rgba(30,43,54,0.88),rgba(24,35,45,0.88));padding:.95rem;border-radius:14px;border:1px solid var(--border);display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:stretch;box-shadow:0 12px 26px rgba(0,0,0,0.2);transition:transform .12s ease,box-shadow .24s ease,border-color .2s ease}
 .card:hover{transform:translateY(-2px);box-shadow:0 18px 36px rgba(0,0,0,0.28);border-color:#233546}
 .card .artwork{width:72px;height:110px;flex-shrink:0;border-radius:10px;overflow:hidden;background:rgba(255,255,255,0.02);box-shadow:0 8px 20px rgba(0,0,0,0.35);border:1px solid rgba(36,54,68,0.8)}
@@ -130,7 +130,7 @@ h1{margin:0 0 .35rem 0;font-size:1.8rem;letter-spacing:.4px}
 .actions .btn{min-width:130px}
 
 .card.collapsible{cursor:pointer;transition:border-color .2s ease,box-shadow .24s ease}
-.card.collapsible.movie-card{display:flex;gap:0;padding:1rem;text-align:left;align-items:flex-start;justify-content:flex-start;width:100%;max-width:260px;margin:0 auto;transition:grid-column .2s ease,width .2s ease,max-width .2s ease}
+.card.collapsible.movie-card{display:flex;gap:0;padding:1rem;text-align:left;align-items:flex-start;justify-content:flex-start;width:auto;flex:0 1 240px;max-width:260px;margin:0;transition:flex-basis .2s ease,max-width .2s ease}
 .card.collapsible.movie-card:hover{border-color:#2a4055}
 .movie-card-summary{display:flex;flex-direction:column;align-items:center;gap:.6rem;text-align:center;flex:0 0 150px}
 .artwork-wrapper{display:flex;flex-direction:column;gap:.4rem;align-items:center}
@@ -142,7 +142,7 @@ h1{margin:0 0 .35rem 0;font-size:1.8rem;letter-spacing:.4px}
 .card.collapsible.movie-card .meta{font-size:.82rem}
 .card.collapsible.movie-card .actor-line{font-size:.8rem}
 .movie-card-details{display:none;flex-direction:column;gap:.55rem;border-left:1px solid transparent;padding-left:0}
-.card.collapsible.movie-card.expanded{border-color:#2a4055;box-shadow:0 16px 34px rgba(0,0,0,0.32);grid-column:span 2;max-width:100%}
+.card.collapsible.movie-card.expanded{border-color:#2a4055;box-shadow:0 16px 34px rgba(0,0,0,0.32);flex:1 1 520px;max-width:100%}
 .card.collapsible.movie-card.expanded .movie-card-details{display:flex;flex:1;border-left:1px solid var(--border);padding-left:1.25rem;margin-left:1.25rem}
 .collapsible-links{display:flex;flex-wrap:wrap;gap:.6rem}
 .collapsible-actions{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:flex-end}
@@ -179,8 +179,9 @@ h1{margin:0 0 .35rem 0;font-size:1.8rem;letter-spacing:.4px}
 @media (max-width:900px){
   .add-form{grid-template-columns:minmax(220px,1fr) 1fr;}
   .add-form select{grid-column:1 / -1}
-  .card.collapsible.movie-card{flex-direction:column;max-width:100%}
-  .card.collapsible.movie-card.expanded{grid-column:span 1}
+  .movies-grid{justify-content:center}
+  .card.collapsible.movie-card{flex-direction:column;max-width:100%;flex:0 1 320px}
+  .card.collapsible.movie-card.expanded{flex:1 1 100%}
   .movie-card-details{border-left:0;padding-left:0;width:100%}
   .card.collapsible.movie-card.expanded .movie-card-details{border-left:0;border-top:1px solid var(--border);padding-top:.85rem;padding-left:0;margin-left:0}
 }
@@ -196,7 +197,7 @@ h1{margin:0 0 .35rem 0;font-size:1.8rem;letter-spacing:.4px}
   .card{grid-template-columns:60px 1fr;}
   .actions{grid-column:1 / -1;flex-direction:row;justify-content:flex-end}
   .actions .btn{min-width:unset}
-  .movies-grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+  .movies-grid{justify-content:center}
   .wheel-result-card{grid-template-columns:1fr;}
   .wheel-result-card .poster{width:100%;height:200px}
 }
