@@ -48,6 +48,7 @@ let tmdbWarningShown = false;
 let spinTimeouts = [];
 const actorFilters = { movies: '', tvShows: '', anime: '' };
 const expandedCards = { movies: new Set() };
+const collapsedSeries = { movies: new Set(), tvShows: new Set(), anime: new Set() };
 const sortModes = { movies: 'title', tvShows: 'title', anime: 'title', books: 'title' };
 const listCaches = {};
 const metadataRefreshInflight = new Set();
@@ -461,11 +462,39 @@ function renderList(listType, data) {
 function renderMoviesGrid(container, entries) {
   const grid = createEl('div', 'movies-grid');
   const visibleIds = new Set();
+  const seriesFirstCards = new Map(); // Track which card is first in each series
 
+  // First pass: identify first card in each series
+  entries.forEach(([id, item]) => {
+    if (item && item.seriesName) {
+      if (!seriesFirstCards.has(item.seriesName)) {
+        seriesFirstCards.set(item.seriesName, { id, item, order: parseSeriesOrder(item.seriesOrder) });
+      } else {
+        const current = seriesFirstCards.get(item.seriesName);
+        const thisOrder = parseSeriesOrder(item.seriesOrder);
+        if (thisOrder < current.order) {
+          seriesFirstCards.set(item.seriesName, { id, item, order: thisOrder });
+        }
+      }
+    }
+  });
+
+  // Second pass: render cards
   entries.forEach(([id, item]) => {
     if (!item) return;
+    
+    // Check if this card should be hidden (part of collapsed series but not the first card)
+    if (item.seriesName && isSeriesCollapsed('movies', item.seriesName)) {
+      const firstCard = seriesFirstCards.get(item.seriesName);
+      if (firstCard && firstCard.id !== id) {
+        // This card is part of a collapsed series and is not the first card, skip it
+        return;
+      }
+    }
+    
     visibleIds.add(id);
-    grid.appendChild(buildCollapsibleMovieCard(id, item));
+    const isFirstInSeries = item.seriesName && seriesFirstCards.get(item.seriesName)?.id === id;
+    grid.appendChild(buildCollapsibleMovieCard(id, item, isFirstInSeries, entries));
   });
 
   container.appendChild(grid);
@@ -481,18 +510,72 @@ function renderMoviesGrid(container, entries) {
 }
 
 function renderStandardList(container, listType, entries) {
+  const seriesFirstCards = new Map(); // Track which card is first in each series
+
+  // First pass: identify first card in each series
+  entries.forEach(([id, item]) => {
+    if (item && item.seriesName) {
+      if (!seriesFirstCards.has(item.seriesName)) {
+        seriesFirstCards.set(item.seriesName, { id, item, order: parseSeriesOrder(item.seriesOrder) });
+      } else {
+        const current = seriesFirstCards.get(item.seriesName);
+        const thisOrder = parseSeriesOrder(item.seriesOrder);
+        if (thisOrder < current.order) {
+          seriesFirstCards.set(item.seriesName, { id, item, order: thisOrder });
+        }
+      }
+    }
+  });
+
+  // Second pass: render cards
   entries.forEach(([id, item]) => {
     if (!item) return;
-    container.appendChild(buildStandardCard(listType, id, item));
+    
+    // Check if this card should be hidden (part of collapsed series but not the first card)
+    if (item.seriesName && isSeriesCollapsed(listType, item.seriesName)) {
+      const firstCard = seriesFirstCards.get(item.seriesName);
+      if (firstCard && firstCard.id !== id) {
+        // This card is part of a collapsed series and is not the first card, skip it
+        return;
+      }
+    }
+    
+    const isFirstInSeries = item.seriesName && seriesFirstCards.get(item.seriesName)?.id === id;
+    container.appendChild(buildStandardCard(listType, id, item, isFirstInSeries, entries));
   });
 }
 
-function buildCollapsibleMovieCard(id, item) {
+function buildCollapsibleMovieCard(id, item, isFirstInSeries = false, allEntries = []) {
   const card = createEl('div', 'card collapsible movie-card');
   card.dataset.id = id;
   if (ensureExpandedSet('movies').has(id)) {
     card.classList.add('expanded');
   }
+  
+  // Add series collapse badge if this is the first card in a series
+  if (isFirstInSeries && item.seriesName) {
+    card.classList.add('series-first');
+    const isCollapsed = isSeriesCollapsed('movies', item.seriesName);
+    if (isCollapsed) {
+      card.classList.add('series-collapsed');
+    }
+    
+    // Count how many cards are in this series
+    const seriesCount = allEntries.filter(([, i]) => i && i.seriesName === item.seriesName).length;
+    
+    // Add collapse button
+    const collapseBtn = createEl('button', 'series-collapse-btn');
+    collapseBtn.setAttribute('aria-label', isCollapsed ? 'Expand series' : 'Collapse series');
+    collapseBtn.innerHTML = isCollapsed 
+      ? `<span class="series-count">+${seriesCount - 1}</span>` 
+      : `<span class="series-count">${seriesCount}</span>`;
+    collapseBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleSeriesCollapse('movies', item.seriesName);
+    });
+    card.appendChild(collapseBtn);
+  }
+  
   card.addEventListener('click', () => toggleCardExpansion('movies', id));
 
   card.appendChild(buildMovieCardSummary(item));
@@ -671,8 +754,32 @@ function buildMovieCardActions(listType, id, item) {
   return actions;
 }
 
-function buildStandardCard(listType, id, item) {
+function buildStandardCard(listType, id, item, isFirstInSeries = false, allEntries = []) {
   const card = createEl('div', 'card');
+  
+  // Add series collapse badge if this is the first card in a series
+  if (isFirstInSeries && item.seriesName) {
+    card.classList.add('series-first');
+    const isCollapsed = isSeriesCollapsed(listType, item.seriesName);
+    if (isCollapsed) {
+      card.classList.add('series-collapsed');
+    }
+    
+    // Count how many cards are in this series
+    const seriesCount = allEntries.filter(([, i]) => i && i.seriesName === item.seriesName).length;
+    
+    // Add collapse button
+    const collapseBtn = createEl('button', 'series-collapse-btn-standard');
+    collapseBtn.setAttribute('aria-label', isCollapsed ? 'Expand series' : 'Collapse series');
+    collapseBtn.textContent = isCollapsed 
+      ? `+${seriesCount - 1} more` 
+      : `${seriesCount} in series`;
+    collapseBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleSeriesCollapse(listType, item.seriesName);
+    });
+    card.appendChild(collapseBtn);
+  }
 
   if (item.poster) {
     const artwork = createEl('div', 'artwork');
@@ -801,6 +908,45 @@ function ensureExpandedSet(listType) {
     expandedCards[listType] = store;
   }
   return store;
+}
+
+function toggleSeriesCollapse(listType, seriesName) {
+  if (!(listType in collapsedSeries)) return;
+  const collapsedSet = collapsedSeries[listType];
+  if (collapsedSet.has(seriesName)) {
+    collapsedSet.delete(seriesName);
+  } else {
+    collapsedSet.add(seriesName);
+  }
+  // Re-render the list to update visibility
+  const cached = listCaches[listType];
+  if (cached) {
+    renderList(listType, cached);
+  }
+}
+
+function isSeriesCollapsed(listType, seriesName) {
+  if (!seriesName || !(listType in collapsedSeries)) return false;
+  return collapsedSeries[listType].has(seriesName);
+}
+
+function getSeriesFirstCard(entries, seriesName) {
+  if (!seriesName) return null;
+  // Find the card with the lowest seriesOrder for this series
+  let firstCard = null;
+  let lowestOrder = Infinity;
+  
+  entries.forEach(([id, item]) => {
+    if (item && item.seriesName === seriesName) {
+      const order = parseSeriesOrder(item.seriesOrder);
+      if (order < lowestOrder) {
+        lowestOrder = order;
+        firstCard = { id, item };
+      }
+    }
+  });
+  
+  return firstCard;
 }
 
 
