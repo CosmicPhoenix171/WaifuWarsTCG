@@ -49,7 +49,7 @@ h1{margin:0 0 .35rem 0;font-size:1.8rem;letter-spacing:.4px}
 .hidden{display:none}
 
 .topbar{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.5rem;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:20;background:linear-gradient(180deg,rgba(15,23,32,0.92),rgba(15,23,32,0.7));backdrop-filter:saturate(1.15) blur(8px)}
-.brand{font-weight:700;letter-spacing:0.45px;font-size:1.05rem}
+.brand{font-weight:700;letter-spacing:0.45px;font-size:1.05rem;display:flex;align-items:center;gap:.25rem}
 .user-info{display:flex;gap:.75rem;align-items:center}
 #back-to-top{font-size:.85rem;padding:.45rem .75rem}
 
