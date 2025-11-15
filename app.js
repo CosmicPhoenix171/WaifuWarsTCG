@@ -493,146 +493,7 @@ function renderList(listType, data) {
     return;
   }
 
-  filtered.forEach(([id, item]) => {
-    if (!item) return;
-
-    const card = document.createElement('div');
-    card.className = 'card';
-
-    if (item.poster) {
-      const artwork = document.createElement('div');
-      artwork.className = 'artwork';
-      const img = document.createElement('img');
-      img.src = item.poster;
-      img.alt = `${item.title || 'Poster'} artwork`;
-      img.loading = 'lazy';
-      artwork.appendChild(img);
-      card.appendChild(artwork);
-    }
-
-    const left = document.createElement('div');
-    left.className = 'card-body';
-
-    const header = document.createElement('div');
-    header.className = 'card-header';
-    const title = document.createElement('div');
-    title.className = 'title';
-    title.textContent = item.title || '(no title)';
-    header.appendChild(title);
-    if (item.status) {
-      header.appendChild(buildStatusChip(item.status));
-    }
-
-    left.appendChild(header);
-
-    const metaParts = [];
-    if (item.year) metaParts.push(item.year);
-    if (listType === 'books') {
-      if (item.author) metaParts.push(item.author);
-    } else {
-      if (item.director) metaParts.push(item.director);
-      if (item.imdbRating) metaParts.push(`IMDb ${item.imdbRating}`);
-      if (item.runtime) metaParts.push(item.runtime);
-    }
-
-    const metaText = metaParts.filter(Boolean).join(' • ');
-    if (metaText) {
-      const meta = document.createElement('div');
-      meta.className = 'meta';
-      meta.textContent = metaText;
-      left.appendChild(meta);
-    }
-
-    if (listType !== 'books' && item.seriesName) {
-      const seriesLine = document.createElement('div');
-      seriesLine.className = 'series-line';
-      const parts = [`Series: ${item.seriesName}`];
-      if (item.seriesOrder !== undefined && item.seriesOrder !== null && item.seriesOrder !== '') {
-        parts.push(`Entry ${item.seriesOrder}`);
-      }
-      if (item.seriesSize) {
-        parts.push(`of ${item.seriesSize}`);
-      }
-      if (item.nextSequel) {
-        parts.push(`Next: ${item.nextSequel}`);
-      }
-      if (item.previousPrequel) {
-        parts.push(`Prev: ${item.previousPrequel}`);
-      }
-      seriesLine.textContent = parts.join(' • ');
-      left.appendChild(seriesLine);
-    }
-
-    if (listType !== 'books') {
-      const actorPreview = buildActorPreview(item.actors, 5);
-      if (actorPreview) {
-        const actorLine = document.createElement('div');
-        actorLine.className = 'actor-line';
-        actorLine.textContent = `Cast: ${actorPreview}`;
-        left.appendChild(actorLine);
-      }
-    }
-
-    if (item.imdbUrl) {
-      const imdbLink = document.createElement('a');
-      imdbLink.href = item.imdbUrl;
-      imdbLink.target = '_blank';
-      imdbLink.rel = 'noopener noreferrer';
-      imdbLink.className = 'meta-link';
-      imdbLink.textContent = 'View on IMDb';
-      left.appendChild(imdbLink);
-    }
-    if (item.trailerUrl) {
-      const trailerLink = document.createElement('a');
-      trailerLink.href = item.trailerUrl;
-      trailerLink.target = '_blank';
-      trailerLink.rel = 'noopener noreferrer';
-      trailerLink.className = 'meta-link';
-      trailerLink.textContent = 'Watch Trailer';
-      left.appendChild(trailerLink);
-    }
-
-    if (item.plot) {
-      const plot = document.createElement('div');
-      plot.className = 'plot-summary';
-      const cleanPlot = item.plot.trim();
-      plot.textContent = cleanPlot.length > 220 ? `${cleanPlot.slice(0, 217)}…` : cleanPlot;
-      left.appendChild(plot);
-    }
-    if (item.notes) {
-      const notes = document.createElement('div');
-      notes.className = 'notes';
-      notes.textContent = item.notes;
-      left.appendChild(notes);
-    }
-
-    const actions = document.createElement('div');
-    actions.className = 'actions';
-    const editBtn = document.createElement('button');
-    editBtn.className = 'btn secondary';
-    editBtn.textContent = 'Edit';
-    editBtn.addEventListener('click', () => openEditModal(listType, id, item));
-
-    const delBtn = document.createElement('button');
-    delBtn.className = 'btn ghost';
-    delBtn.textContent = 'Delete';
-    delBtn.addEventListener('click', () => deleteItem(listType, id));
-
-    actions.appendChild(editBtn);
-    actions.appendChild(delBtn);
-
-    if (['movies','tvShows','anime'].includes(listType)) {
-      const markBtn = document.createElement('button');
-      markBtn.className = 'btn primary';
-      markBtn.textContent = 'Mark Completed';
-      markBtn.addEventListener('click', () => updateItem(listType, id, { status: 'Completed' }));
-      actions.appendChild(markBtn);
-    }
-
-    card.appendChild(left);
-    card.appendChild(actions);
-    container.appendChild(card);
-  });
+  renderStandardList(container, listType, filtered);
 
   if (listType in expandedCards) {
     updateCollapsibleCardStates(listType);
@@ -659,6 +520,13 @@ function renderMoviesGrid(container, entries) {
   });
 
   updateCollapsibleCardStates('movies');
+}
+
+function renderStandardList(container, listType, entries) {
+  entries.forEach(([id, item]) => {
+    if (!item) return;
+    container.appendChild(buildStandardCard(listType, id, item));
+  });
 }
 
 function buildCollapsibleMovieCard(id, item) {
@@ -824,6 +692,113 @@ function buildMovieCardActions(listType, id, item) {
     });
     actions.appendChild(btn);
   });
+
+  return actions;
+}
+
+function buildStandardCard(listType, id, item) {
+  const card = createEl('div', 'card');
+
+  if (item.poster) {
+    const artwork = createEl('div', 'artwork');
+    const img = createEl('img');
+    img.src = item.poster;
+    img.alt = `${item.title || 'Poster'} artwork`;
+    img.loading = 'lazy';
+    artwork.appendChild(img);
+    card.appendChild(artwork);
+  }
+
+  const body = createEl('div', 'card-body');
+  body.appendChild(buildStandardCardHeader(item));
+
+  const metaText = buildStandardMetaText(listType, item);
+  if (metaText) {
+    body.appendChild(createEl('div', 'meta', { text: metaText }));
+  }
+
+  if (listType !== 'books') {
+    const seriesLine = buildSeriesLine(item);
+    if (seriesLine) body.appendChild(seriesLine);
+    const actorLine = buildStandardActorLine(item);
+    if (actorLine) body.appendChild(actorLine);
+  }
+
+  appendMediaLinks(body, item);
+
+  if (item.plot) {
+    const cleanPlot = item.plot.trim();
+    const plotText = cleanPlot.length > 220 ? `${cleanPlot.slice(0, 217)}…` : cleanPlot;
+    body.appendChild(createEl('div', 'plot-summary', { text: plotText }));
+  }
+  if (item.notes) {
+    body.appendChild(createEl('div', 'notes', { text: item.notes }));
+  }
+
+  card.appendChild(body);
+  card.appendChild(buildStandardCardActions(listType, id, item));
+  return card;
+}
+
+function buildStandardCardHeader(item) {
+  const header = createEl('div', 'card-header');
+  header.appendChild(createEl('div', 'title', { text: item.title || '(no title)' }));
+  if (item.status) header.appendChild(buildStatusChip(item.status));
+  return header;
+}
+
+function buildStandardMetaText(listType, item) {
+  const metaParts = [];
+  if (item.year) metaParts.push(item.year);
+  if (listType === 'books') {
+    if (item.author) metaParts.push(item.author);
+  } else {
+    if (item.director) metaParts.push(item.director);
+    if (item.imdbRating) metaParts.push(`IMDb ${item.imdbRating}`);
+    if (item.runtime) metaParts.push(item.runtime);
+  }
+  return metaParts.filter(Boolean).join(' • ');
+}
+
+function buildStandardActorLine(item) {
+  const actorPreview = buildActorPreview(item.actors, 5);
+  if (!actorPreview) return null;
+  return createEl('div', 'actor-line', { text: `Cast: ${actorPreview}` });
+}
+
+function appendMediaLinks(container, item) {
+  const links = [];
+  if (item.imdbUrl) {
+    links.push({ href: item.imdbUrl, label: 'View on IMDb' });
+  }
+  if (item.trailerUrl) {
+    links.push({ href: item.trailerUrl, label: 'Watch Trailer' });
+  }
+  links.forEach(link => {
+    const anchor = createEl('a', 'meta-link', { text: link.label });
+    anchor.href = link.href;
+    anchor.target = '_blank';
+    anchor.rel = 'noopener noreferrer';
+    container.appendChild(anchor);
+  });
+}
+
+function buildStandardCardActions(listType, id, item) {
+  const actions = createEl('div', 'actions');
+
+  const editBtn = createEl('button', 'btn secondary', { text: 'Edit' });
+  editBtn.addEventListener('click', () => openEditModal(listType, id, item));
+  actions.appendChild(editBtn);
+
+  const deleteBtn = createEl('button', 'btn ghost', { text: 'Delete' });
+  deleteBtn.addEventListener('click', () => deleteItem(listType, id));
+  actions.appendChild(deleteBtn);
+
+  if (['movies', 'tvShows', 'anime'].includes(listType)) {
+    const markBtn = createEl('button', 'btn primary', { text: 'Mark Completed' });
+    markBtn.addEventListener('click', () => updateItem(listType, id, { status: 'Completed' }));
+    actions.appendChild(markBtn);
+  }
 
   return actions;
 }
