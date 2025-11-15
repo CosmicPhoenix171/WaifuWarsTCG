@@ -885,9 +885,14 @@ async function addItemFromForm(listType, form) {
   try {
     let metadata = form.__selectedMetadata || null;
     const selectedImdbId = form.dataset.selectedImdbId || '';
-    if (!metadata && OMDB_API_KEY && ['movies', 'tvShows', 'anime'].includes(listType)) {
+    const supportsMetadata = ['movies', 'tvShows', 'anime'].includes(listType);
+    const hasMetadataProvider = Boolean(OMDB_API_KEY || TMDB_API_KEY);
+    if (!metadata && supportsMetadata && hasMetadataProvider) {
+      if (!OMDB_API_KEY) {
+        maybeWarnAboutOmdbKey();
+      }
       metadata = await fetchOmdbMetadata(listType, { title, year, imdbId: selectedImdbId });
-    } else if (!metadata && !OMDB_API_KEY && ['movies', 'tvShows', 'anime'].includes(listType)) {
+    } else if (!metadata && supportsMetadata && !hasMetadataProvider) {
       maybeWarnAboutOmdbKey();
     }
 
@@ -1312,7 +1317,10 @@ function needsMetadataRefresh(listType, item) {
 }
 
 function refreshMetadataForItem(listType, itemId, item, missingFields = []) {
-  if (!OMDB_API_KEY) return;
+  if (!OMDB_API_KEY && !TMDB_API_KEY) {
+    maybeWarnAboutOmdbKey();
+    return;
+  }
   const key = `${listType}:${itemId}`;
   if (metadataRefreshInflight.has(key)) return;
   metadataRefreshInflight.add(key);
@@ -1345,9 +1353,11 @@ function refreshMetadataForItem(listType, itemId, item, missingFields = []) {
 }
 
 function maybeRefreshMetadata(listType, data) {
-  if (!OMDB_API_KEY) return;
   if (!currentUser) return;
   if (!['movies', 'tvShows', 'anime'].includes(listType)) return;
+  if (!OMDB_API_KEY && !TMDB_API_KEY) {
+    return;
+  }
 
   Object.entries(data || {}).forEach(([id, item]) => {
     if (!needsMetadataRefresh(listType, item)) return;
