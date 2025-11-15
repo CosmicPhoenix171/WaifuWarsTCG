@@ -551,12 +551,6 @@ function buildMovieCardDetails(listType, id, item) {
     infoStack.appendChild(extendedMeta);
   }
 
-  // Watch Now dropdown (TMDb providers)
-  if (listType === 'movies') {
-    const watchNow = buildWatchNowSection(listType, item);
-    if (watchNow) infoStack.appendChild(watchNow);
-  }
-
   const seriesLine = buildSeriesLine(item);
   if (seriesLine) {
     infoStack.appendChild(seriesLine);
@@ -567,7 +561,7 @@ function buildMovieCardDetails(listType, id, item) {
     infoStack.appendChild(actorLine);
   }
 
-  const links = buildMovieLinks(item);
+  const links = buildMovieLinks(listType, item);
   if (links) {
     infoStack.appendChild(links);
   }
@@ -630,7 +624,7 @@ function buildMovieCastLine(item) {
   return createEl('div', 'actor-line', { text: `Cast: ${actorPreview}` });
 }
 
-function buildMovieLinks(item) {
+function buildMovieLinks(listType, item) {
   const links = createEl('div', 'collapsible-links');
   if (item.imdbUrl) {
     const imdb = createEl('a', 'meta-link', { text: 'View on IMDb' });
@@ -645,6 +639,11 @@ function buildMovieLinks(item) {
     trailer.target = '_blank';
     trailer.rel = 'noopener noreferrer';
     links.appendChild(trailer);
+  }
+  // Inline "Watch Now" next to trailer for movies
+  if (listType === 'movies' && TMDB_API_KEY) {
+    const watchInline = buildWatchNowSection(listType, item, true);
+    if (watchInline) links.appendChild(watchInline);
   }
   return links.children.length ? links : null;
 }
@@ -1762,26 +1761,29 @@ async function fetchWatchProviders(mediaType, tmdbId) {
   return await resp.json();
 }
 
-function buildWatchNowSection(listType, item) {
+function buildWatchNowSection(listType, item, inline = false) {
   if (!TMDB_API_KEY) return null;
   // Only applicable for screen media (movies/tv). We add it on movie cards.
   const region = getUserRegion();
-  const block = createEl('div', 'watch-now-block');
+  const block = inline ? createEl('span', 'watch-now-inline') : createEl('div', 'watch-now-block');
 
-  // Layout container
-  const controlRow = createEl('div', 'watch-now-controls');
-  const btn = createEl('button', 'btn secondary', { text: 'Watch Now' });
-  const regionTag = createEl('span', 'watch-region small', { text: `Region: ${region}` });
-  controlRow.style.display = 'flex';
-  controlRow.style.gap = '.5rem';
-  controlRow.style.alignItems = 'center';
-  controlRow.appendChild(btn);
-  controlRow.appendChild(regionTag);
-  block.appendChild(controlRow);
+  // Control (inline next to links)
+  const btnClass = inline ? 'meta-link' : 'btn secondary';
+  const btn = createEl('button', btnClass, { text: 'Watch Now' });
+  if (!inline) {
+    const controlRow = createEl('div', 'watch-now-controls');
+    controlRow.style.display = 'flex';
+    controlRow.style.gap = '.5rem';
+    controlRow.style.alignItems = 'center';
+    controlRow.appendChild(btn);
+    block.appendChild(controlRow);
+  } else {
+    block.appendChild(btn);
+  }
 
   const dropdown = createEl('div', 'watch-dropdown');
   dropdown.style.display = 'none';
-  dropdown.style.marginTop = '.5rem';
+  dropdown.style.marginTop = inline ? '.25rem' : '.5rem';
   dropdown.style.background = 'var(--card-bg, #1f1f1f)';
   dropdown.style.border = '1px solid var(--border, #333)';
   dropdown.style.borderRadius = '8px';
@@ -1890,21 +1892,19 @@ function buildWatchNowSection(listType, item) {
       }
     });
 
-    const footer = createEl('div', 'watch-footer');
-    footer.style.display = 'flex';
-    footer.style.justifyContent = 'space-between';
-    footer.style.alignItems = 'center';
-    footer.style.marginTop = any ? '.5rem' : '0';
-    const note = createEl('span', 'small', { text: `Region: ${effRegion}` });
-    footer.appendChild(note);
     if (payload.link) {
+      const footer = createEl('div', 'watch-footer');
+      footer.style.display = 'flex';
+      footer.style.justifyContent = 'flex-end';
+      footer.style.alignItems = 'center';
+      footer.style.marginTop = any ? '.5rem' : '0';
       const allLink = createEl('a', 'meta-link', { text: 'All options' });
       allLink.href = payload.link;
       allLink.target = '_blank';
       allLink.rel = 'noopener noreferrer';
       footer.appendChild(allLink);
+      dropdown.appendChild(footer);
     }
-    dropdown.appendChild(footer);
 
     if (!any) {
       const empty = createEl('div', 'small', { text: 'No providers found for this region.' });
@@ -1913,7 +1913,7 @@ function buildWatchNowSection(listType, item) {
     }
   }
 
-  btn.addEventListener('click', (ev) => { ev.stopPropagation(); toggle(); });
+  btn.addEventListener('click', (ev) => { ev.preventDefault?.(); ev.stopPropagation(); toggle(); });
   // Prevent clicks inside dropdown from toggling the parent card
   dropdown.addEventListener('click', (ev) => ev.stopPropagation());
 
