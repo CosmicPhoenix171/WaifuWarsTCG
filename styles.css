@@ -124,6 +124,7 @@ h1{margin:0 0 .35rem 0;font-size:1.8rem;letter-spacing:.4px}
 .card-header{display:flex;align-items:center;justify-content:space-between;gap:.6rem;flex-wrap:wrap}
 .card .title{font-weight:700;font-size:1rem}
 .card .meta{color:var(--text-500);font-size:.85rem}
+.movie-card-extra-meta{color:var(--text-300);font-size:.84rem;margin-top:.15rem}
 .series-line{color:var(--text-300);font-size:.85rem;margin-top:.1rem}
 .card .plot-summary,.card .notes{color:var(--text-300);font-size:.9rem}
 .card .meta-link{display:inline-block;margin-top:.1rem;margin-right:.75rem;color:var(--primary-400);font-weight:600;font-size:.82rem;text-decoration:none}

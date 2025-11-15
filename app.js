@@ -1,23 +1,3 @@
-/**
- * THE LIST ™ - app.js
- *
- * Firebase Realtime Database rules (paste into Firebase Console -> Realtime Database -> Rules):
- *
- * {
- *   "rules": {
- *     "users": {
- *       "$uid": {
- *         ".read": "auth != null && auth.uid === $uid",
- *         ".write": "auth != null && auth.uid === $uid"
- *       }
- *     }
- *   }
- * }
- *
- * This ensures users can only read/write their own data.
- */
-
-// Imports (modular Firebase v9)
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js';
 import {
   getAuth,
@@ -43,18 +23,6 @@ import {
   get
 } from 'https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js';
 
-// ===== TODO: Paste your Firebase config here =====
-// Replace the placeholder below with your Firebase project's config object.
-// Example:
-// const firebaseConfig = {
-//   apiKey: "...",
-//   authDomain: "...",
-//   databaseURL: "https://<your-db>.firebaseio.com",
-//   projectId: "...",
-//   storageBucket: "...",
-//   messagingSenderId: "...",
-//   appId: "..."
-// };
 const firebaseConfig = {
   apiKey: 'AIzaSyCWJpMYjSdV9awGRwJ3zyZ_9sDjUrnTu2I',
   authDomain: 'the-list-a700d.firebaseapp.com',
@@ -577,6 +545,11 @@ function buildMovieCardDetails(listType, id, item) {
     infoStack.appendChild(createEl('div', 'meta', { text: metaText }));
   }
 
+  const extendedMeta = buildMovieExtendedMeta(item);
+  if (extendedMeta) {
+    infoStack.appendChild(extendedMeta);
+  }
+
   const seriesLine = buildSeriesLine(item);
   if (seriesLine) {
     infoStack.appendChild(seriesLine);
@@ -615,6 +588,15 @@ function buildMovieMetaText(item) {
   if (item.runtime) metaParts.push(item.runtime);
   if (item.imdbRating) metaParts.push(`IMDb ${item.imdbRating}`);
   return metaParts.join(' • ');
+}
+
+function buildMovieExtendedMeta(item) {
+  const parts = [];
+  if (item.originalLanguage) parts.push(`Original Language: ${item.originalLanguage}`);
+  if (item.budget) parts.push(`Budget: ${item.budget}`);
+  if (item.revenue) parts.push(`Revenue: ${item.revenue}`);
+  if (!parts.length) return null;
+  return createEl('div', 'movie-card-extra-meta', { text: parts.join(' • ') });
 }
 
 function buildSeriesLine(item, className = 'series-line') {
@@ -856,13 +838,14 @@ async function addItemFromForm(listType, form) {
   try {
     let metadata = form.__selectedMetadata || null;
     const selectedImdbId = form.dataset.selectedImdbId || '';
+    const selectedTmdbId = form.dataset.selectedTmdbId || '';
     const supportsMetadata = ['movies', 'tvShows', 'anime'].includes(listType);
     const hasMetadataProvider = Boolean(TMDB_API_KEY);
     if (!metadata && supportsMetadata) {
       if (!hasMetadataProvider) {
         maybeWarnAboutTmdbKey();
       } else {
-        metadata = await fetchTmdbMetadata(listType, { title, year, imdbId: selectedImdbId });
+        metadata = await fetchTmdbMetadata(listType, { title, year, imdbId: selectedImdbId, tmdbId: selectedTmdbId });
       }
     }
 
@@ -932,6 +915,7 @@ async function addItemFromForm(listType, form) {
     form.reset();
     form.__selectedMetadata = null;
     delete form.dataset.selectedImdbId;
+    delete form.dataset.selectedTmdbId;
     hideTitleSuggestions(form);
   } catch (err) {
     console.error('Unable to add item', err);
@@ -1111,6 +1095,23 @@ function buildActorPreview(value, limit = 5) {
   return `${preview.join(', ')}${truncated ? '…' : ''}`;
 }
 
+function formatCurrencyShort(value) {
+  const amount = Number(value);
+  if (!Number.isFinite(amount) || amount <= 0) return '';
+  if (amount >= 1_000_000_000) return `$${(amount / 1_000_000_000).toFixed(1).replace(/\.0$/, '')}B`;
+  if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(1).replace(/\.0$/, '')}M`;
+  if (amount >= 1_000) return `$${(amount / 1_000).toFixed(1).replace(/\.0$/, '')}K`;
+  return `$${amount.toLocaleString()}`;
+}
+
+function resolveLanguageName(isoCode, spokenLanguages) {
+  if (!isoCode) return '';
+  const bucket = Array.isArray(spokenLanguages) ? spokenLanguages : [];
+  const match = bucket.find(entry => entry && entry.iso_639_1 === isoCode);
+  const name = match?.english_name || match?.name;
+  return name || isoCode.toUpperCase();
+}
+
 function hasMeaningfulValue(value) {
   if (value === null || value === undefined) return false;
   if (typeof value === 'string') return value.trim().length > 0;
@@ -1171,6 +1172,18 @@ function deriveMetadataAssignments(metadata, existing = {}, options = {}) {
   if (actors.length) {
     setField('actors', actors);
   }
+
+  const originalLanguage = metadata.OriginalLanguage && metadata.OriginalLanguage !== 'N/A' ? metadata.OriginalLanguage : '';
+  setField('originalLanguage', originalLanguage);
+
+  const budgetValue = metadata.Budget && metadata.Budget !== 'N/A' ? metadata.Budget : '';
+  setField('budget', budgetValue);
+
+  const revenueValue = metadata.Revenue && metadata.Revenue !== 'N/A' ? metadata.Revenue : '';
+  setField('revenue', revenueValue);
+
+  const tmdbIdValue = metadata.TmdbID && metadata.TmdbID !== 'N/A' ? metadata.TmdbID : (metadata.TmdbId || '');
+  setField('tmdbId', tmdbIdValue);
 
   const effectiveTitle = (metadata.Title && metadata.Title !== 'N/A') ? metadata.Title : fallbackTitle;
   const effectiveYear = apiYear || fallbackYear;
@@ -1303,6 +1316,7 @@ function refreshMetadataForItem(listType, itemId, item, missingFields = []) {
     title: item.title || '',
     year: item.year || '',
     imdbId: item.imdbId || item.imdbID || '',
+    tmdbId: item.tmdbId || item.tmdbID || '',
   };
 
   fetchTmdbMetadata(listType, lookup).then(metadata => {
@@ -1533,6 +1547,11 @@ function setupFormAutocomplete(form, listType) {
       } else {
         delete form.dataset.selectedImdbId;
       }
+      if (suggestion.tmdbId) {
+        form.dataset.selectedTmdbId = suggestion.tmdbId;
+      } else {
+        delete form.dataset.selectedTmdbId;
+      }
       if (TMDB_API_KEY && suggestion.tmdbId) {
         try {
           const detail = await fetchTmdbMetadata(listType, {
@@ -1565,6 +1584,7 @@ function setupFormAutocomplete(form, listType) {
     const query = titleInput.value.trim();
     form.__selectedMetadata = null;
     delete form.dataset.selectedImdbId;
+    delete form.dataset.selectedTmdbId;
     if (query.length < 3) {
       lastFetchToken++;
       hideTitleSuggestions(form);
@@ -1674,6 +1694,10 @@ function mapTmdbDetailToMetadata(detail, mediaType) {
   const cast = Array.isArray(detail.credits?.cast) ? detail.credits.cast.slice(0, 12).map(actor => actor && actor.name).filter(Boolean) : [];
   const imdbId = detail.imdb_id || detail.external_ids?.imdb_id || '';
   const rating = typeof detail.vote_average === 'number' && detail.vote_average > 0 ? detail.vote_average.toFixed(1) : '';
+  const budget = formatCurrencyShort(detail.budget);
+  const revenue = formatCurrencyShort(detail.revenue);
+  const originalLanguage = resolveLanguageName(detail.original_language, detail.spoken_languages);
+  const tmdbId = detail.id || '';
 
   return {
     Title: detail.title || detail.name || '',
@@ -1685,7 +1709,11 @@ function mapTmdbDetailToMetadata(detail, mediaType) {
     imdbID: imdbId,
     imdbRating: rating,
     Actors: cast.join(', '),
-    Type: mediaType === 'movie' ? 'movie' : 'series'
+    Type: mediaType === 'movie' ? 'movie' : 'series',
+    Budget: budget,
+    Revenue: revenue,
+    OriginalLanguage: originalLanguage,
+    TmdbID: tmdbId,
   };
 }
 
