@@ -66,13 +66,8 @@ const firebaseConfig = {
   measurementId: 'G-YXJ2E2XG42',
 };
 
-// Optional: OMDb API key for metadata lookups. Get one at https://www.omdbapi.com/apikey.aspx
-const OMDB_API_KEY = '37fad759';
-const OMDB_API_URL = 'https://www.omdbapi.com/';
-
-// Optional: TMDb API for franchise/collection info (recommended for sequels/prequels)
-// Create a key at https://www.themoviedb.org/settings/api
-// Leave blank to disable TMDb features.
+// TMDb API powers metadata, autocomplete, and franchise info (recommended)
+// Create a key at https://www.themoviedb.org/settings/api and paste it here.
 const TMDB_API_KEY = '46dcf1eaa2ce4284037a00fdefca9bb8';
 
 // -----------------------
@@ -80,7 +75,7 @@ const TMDB_API_KEY = '46dcf1eaa2ce4284037a00fdefca9bb8';
 let appInitialized = false;
 let currentUser = null;
 const listeners = {};
-let omdbWarningShown = false;
+let tmdbWarningShown = false;
 let spinTimeouts = [];
 const actorFilters = { movies: '', tvShows: '', anime: '' };
 const expandedCards = { movies: new Set() };
@@ -88,11 +83,6 @@ const sortModes = { movies: 'title', tvShows: 'title', anime: 'title', books: 't
 const listCaches = {};
 const metadataRefreshInflight = new Set();
 const AUTOCOMPLETE_LISTS = new Set(['movies', 'tvShows', 'anime']);
-const OMDB_TYPE_MAP = {
-  movies: 'movie',
-  tvShows: 'series',
-  anime: 'series',
-};
 const suggestionForms = new Set();
 let globalSuggestionClickBound = false;
 
@@ -886,14 +876,13 @@ async function addItemFromForm(listType, form) {
     let metadata = form.__selectedMetadata || null;
     const selectedImdbId = form.dataset.selectedImdbId || '';
     const supportsMetadata = ['movies', 'tvShows', 'anime'].includes(listType);
-    const hasMetadataProvider = Boolean(OMDB_API_KEY || TMDB_API_KEY);
-    if (!metadata && supportsMetadata && hasMetadataProvider) {
-      if (!OMDB_API_KEY) {
-        maybeWarnAboutOmdbKey();
+    const hasMetadataProvider = Boolean(TMDB_API_KEY);
+    if (!metadata && supportsMetadata) {
+      if (!hasMetadataProvider) {
+        maybeWarnAboutTmdbKey();
+      } else {
+        metadata = await fetchTmdbMetadata(listType, { title, year, imdbId: selectedImdbId });
       }
-      metadata = await fetchOmdbMetadata(listType, { title, year, imdbId: selectedImdbId });
-    } else if (!metadata && supportsMetadata && !hasMetadataProvider) {
-      maybeWarnAboutOmdbKey();
     }
 
     const item = {
@@ -1317,8 +1306,8 @@ function needsMetadataRefresh(listType, item) {
 }
 
 function refreshMetadataForItem(listType, itemId, item, missingFields = []) {
-  if (!OMDB_API_KEY && !TMDB_API_KEY) {
-    maybeWarnAboutOmdbKey();
+  if (!TMDB_API_KEY) {
+    maybeWarnAboutTmdbKey();
     return;
   }
   const key = `${listType}:${itemId}`;
@@ -1335,7 +1324,7 @@ function refreshMetadataForItem(listType, itemId, item, missingFields = []) {
     imdbId: item.imdbId || item.imdbID || '',
   };
 
-  fetchOmdbMetadata(listType, lookup).then(metadata => {
+  fetchTmdbMetadata(listType, lookup).then(metadata => {
     if (!metadata) return;
     const updates = deriveMetadataAssignments(metadata, item, {
       overwrite: false,
@@ -1355,7 +1344,7 @@ function refreshMetadataForItem(listType, itemId, item, missingFields = []) {
 function maybeRefreshMetadata(listType, data) {
   if (!currentUser) return;
   if (!['movies', 'tvShows', 'anime'].includes(listType)) return;
-  if (!OMDB_API_KEY && !TMDB_API_KEY) {
+  if (!TMDB_API_KEY) {
     return;
   }
 
@@ -1418,10 +1407,10 @@ function setButtonBusy(button, isBusy) {
   }
 }
 
-function maybeWarnAboutOmdbKey() {
-  if (omdbWarningShown) return;
-  omdbWarningShown = true;
-  const message = 'OMDb API key missing. Metadata lookups are disabled. Set OMDB_API_KEY in app.js to enable them.';
+function maybeWarnAboutTmdbKey() {
+  if (tmdbWarningShown) return;
+  tmdbWarningShown = true;
+  const message = 'TMDb API key missing. Metadata lookups, autocomplete, and collection helpers are disabled. Set TMDB_API_KEY in app.js to re-enable them.';
   console.warn(message);
   alert(message);
 }
@@ -1464,16 +1453,9 @@ function renderTitleSuggestions(container, suggestions, onSelect) {
 
   const provider = suggestions[0] && suggestions[0].source;
   if (provider === 'tmdb') {
-    const reason = suggestions[0].sourceReason;
     const note = document.createElement('div');
     note.className = 'suggestions-note';
-    if (reason === 'omdb_limit') {
-      note.textContent = 'OMDb limit reached. Showing TMDb suggestions instead.';
-    } else if (reason === 'no_omdb_key') {
-      note.textContent = 'Suggestions powered by TMDb (OMDb key unavailable).';
-    } else {
-      note.textContent = 'Suggestions powered by TMDb.';
-    }
+    note.textContent = 'Suggestions powered by TMDb.';
     container.appendChild(note);
   }
 
@@ -1494,61 +1476,8 @@ function renderTitleSuggestions(container, suggestions, onSelect) {
   });
 }
 
-async function fetchOmdbSuggestions(listType, query) {
-  const type = OMDB_TYPE_MAP[listType];
-  let shouldFallbackToTmdb = false;
-  let fallbackReason = 'tmdb_default';
-  if (!OMDB_API_KEY) {
-    shouldFallbackToTmdb = true;
-    fallbackReason = 'no_omdb_key';
-  } else {
-    const params = new URLSearchParams({ apikey: OMDB_API_KEY, s: query });
-    if (type) params.set('type', type);
-    try {
-      const resp = await fetch(`${OMDB_API_URL}?${params.toString()}`);
-      if (resp.ok) {
-        const json = await resp.json();
-        if (json && json.Response === 'True' && Array.isArray(json.Search)) {
-          return json.Search.slice(0, 8).map(entry => ({
-            title: entry.Title,
-            year: entry.Year,
-            imdbID: entry.imdbID,
-            type: entry.Type,
-            source: 'omdb',
-          }));
-        }
-        shouldFallbackToTmdb = true;
-        if (json && typeof json.Error === 'string') {
-          const lowerError = json.Error.toLowerCase();
-          if (lowerError.includes('limit')) {
-            console.info('OMDb daily limit reached, falling back to TMDb suggestions.');
-            fallbackReason = 'omdb_limit';
-          } else {
-            fallbackReason = 'omdb_empty';
-          }
-        } else {
-          fallbackReason = 'omdb_empty';
-        }
-      } else {
-        shouldFallbackToTmdb = true;
-        fallbackReason = 'omdb_error';
-      }
-    } catch (err) {
-      console.warn('OMDb suggestion lookup failed', err);
-      shouldFallbackToTmdb = true;
-      fallbackReason = 'omdb_error';
-    }
-  }
-
-  if (!shouldFallbackToTmdb || !TMDB_API_KEY) {
-    return [];
-  }
-  return fetchTmdbSuggestions(listType, query, { reason: fallbackReason });
-}
-
-async function fetchTmdbSuggestions(listType, query, options = {}) {
+async function fetchTmdbSuggestions(listType, query) {
   if (!TMDB_API_KEY) return [];
-  const { reason = 'tmdb_default' } = options;
   const mediaType = listType === 'movies' ? 'movie' : 'tv';
   const params = new URLSearchParams({
     api_key: TMDB_API_KEY,
@@ -1566,8 +1495,8 @@ async function fetchTmdbSuggestions(listType, query, options = {}) {
       year: extractPrimaryYear(entry.release_date || entry.first_air_date || ''),
       imdbID: '',
       type: mediaType,
+      tmdbId: entry.id,
       source: 'tmdb',
-      sourceReason: reason,
     })).filter(suggestion => suggestion.title);
   } catch (err) {
     console.warn('TMDb suggestion lookup failed', err);
@@ -1587,13 +1516,10 @@ function setupFormAutocomplete(form, listType) {
     return;
   }
 
-  const hasSuggestionProvider = Boolean(OMDB_API_KEY || TMDB_API_KEY);
+  const hasSuggestionProvider = Boolean(TMDB_API_KEY);
   if (!hasSuggestionProvider) {
-    maybeWarnAboutOmdbKey();
+    maybeWarnAboutTmdbKey();
     return;
-  }
-  if (!OMDB_API_KEY) {
-    maybeWarnAboutOmdbKey();
   }
 
   suggestionForms.add(form);
@@ -1612,7 +1538,7 @@ function setupFormAutocomplete(form, listType) {
 
   const performSearch = debounce(async (query) => {
     const currentToken = ++lastFetchToken;
-    const results = await fetchOmdbSuggestions(listType, query);
+    const results = await fetchTmdbSuggestions(listType, query);
     if (currentToken !== lastFetchToken) return;
     renderTitleSuggestions(suggestionsEl, results, async (suggestion) => {
       titleInput.value = suggestion.title || '';
@@ -1623,8 +1549,17 @@ function setupFormAutocomplete(form, listType) {
       form.__selectedMetadata = null;
       if (suggestion.imdbID) {
         form.dataset.selectedImdbId = suggestion.imdbID;
+      } else {
+        delete form.dataset.selectedImdbId;
+      }
+      if (TMDB_API_KEY && suggestion.tmdbId) {
         try {
-          const detail = await fetchOmdbMetadata(listType, { title: suggestion.title, year: suggestionYear, imdbId: suggestion.imdbID });
+          const detail = await fetchTmdbMetadata(listType, {
+            title: suggestion.title,
+            year: suggestionYear,
+            imdbId: suggestion.imdbID,
+            tmdbId: suggestion.tmdbId,
+          });
           if (detail) {
             form.__selectedMetadata = detail;
             if (yearInput) {
@@ -1638,8 +1573,6 @@ function setupFormAutocomplete(form, listType) {
         } catch (err) {
           console.warn('Unable to prefill metadata from suggestion', err);
         }
-      } else {
-        delete form.dataset.selectedImdbId;
       }
       hideTitleSuggestions(form);
       titleInput.focus();
@@ -1676,86 +1609,18 @@ function setupFormAutocomplete(form, listType) {
   });
 }
 
-async function fetchOmdbMetadata(listType, { title, year, imdbId }) {
-  const attemptTmdbFallback = async () => {
-    if (!TMDB_API_KEY) return null;
-    return fetchTmdbMetadata(listType, { title, year, imdbId });
-  };
-
-  if (!OMDB_API_KEY) {
-    return attemptTmdbFallback();
-  }
-
-  const type = OMDB_TYPE_MAP[listType];
-
-  if (imdbId) {
-    try {
-      const detailParams = new URLSearchParams({ apikey: OMDB_API_KEY, i: imdbId, plot: 'short' });
-      const detailResp = await fetch(`${OMDB_API_URL}?${detailParams.toString()}`);
-      if (detailResp.ok) {
-        const detailJson = await detailResp.json();
-        if (detailJson && detailJson.Response === 'True') {
-          return detailJson;
-        }
-      }
-    } catch (err) {
-      console.warn('OMDb lookup by ID failed', err);
-    }
-  }
-
-  if (!title) return null;
-  const params = new URLSearchParams({ apikey: OMDB_API_KEY, t: title });
-  if (type) params.set('type', type);
-  if (year) params.set('y', year);
-
-  try {
-    const directResp = await fetch(`${OMDB_API_URL}?${params.toString()}`);
-    if (directResp.ok) {
-      const directJson = await directResp.json();
-      if (directJson && directJson.Response === 'True') {
-        return directJson;
-      }
-    }
-  } catch (err) {
-    console.warn('OMDb direct lookup failed', err);
-  }
-
-  // Fallback to search endpoint
-  try {
-    const searchParams = new URLSearchParams({ apikey: OMDB_API_KEY, s: title });
-    if (type) searchParams.set('type', type);
-    const searchResp = await fetch(`${OMDB_API_URL}?${searchParams.toString()}`);
-    if (!searchResp.ok) return null;
-    const searchJson = await searchResp.json();
-    if (!searchJson || searchJson.Response !== 'True' || !Array.isArray(searchJson.Search)) return null;
-
-    const normalizedYear = year;
-    const match = searchJson.Search.find(entry => {
-      if (!normalizedYear) return true;
-      return entry.Year && entry.Year.includes(normalizedYear);
-    }) || searchJson.Search[0];
-    if (!match || !match.imdbID) return null;
-
-    const detailParams = new URLSearchParams({ apikey: OMDB_API_KEY, i: match.imdbID, plot: 'short' });
-    const detailResp = await fetch(`${OMDB_API_URL}?${detailParams.toString()}`);
-    if (!detailResp.ok) return null;
-    const detailJson = await detailResp.json();
-    if (detailJson && detailJson.Response === 'True') {
-      return detailJson;
-    }
-  } catch (err) {
-    console.warn('OMDb search lookup failed', err);
-  }
-
-  return attemptTmdbFallback();
-}
-
-async function fetchTmdbMetadata(listType, { title, year, imdbId }) {
+async function fetchTmdbMetadata(listType, { title, year, imdbId, tmdbId }) {
   if (!TMDB_API_KEY) return null;
   const mediaType = listType === 'movies' ? 'movie' : 'tv';
-  const pick = await findTmdbCandidate({ mediaType, title, year, imdbId });
-  if (!pick) return null;
-  const detail = await fetchTmdbDetail(mediaType, pick.id);
+  let detail = null;
+  if (tmdbId) {
+    detail = await fetchTmdbDetail(mediaType, tmdbId);
+  }
+  if (!detail) {
+    const pick = await findTmdbCandidate({ mediaType, title, year, imdbId });
+    if (!pick) return null;
+    detail = await fetchTmdbDetail(mediaType, pick.id);
+  }
   if (!detail) return null;
   return mapTmdbDetailToMetadata(detail, mediaType);
 }
@@ -2126,66 +1991,7 @@ function renderWheelResult(item, listType) {
   wheelResultEl.appendChild(card);
 }
 
-// --- Sequel / Prequel Lookup Logic ---
-function deriveFranchiseBase(title) {
-  if (!title) return '';
-  let base = String(title).trim();
-  // Remove common sequel indicators at end
-  base = base.replace(/\b(part\s+[ivx0-9]+)$/i, '').trim();
-  base = base.replace(/\bchapter\s+[0-9]+$/i, '').trim();
-  base = base.replace(/\bvolume\s+[0-9]+$/i, '').trim();
-  // Remove trailing Roman numerals or digits standing alone
-  base = base.replace(/\b([ivx]+|\d+)$/i, '').trim();
-  // Remove trailing colon subtitle for initial broad search attempt
-  base = base.replace(/:\s*[^:]+$/,'').trim();
-  return base;
-}
-
-function extractOrderToken(title) {
-  if (!title) return null;
-  const partMatch = title.match(/part\s+([ivx0-9]+)/i);
-  if (partMatch) return partMatch[1];
-  const romanMatch = title.match(/\b(ii|iii|iv|vi|vii|viii|ix|x)\b/i);
-  if (romanMatch) return romanMatch[1];
-  const digitMatch = title.match(/\b(\d{1,2})\b/);
-  if (digitMatch) return digitMatch[1];
-  return null;
-}
-
-async function omdbSearchFranchise(base) {
-  if (!OMDB_API_KEY) {
-    alert('OMDb API key missing; cannot lookup related titles.');
-    return [];
-  }
-  const results = [];
-  const encoded = encodeURIComponent(base);
-  for (let page = 1; page <= 3; page++) {
-    const url = `https://www.omdbapi.com/?apikey=${OMDB_API_KEY}&type=movie&s=${encoded}&page=${page}`;
-    try {
-      const resp = await fetch(url);
-      const data = await resp.json();
-      if (data && Array.isArray(data.Search)) {
-        results.push(...data.Search);
-        if (data.Search.length < 10) break; // last page
-      } else {
-        break;
-      }
-    } catch (e) {
-      console.warn('OMDb search failed', e);
-      break;
-    }
-  }
-  return results;
-}
-
-function scoreFranchiseMatch(base, candidateTitle) {
-  const ct = candidateTitle.toLowerCase();
-  const b = base.toLowerCase();
-  if (ct === b) return 100;
-  if (ct.startsWith(b)) return 90;
-  if (ct.includes(b)) return 70;
-  return 0;
-}
+// --- Sequel / Prequel Lookup Logic (TMDb only) ---
 
 function buildRelatedModal(currentItem, related) {
   const modalRoot = document.getElementById('modal-root');
@@ -2315,46 +2121,7 @@ async function lookupRelatedTitles(item) {
     buildRelatedModal(item, tmdbList);
     return;
   }
-  // 2) Fallback: OMDb heuristic search
-  const base = deriveFranchiseBase(item.title);
-  try { console.log('[Franchise] base derived', { original: item.title, base }); } catch(_) {}
-  if (!base || base.length < 3) {
-    alert('Not enough info to search for related titles.');
-    return;
-  }
-  const raw = await omdbSearchFranchise(base);
-  const filtered = raw.filter(r => scoreFranchiseMatch(base, r.Title) >= 70);
-  // Remove exact duplicate of current item (match by imdbID or sanitized title+year)
-  const currentKey = (item.imdbId || item.imdbID || '') + '|' + (item.year || '') + '|' + (item.title || '').toLowerCase();
-  const unique = [];
-  const seen = new Set();
-  filtered.forEach(r => {
-    const key = (r.imdbID || '') + '|' + (r.Year || '') + '|' + (r.Title || '').toLowerCase();
-    if (key === currentKey) return;
-    if (seen.has(key)) return;
-    seen.add(key);
-    unique.push(r);
-  });
-  // Basic ordering: detect order tokens, then by year
-  unique.sort((a, b) => {
-    const tokA = extractOrderToken(a.Title);
-    const tokB = extractOrderToken(b.Title);
-    if (tokA && tokB && tokA !== tokB) {
-      // attempt numeric comparison if possible
-      const numA = parseInt(tokA, 10);
-      const numB = parseInt(tokB, 10);
-      if (!isNaN(numA) && !isNaN(numB) && numA !== numB) return numA - numB;
-    }
-    const yearA = parseInt(a.Year, 10) || 9999;
-    const yearB = parseInt(b.Year, 10) || 9999;
-    if (yearA !== yearB) return yearA - yearB;
-    const tA = a.Title.toLowerCase();
-    const tB = b.Title.toLowerCase();
-    if (tA < tB) return -1;
-    if (tA > tB) return 1;
-    return 0;
-  });
-  buildRelatedModal(item, unique);
+  alert('No related titles found on TMDb.');
 }
 
 function resolveSeriesRedirect(listType, item, rawData) {
