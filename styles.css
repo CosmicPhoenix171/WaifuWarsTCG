@@ -103,6 +103,7 @@ h1{margin:0 0 .35rem 0;font-size:1.8rem;letter-spacing:.4px}
 .suggestions button{display:flex;width:100%;gap:.5rem;align-items:center;justify-content:space-between;background:transparent;border:0;color:inherit;padding:.6rem .7rem;font-size:.92rem;cursor:pointer;text-align:left}
 .suggestions button:hover,.suggestions button:focus{background:rgba(96,165,250,0.12);outline:none}
 .suggestions button .year{color:var(--text-500);font-size:.8rem}
+.suggestions .suggestions-note{padding:.55rem .7rem;font-size:.78rem;color:var(--text-500);border-bottom:1px solid rgba(255,255,255,0.08)}
 .suggestions .empty{padding:.6rem .7rem;color:var(--text-500);font-size:.85rem}
 
 .list{display:grid;gap:.8rem}

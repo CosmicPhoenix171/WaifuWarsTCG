@@ -1462,6 +1462,21 @@ function renderTitleSuggestions(container, suggestions, onSelect) {
     return;
   }
 
+  const provider = suggestions[0] && suggestions[0].source;
+  if (provider === 'tmdb') {
+    const reason = suggestions[0].sourceReason;
+    const note = document.createElement('div');
+    note.className = 'suggestions-note';
+    if (reason === 'omdb_limit') {
+      note.textContent = 'OMDb limit reached. Showing TMDb suggestions instead.';
+    } else if (reason === 'no_omdb_key') {
+      note.textContent = 'Suggestions powered by TMDb (OMDb key unavailable).';
+    } else {
+      note.textContent = 'Suggestions powered by TMDb.';
+    }
+    container.appendChild(note);
+  }
+
   suggestions.forEach(suggestion => {
     const button = document.createElement('button');
     button.type = 'button';
@@ -1480,23 +1495,82 @@ function renderTitleSuggestions(container, suggestions, onSelect) {
 }
 
 async function fetchOmdbSuggestions(listType, query) {
-  if (!OMDB_API_KEY) return [];
   const type = OMDB_TYPE_MAP[listType];
-  const params = new URLSearchParams({ apikey: OMDB_API_KEY, s: query });
-  if (type) params.set('type', type);
+  let shouldFallbackToTmdb = false;
+  let fallbackReason = 'tmdb_default';
+  if (!OMDB_API_KEY) {
+    shouldFallbackToTmdb = true;
+    fallbackReason = 'no_omdb_key';
+  } else {
+    const params = new URLSearchParams({ apikey: OMDB_API_KEY, s: query });
+    if (type) params.set('type', type);
+    try {
+      const resp = await fetch(`${OMDB_API_URL}?${params.toString()}`);
+      if (resp.ok) {
+        const json = await resp.json();
+        if (json && json.Response === 'True' && Array.isArray(json.Search)) {
+          return json.Search.slice(0, 8).map(entry => ({
+            title: entry.Title,
+            year: entry.Year,
+            imdbID: entry.imdbID,
+            type: entry.Type,
+            source: 'omdb',
+          }));
+        }
+        shouldFallbackToTmdb = true;
+        if (json && typeof json.Error === 'string') {
+          const lowerError = json.Error.toLowerCase();
+          if (lowerError.includes('limit')) {
+            console.info('OMDb daily limit reached, falling back to TMDb suggestions.');
+            fallbackReason = 'omdb_limit';
+          } else {
+            fallbackReason = 'omdb_empty';
+          }
+        } else {
+          fallbackReason = 'omdb_empty';
+        }
+      } else {
+        shouldFallbackToTmdb = true;
+        fallbackReason = 'omdb_error';
+      }
+    } catch (err) {
+      console.warn('OMDb suggestion lookup failed', err);
+      shouldFallbackToTmdb = true;
+      fallbackReason = 'omdb_error';
+    }
+  }
+
+  if (!shouldFallbackToTmdb || !TMDB_API_KEY) {
+    return [];
+  }
+  return fetchTmdbSuggestions(listType, query, { reason: fallbackReason });
+}
+
+async function fetchTmdbSuggestions(listType, query, options = {}) {
+  if (!TMDB_API_KEY) return [];
+  const { reason = 'tmdb_default' } = options;
+  const mediaType = listType === 'movies' ? 'movie' : 'tv';
+  const params = new URLSearchParams({
+    api_key: TMDB_API_KEY,
+    query,
+    include_adult: 'false',
+  });
+  params.set('language', 'en-US');
   try {
-    const resp = await fetch(`${OMDB_API_URL}?${params.toString()}`);
+    const resp = await fetch(`https://api.themoviedb.org/3/search/${mediaType}?${params.toString()}`);
     if (!resp.ok) return [];
     const json = await resp.json();
-    if (!json || json.Response !== 'True' || !Array.isArray(json.Search)) return [];
-    return json.Search.slice(0, 8).map(entry => ({
-      title: entry.Title,
-      year: entry.Year,
-      imdbID: entry.imdbID,
-      type: entry.Type,
-    }));
+    if (!json || !Array.isArray(json.results) || !json.results.length) return [];
+    return json.results.slice(0, 8).map(entry => ({
+      title: entry.title || entry.name || '',
+      year: extractPrimaryYear(entry.release_date || entry.first_air_date || ''),
+      imdbID: '',
+      type: mediaType,
+      source: 'tmdb',
+      sourceReason: reason,
+    })).filter(suggestion => suggestion.title);
   } catch (err) {
-    console.warn('OMDb suggestion lookup failed', err);
+    console.warn('TMDb suggestion lookup failed', err);
     return [];
   }
 }
@@ -1513,9 +1587,13 @@ function setupFormAutocomplete(form, listType) {
     return;
   }
 
-  if (!OMDB_API_KEY) {
+  const hasSuggestionProvider = Boolean(OMDB_API_KEY || TMDB_API_KEY);
+  if (!hasSuggestionProvider) {
     maybeWarnAboutOmdbKey();
     return;
+  }
+  if (!OMDB_API_KEY) {
+    maybeWarnAboutOmdbKey();
   }
 
   suggestionForms.add(form);
