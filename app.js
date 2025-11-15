@@ -1564,7 +1564,15 @@ function setupFormAutocomplete(form, listType) {
 }
 
 async function fetchOmdbMetadata(listType, { title, year, imdbId }) {
-  if (!OMDB_API_KEY) return null;
+  const attemptTmdbFallback = async () => {
+    if (!TMDB_API_KEY) return null;
+    return fetchTmdbMetadata(listType, { title, year, imdbId });
+  };
+
+  if (!OMDB_API_KEY) {
+    return attemptTmdbFallback();
+  }
+
   const type = OMDB_TYPE_MAP[listType];
 
   if (imdbId) {
@@ -1626,7 +1634,100 @@ async function fetchOmdbMetadata(listType, { title, year, imdbId }) {
     console.warn('OMDb search lookup failed', err);
   }
 
-  return null;
+  return attemptTmdbFallback();
+}
+
+async function fetchTmdbMetadata(listType, { title, year, imdbId }) {
+  if (!TMDB_API_KEY) return null;
+  const mediaType = listType === 'movies' ? 'movie' : 'tv';
+  const pick = await findTmdbCandidate({ mediaType, title, year, imdbId });
+  if (!pick) return null;
+  const detail = await fetchTmdbDetail(mediaType, pick.id);
+  if (!detail) return null;
+  return mapTmdbDetailToMetadata(detail, mediaType);
+}
+
+async function findTmdbCandidate({ mediaType, title, year, imdbId }) {
+  if (imdbId) {
+    try {
+      const findResp = await fetch(`https://api.themoviedb.org/3/find/${imdbId}?api_key=${TMDB_API_KEY}&external_source=imdb_id`);
+      if (findResp.ok) {
+        const payload = await findResp.json();
+        const bucket = mediaType === 'movie' ? payload.movie_results : payload.tv_results;
+        if (Array.isArray(bucket) && bucket.length) {
+          return bucket[0];
+        }
+      }
+    } catch (err) {
+      console.warn('TMDb lookup by IMDb failed', err);
+    }
+  }
+
+  if (!title) return null;
+  try {
+    const searchParams = new URLSearchParams({ api_key: TMDB_API_KEY, query: title, include_adult: 'false' });
+    if (year) {
+      const yearKey = mediaType === 'movie' ? 'year' : 'first_air_date_year';
+      searchParams.set(yearKey, year);
+    }
+    const searchResp = await fetch(`https://api.themoviedb.org/3/search/${mediaType}?${searchParams.toString()}`);
+    if (!searchResp.ok) return null;
+    const searchJson = await searchResp.json();
+    if (!searchJson || !Array.isArray(searchJson.results) || !searchJson.results.length) return null;
+
+    const normalizedYear = year ? String(year) : '';
+    const match = normalizedYear
+      ? searchJson.results.find(entry => {
+          const dateField = mediaType === 'movie' ? entry.release_date : entry.first_air_date;
+          return dateField && dateField.startsWith(normalizedYear);
+        }) || searchJson.results[0]
+      : searchJson.results[0];
+    return match || null;
+  } catch (err) {
+    console.warn('TMDb search failed', err);
+    return null;
+  }
+}
+
+async function fetchTmdbDetail(mediaType, id) {
+  try {
+    const detailResp = await fetch(`https://api.themoviedb.org/3/${mediaType}/${id}?api_key=${TMDB_API_KEY}&append_to_response=credits,external_ids`);
+    if (!detailResp.ok) return null;
+    return await detailResp.json();
+  } catch (err) {
+    console.warn('TMDb detail fetch failed', err);
+    return null;
+  }
+}
+
+function mapTmdbDetailToMetadata(detail, mediaType) {
+  if (!detail) return null;
+  const poster = detail.poster_path ? `https://image.tmdb.org/t/p/w500${detail.poster_path}` : '';
+  const releaseDate = mediaType === 'movie' ? detail.release_date : detail.first_air_date;
+  const runtimeMinutes = mediaType === 'movie'
+    ? detail.runtime
+    : (Array.isArray(detail.episode_run_time) && detail.episode_run_time.length ? detail.episode_run_time[0] : null);
+  const crew = Array.isArray(detail.credits?.crew) ? detail.credits.crew : [];
+  const directorCrew = crew.find(member => member && member.job === 'Director');
+  const director = directorCrew?.name
+    || (Array.isArray(detail.created_by) ? detail.created_by.map(c => c && c.name).filter(Boolean).join(', ') : '')
+    || '';
+  const cast = Array.isArray(detail.credits?.cast) ? detail.credits.cast.slice(0, 12).map(actor => actor && actor.name).filter(Boolean) : [];
+  const imdbId = detail.imdb_id || detail.external_ids?.imdb_id || '';
+  const rating = typeof detail.vote_average === 'number' && detail.vote_average > 0 ? detail.vote_average.toFixed(1) : '';
+
+  return {
+    Title: detail.title || detail.name || '',
+    Year: releaseDate ? String(releaseDate).slice(0, 4) : '',
+    Director: director,
+    Runtime: runtimeMinutes ? `${runtimeMinutes} min` : '',
+    Poster: poster || 'N/A',
+    Plot: detail.overview || '',
+    imdbID: imdbId,
+    imdbRating: rating,
+    Actors: cast.join(', '),
+    Type: mediaType === 'movie' ? 'movie' : 'series'
+  };
 }
 
 // Create a new item
