@@ -37,6 +37,7 @@ const firebaseConfig = {
 // TMDb API powers metadata, autocomplete, and franchise info (recommended)
 // Create a key at https://www.themoviedb.org/settings/api and paste it here.
 const TMDB_API_KEY = '46dcf1eaa2ce4284037a00fdefca9bb8';
+const METADATA_SCHEMA_VERSION = 2;
 
 // -----------------------
 // App state
@@ -1128,7 +1129,7 @@ function deriveMetadataAssignments(metadata, existing = {}, options = {}) {
     alwaysAssign = [],
   } = options;
   const updates = {};
-  const forceKeys = new Set(Array.isArray(alwaysAssign) ? alwaysAssign : []);
+  const forceKeys = new Set(['metadataVersion', ...(Array.isArray(alwaysAssign) ? alwaysAssign : [])]);
 
   const setField = (key, value) => {
     if (value === undefined || value === null) return;
@@ -1191,6 +1192,8 @@ function deriveMetadataAssignments(metadata, existing = {}, options = {}) {
     const trailerUrl = buildTrailerUrl(effectiveTitle, effectiveYear);
     setField('trailerUrl', trailerUrl);
   }
+
+  setField('metadataVersion', METADATA_SCHEMA_VERSION);
 
   return updates;
 }
@@ -1296,6 +1299,7 @@ function getMissingMetadataFields(item) {
 function needsMetadataRefresh(listType, item) {
   if (!item || !item.title) return false;
   if (!['movies', 'tvShows', 'anime'].includes(listType)) return false;
+  if (item.metadataVersion !== METADATA_SCHEMA_VERSION) return true;
   return getMissingMetadataFields(item).length > 0;
 }
 
